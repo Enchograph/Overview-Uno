@@ -43,6 +43,7 @@
 - `HOME-620`
 - `HOME-630`
 - `LIST-700`
+- `LIST-710`
 
 ## 正在进行任务 ID
 
@@ -50,7 +51,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `LIST-710`
+- `LIST-720`
 
 ## 当前阻塞
 
@@ -58,6 +59,29 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，15/15 用例通过，0 failed
+- 已确认客户端列表页已新增排序与状态切换入口：
+  - `Presentation/Pages/ListPage.xaml`
+  - `Presentation/Pages/ListPage.xaml.cs`
+- 已确认客户端列表页状态 ViewModel 已接入：
+  - 排序依据切换
+  - 行点击完成状态切换
+  - 星标重要状态切换
+  - `Presentation/ViewModels/ListPageViewModel.cs`
+  - `Presentation/ViewModels/ListPageSortOptionViewModel.cs`
+  - `Presentation/ViewModels/ListPageItemEntryViewModel.cs`
+- 已确认客户端事项应用层已补齐重要状态切换入口：
+  - `Application/Items/IItemService.cs`
+  - `Application/Items/ItemService.cs`
+- 已确认客户端列表页当前已新增覆盖：
+  - 重要性、到期日期、今天执行者、字母顺序、创建日期五种排序依据
+  - 点击整行切换完成状态
+  - 点击星标切换重要状态
+  - 重要事项标签下取消重要后即时移出当前筛选结果
+- 已确认客户端新增列表页排序与状态切换测试：
+  - `tests/Overview.Client.Tests/ListPageServiceTests.cs`
+  - `tests/Overview.Client.Tests/ListPageViewModelTests.cs`
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，10/10 用例通过，0 failed
 - 已确认客户端列表页已从占位实现切换为真实列表筛选页：
   - `Presentation/Pages/ListPage.xaml`

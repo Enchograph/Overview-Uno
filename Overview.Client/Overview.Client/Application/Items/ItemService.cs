@@ -148,6 +148,58 @@ public sealed class ItemService : IItemService
         return updatedItem;
     }
 
+    public async Task<Item> SetImportantAsync(
+        Guid userId,
+        Guid itemId,
+        bool isImportant,
+        CancellationToken cancellationToken = default)
+    {
+        var existingItem = await itemRepository.GetAsync(userId, itemId, cancellationToken).ConfigureAwait(false)
+            ?? throw new InvalidOperationException($"Item {itemId} was not found.");
+
+        if (existingItem.DeletedAt is not null)
+        {
+            throw new InvalidOperationException("Deleted items cannot be updated.");
+        }
+
+        if (existingItem.IsImportant == isImportant)
+        {
+            return existingItem;
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        var updatedItem = new Item
+        {
+            Id = existingItem.Id,
+            UserId = existingItem.UserId,
+            Type = existingItem.Type,
+            Title = existingItem.Title,
+            Description = existingItem.Description,
+            Location = existingItem.Location,
+            Color = existingItem.Color,
+            IsImportant = isImportant,
+            IsCompleted = existingItem.IsCompleted,
+            ReminderConfig = existingItem.ReminderConfig,
+            RepeatRule = existingItem.RepeatRule,
+            TimeZoneId = existingItem.TimeZoneId,
+            CreatedAt = existingItem.CreatedAt,
+            UpdatedAt = now,
+            DeletedAt = existingItem.DeletedAt,
+            LastModifiedAt = now,
+            SourceDeviceId = await deviceIdStore.GetOrCreateAsync(cancellationToken).ConfigureAwait(false),
+            StartAt = existingItem.StartAt,
+            EndAt = existingItem.EndAt,
+            PlannedStartAt = existingItem.PlannedStartAt,
+            PlannedEndAt = existingItem.PlannedEndAt,
+            DeadlineAt = existingItem.DeadlineAt,
+            ExpectedDurationMinutes = existingItem.ExpectedDurationMinutes,
+            TargetDate = existingItem.TargetDate
+        };
+
+        await PersistItemAsync(updatedItem, SyncChangeType.Upsert, cancellationToken).ConfigureAwait(false);
+        return updatedItem;
+    }
+
     public async Task DeleteAsync(
         Guid userId,
         Guid itemId,

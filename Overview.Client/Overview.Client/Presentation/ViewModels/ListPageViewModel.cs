@@ -1,4 +1,5 @@
 using Overview.Client.Application.Auth;
+using Overview.Client.Application.Items;
 using Overview.Client.Application.Lists;
 using Overview.Client.Domain.Enums;
 
@@ -7,15 +8,19 @@ namespace Overview.Client.Presentation.ViewModels;
 public sealed class ListPageViewModel
 {
     private readonly IAuthenticationService authenticationService;
+    private readonly IItemService itemService;
     private readonly IListPageService listPageService;
 
     public ListPageViewModel(
         IAuthenticationService authenticationService,
+        IItemService itemService,
         IListPageService listPageService)
     {
         this.authenticationService = authenticationService;
+        this.itemService = itemService;
         this.listPageService = listPageService;
         Tabs = BuildTabs(ListPageTab.MyDay);
+        SortOptions = BuildSortOptions(ListSortBy.Importance);
     }
 
     public IReadOnlyList<ListPageTabEntryViewModel> Tabs { get; private set; }
@@ -24,11 +29,15 @@ public sealed class ListPageViewModel
 
     public IReadOnlyList<ListPageItemEntryViewModel> CompletedItems { get; private set; } = Array.Empty<ListPageItemEntryViewModel>();
 
+    public IReadOnlyList<ListPageSortOptionViewModel> SortOptions { get; private set; }
+
     public bool IsBusy { get; private set; }
 
     public bool IsAuthenticated => authenticationService.CurrentSession is not null;
 
     public ListPageTab CurrentTab { get; private set; } = ListPageTab.MyDay;
+
+    public ListSortBy CurrentSortBy { get; private set; } = ListSortBy.Importance;
 
     public string PageTitle { get; private set; } = "List";
 
@@ -76,9 +85,116 @@ public sealed class ListPageViewModel
         await LoadSnapshotAsync(
             new ListPageQuery
             {
-                Tab = CurrentTab
+                Tab = CurrentTab,
+                SortBy = CurrentSortBy
             },
             cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task SelectSortAsync(ListSortBy sortBy, CancellationToken cancellationToken = default)
+    {
+        if (IsBusy || sortBy == CurrentSortBy)
+        {
+            return;
+        }
+
+        var session = authenticationService.CurrentSession;
+        if (session is null)
+        {
+            CurrentSortBy = sortBy;
+            SortOptions = BuildSortOptions(sortBy);
+            StatusMessage = "Sign in to save and apply list sorting.";
+            return;
+        }
+
+        IsBusy = true;
+
+        try
+        {
+            await listPageService.SetSortByAsync(session.UserId, sortBy, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        await LoadSnapshotAsync(
+            new ListPageQuery
+            {
+                Tab = CurrentTab,
+                SortBy = sortBy
+            },
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task ToggleCompletionAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+
+        var session = authenticationService.CurrentSession;
+        if (session is null)
+        {
+            StatusMessage = "Sign in to update completion state.";
+            return;
+        }
+
+        var item = FindItem(itemId);
+        if (item is null)
+        {
+            StatusMessage = "Selected item is no longer available in this list.";
+            return;
+        }
+
+        IsBusy = true;
+
+        try
+        {
+            await itemService.SetCompletedAsync(session.UserId, itemId, !item.IsCompleted, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        await RefreshAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task ToggleImportanceAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+
+        var session = authenticationService.CurrentSession;
+        if (session is null)
+        {
+            StatusMessage = "Sign in to update important items.";
+            return;
+        }
+
+        var item = FindItem(itemId);
+        if (item is null)
+        {
+            StatusMessage = "Selected item is no longer available in this list.";
+            return;
+        }
+
+        IsBusy = true;
+
+        try
+        {
+            await itemService.SetImportantAsync(session.UserId, itemId, !item.IsImportant, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        await RefreshAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task LoadSnapshotAsync(
@@ -98,7 +214,9 @@ public sealed class ListPageViewModel
             if (session is null)
             {
                 CurrentTab = query?.Tab ?? CurrentTab;
+                CurrentSortBy = query?.SortBy ?? CurrentSortBy;
                 Tabs = BuildTabs(CurrentTab);
+                SortOptions = BuildSortOptions(CurrentSortBy);
                 ActiveItems = Array.Empty<ListPageItemEntryViewModel>();
                 CompletedItems = Array.Empty<ListPageItemEntryViewModel>();
                 PageTitle = GetTabTitle(CurrentTab);
@@ -117,7 +235,9 @@ public sealed class ListPageViewModel
                 cancellationToken).ConfigureAwait(false);
 
             CurrentTab = snapshot.Tab;
+            CurrentSortBy = snapshot.SortBy;
             Tabs = BuildTabs(snapshot.Tab);
+            SortOptions = BuildSortOptions(snapshot.SortBy);
             ActiveItems = snapshot.ActiveItems.Select(ToEntry).ToArray();
             CompletedItems = snapshot.CompletedItems.Select(ToEntry).ToArray();
             PageTitle = GetTabTitle(snapshot.Tab);
@@ -149,12 +269,21 @@ public sealed class ListPageViewModel
         return new ListPageItemEntryViewModel
         {
             ItemId = item.ItemId,
+            IsCompleted = item.IsCompleted,
+            IsImportant = item.IsImportant,
             Title = item.Title,
             Subtitle = BuildItemSubtitle(item),
             TypeBadge = GetTypeBadge(item.Type),
             ImportanceBadge = item.IsImportant ? "Important" : string.Empty,
-            CompletionBadge = item.IsCompleted ? "Completed" : "Open"
+            CompletionBadge = item.IsCompleted ? "Completed" : "Open",
+            CompletionGlyph = item.IsCompleted ? "●" : "○",
+            ImportanceGlyph = item.IsImportant ? "★" : "☆"
         };
+    }
+
+    private ListPageItemEntryViewModel? FindItem(Guid itemId)
+    {
+        return ActiveItems.Concat(CompletedItems).FirstOrDefault(item => item.ItemId == itemId);
     }
 
     private static string BuildItemSubtitle(ListPageItem item)
@@ -198,6 +327,25 @@ public sealed class ListPageViewModel
         }).ToArray();
     }
 
+    private static IReadOnlyList<ListPageSortOptionViewModel> BuildSortOptions(ListSortBy selectedSort)
+    {
+        var options = new[]
+        {
+            ListSortBy.Importance,
+            ListSortBy.DueDate,
+            ListSortBy.TodayExecutor,
+            ListSortBy.Alphabetical,
+            ListSortBy.CreatedAt
+        };
+
+        return options.Select(sortBy => new ListPageSortOptionViewModel
+        {
+            SortBy = sortBy,
+            Label = GetSortLabel(sortBy),
+            IsSelected = sortBy == selectedSort
+        }).ToArray();
+    }
+
     private static string GetTabTitle(ListPageTab tab)
     {
         return tab switch
@@ -237,6 +385,19 @@ public sealed class ListPageViewModel
             ListPageTab.Notes => "Create a note to keep lightweight reminders here.",
             ListPageTab.Important => "Mark an item as important to surface it in this tab.",
             _ => "No matching items."
+        };
+    }
+
+    private static string GetSortLabel(ListSortBy sortBy)
+    {
+        return sortBy switch
+        {
+            ListSortBy.Importance => "Importance",
+            ListSortBy.DueDate => "Due Date",
+            ListSortBy.TodayExecutor => "Today Executor",
+            ListSortBy.Alphabetical => "Alphabetical",
+            ListSortBy.CreatedAt => "Created Date",
+            _ => sortBy.ToString()
         };
     }
 

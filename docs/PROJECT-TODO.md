@@ -520,12 +520,15 @@
 - Title: 实现列表页排序、完成、重要切换
 - Phase: 阶段 7
 - Depends On: LIST-700
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 实现排序和状态切换
-- Implementation Notes: 对齐原始需求中的排序项
+- Implementation Notes: 已对齐原始需求中的五种排序项，并在列表页接入完成/重要切换入口
 - Done When: 排序与状态切换完成
-- Verification: 可定位排序逻辑和操作入口
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位排序逻辑和操作入口
 - Files Expected: 列表交互逻辑
 
 ### Task ID: LIST-720

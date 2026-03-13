@@ -261,6 +261,19 @@
 
 ### Round 29
 
+- 完成 `LIST-710`
+- 更新 `Presentation/Pages/ListPage.xaml` 与 `ListPage.xaml.cs`，接入排序入口、行点击完成切换和星标重要切换
+- 更新 `Presentation/ViewModels/ListPageViewModel.cs`
+- 新增 `Presentation/ViewModels/ListPageSortOptionViewModel.cs`
+- 更新 `Presentation/ViewModels/ListPageItemEntryViewModel.cs`
+- 在 `Application/Items` 补齐 `SetImportantAsync` 入口
+- 在 `ClientServiceRegistry` 为列表页 ViewModel 接入事项应用服务
+- 新增列表页排序与状态切换测试 `ListPageViewModelTests.cs`
+- 扩展 `ListPageServiceTests.cs` 覆盖排序逻辑
+- 验证客户端桌面目标可无警告构建，测试 15/15 通过
+
+### Round 29
+
 - 完成 `HOME-600`
 - 新增独立时间选择组件 `TimeSelectionPicker`
 - 新增时间选择确认事件参数 `TimeSelectionConfirmedEventArgs`

@@ -44,17 +44,33 @@
           </ItemsControl>
         </ScrollViewer>
 
-        <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="12">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
+          <TextBlock
+            VerticalAlignment="Center"
+            Text="Sort by"
+            Style="{ThemeResource BodyStrongTextBlockStyle}" />
+          <ComboBox
+            x:Name="SortByComboBox"
+            Grid.Column="1"
+            MinWidth="180"
+            SelectionChanged="OnSortBySelectionChanged">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:ListPageSortOptionViewModel">
+                <TextBlock Text="{Binding Label}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
           <TextBlock
             x:Name="ActiveSummaryTextBlock"
+            Grid.Column="2"
             Style="{ThemeResource BodyStrongTextBlockStyle}" />
           <TextBlock
             x:Name="CompletedSummaryTextBlock"
-            Grid.Column="1"
+            Grid.Column="3"
             Style="{ThemeResource BodyStrongTextBlockStyle}" />
           <ProgressRing
             x:Name="BusyIndicator"
-            Grid.Column="2"
+            Grid.Column="4"
             Width="24"
             Height="24"
             IsActive="False"
@@ -83,12 +99,22 @@
                 <ListView.ItemTemplate>
                   <DataTemplate x:DataType="viewModels:ListPageItemEntryViewModel">
                     <Border
+                      Tag="{Binding ItemId}"
                       Margin="0,0,0,10"
                       Padding="14"
                       Background="{ThemeResource LayerFillColorDefaultBrush}"
-                      CornerRadius="18">
-                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                      CornerRadius="18"
+                      Tapped="OnItemContainerTapped">
+                      <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
+                        <Button
+                          Width="36"
+                          Height="36"
+                          Click="OnCompletionButtonClick"
+                          Content="{Binding CompletionGlyph}"
+                          Tag="{Binding ItemId}" />
+
                         <Border
+                          Grid.Column="1"
                           Width="36"
                           Height="36"
                           Background="{ThemeResource AccentFillColorSecondaryBrush}"
@@ -100,12 +126,17 @@
                             Text="{Binding TypeBadge}" />
                         </Border>
 
-                        <StackPanel Grid.Column="1" Spacing="4">
+                        <StackPanel Grid.Column="2" Spacing="4">
                           <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
                           <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
                         </StackPanel>
 
-                        <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center">
+                          <Button
+                            HorizontalAlignment="Right"
+                            Click="OnImportanceButtonClick"
+                            Content="{Binding ImportanceGlyph}"
+                            Tag="{Binding ItemId}" />
                           <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
                           <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
                         </StackPanel>
@@ -129,13 +160,23 @@
                 <ListView.ItemTemplate>
                   <DataTemplate x:DataType="viewModels:ListPageItemEntryViewModel">
                     <Border
+                      Tag="{Binding ItemId}"
                       Margin="0,0,0,10"
                       Padding="14"
                       Background="{ThemeResource LayerFillColorDefaultBrush}"
                       CornerRadius="18"
-                      Opacity="0.72">
-                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                      Opacity="0.72"
+                      Tapped="OnItemContainerTapped">
+                      <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
+                        <Button
+                          Width="36"
+                          Height="36"
+                          Click="OnCompletionButtonClick"
+                          Content="{Binding CompletionGlyph}"
+                          Tag="{Binding ItemId}" />
+
                         <Border
+                          Grid.Column="1"
                           Width="36"
                           Height="36"
                           Background="{ThemeResource AccentFillColorTertiaryBrush}"
@@ -147,12 +188,17 @@
                             Text="{Binding TypeBadge}" />
                         </Border>
 
-                        <StackPanel Grid.Column="1" Spacing="4">
+                        <StackPanel Grid.Column="2" Spacing="4">
                           <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
                           <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
                         </StackPanel>
 
-                        <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center">
+                          <Button
+                            HorizontalAlignment="Right"
+                            Click="OnImportanceButtonClick"
+                            Content="{Binding ImportanceGlyph}"
+                            Tag="{Binding ItemId}" />
                           <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
                           <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
                         </StackPanel>

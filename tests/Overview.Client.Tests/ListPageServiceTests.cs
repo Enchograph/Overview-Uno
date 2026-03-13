@@ -41,6 +41,45 @@ public sealed class ListPageServiceTests
         Assert.Equal(expectedTitles.OrderBy(title => title, StringComparer.Ordinal), titles);
     }
 
+    [Fact]
+    public async Task BuildSnapshotAsync_SortsByImportanceBeforeNonImportantItems()
+    {
+        var service = CreateService();
+
+        var snapshot = await service.BuildSnapshotAsync(
+            UserId,
+            new ListPageQuery
+            {
+                Tab = ListPageTab.AllItems,
+                SortBy = ListSortBy.Importance,
+                ReferenceDate = ReferenceDate
+            });
+
+        var titles = snapshot.ActiveItems.Select(item => item.Title).ToArray();
+
+        Assert.Equal("Focus Note", titles[0]);
+        Assert.Equal("Morning Schedule", titles[1]);
+    }
+
+    [Fact]
+    public async Task BuildSnapshotAsync_SortsByDueDateAscending()
+    {
+        var service = CreateService();
+
+        var snapshot = await service.BuildSnapshotAsync(
+            UserId,
+            new ListPageQuery
+            {
+                Tab = ListPageTab.AllItems,
+                SortBy = ListSortBy.DueDate,
+                ReferenceDate = ReferenceDate
+            });
+
+        var titles = snapshot.ActiveItems.Select(item => item.Title).ToArray();
+
+        Assert.Equal(["Daily Task", "Focus Note", "Morning Schedule", "Future Task", "Weekly Review"], titles);
+    }
+
     private static ListPageService CreateService()
     {
         return new ListPageService(
@@ -155,6 +194,11 @@ public sealed class ListPageServiceTests
         }
 
         public Task<Item> SetCompletedAsync(Guid userId, Guid itemId, bool isCompleted, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<Item> SetImportantAsync(Guid userId, Guid itemId, bool isImportant, CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }

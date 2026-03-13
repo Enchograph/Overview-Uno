@@ -32,6 +32,12 @@ public interface IItemService
         bool isCompleted,
         CancellationToken cancellationToken = default);
 
+    Task<Item> SetImportantAsync(
+        Guid userId,
+        Guid itemId,
+        bool isImportant,
+        CancellationToken cancellationToken = default);
+
     Task DeleteAsync(
         Guid userId,
         Guid itemId,
