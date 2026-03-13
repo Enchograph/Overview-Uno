@@ -248,3 +248,15 @@
 - AI 应用层支持请求类型识别、相关事项摘要检索、OpenAI 兼容请求体组装和结构化响应解析入口
 - 在客户端轻量注册中心接入 `IAiOrchestrationService`
 - 验证客户端桌面目标可无警告构建
+
+### Round 28
+
+- 完成 `APP-450`
+- 在客户端新增同步应用层目录 `Application/Sync`
+- 新增 `ISyncOrchestrationService`、`SyncOrchestrationService`
+- 新增 `SyncStatusSnapshot`、`SyncCheckpoint`、`SyncExecutionTrigger`、`SyncLifecycleState`
+- 新增同步游标持久化抽象 `ISyncStateStore` 与文件实现 `FileSyncStateStore`
+- 扩展 `ISyncChangeRepository`，支持待同步变更已同步标记和冲突/过期记录删除
+- 同步应用层支持自动后台轮询、手动同步、状态事件、访问令牌刷新重试和 `LastModifiedAt` 冲突收敛
+- 在客户端轻量注册中心接入 `ISyncOrchestrationService`、`ISyncStateStore` 与 `TimeProvider`
+- 验证客户端桌面目标可无警告构建

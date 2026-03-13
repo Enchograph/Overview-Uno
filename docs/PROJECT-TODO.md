@@ -348,12 +348,14 @@
 - Title: 实现自动同步编排、同步状态机与冲突收敛
 - Phase: 阶段 4
 - Depends On: INFRA-330, INFRA-300, APP-410
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持自动后台同步、手动同步、状态展示和冲突收敛
 - Implementation Notes: 必须满足“实时同步”目标，不能只支持手动同步
 - Done When: 自动同步和同步状态机完成
-- Verification: 可定位同步编排和状态模型
+- Verification:
+  - 可定位同步编排和状态模型
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
 - Files Expected: 同步应用服务
 
 ---

@@ -2,8 +2,8 @@
 
 ## 当前阶段
 
-- 阶段编号：4
-- 阶段名称：Application 层
+- 阶段编号：5
+- 阶段名称：Presentation 基础页面
 - 阶段状态：`active`
 
 ## 当前里程碑
@@ -33,6 +33,7 @@
 - `APP-420`
 - `APP-430`
 - `APP-440`
+- `APP-450`
 
 ## 正在进行任务 ID
 
@@ -40,7 +41,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `APP-450`
+- `UI-500`
 
 ## 当前阻塞
 
@@ -48,6 +49,21 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端新增同步应用层目录：
+  - `Application/Sync`
+- 已确认客户端同步应用层已提供：
+  - `ISyncOrchestrationService`
+  - `SyncOrchestrationService`
+  - `SyncStatusSnapshot`
+  - `SyncCheckpoint`
+- 已确认客户端同步应用层已覆盖：
+  - 手动同步入口
+  - 自动后台轮询同步
+  - 同步状态机与状态事件
+  - 访问令牌刷新后重试
+  - `LastModifiedAt` 冲突收敛与本地覆盖
+  - 增量 `pull` 游标持久化
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - 已确认客户端新增 AI 应用层目录：
   - `Application/Ai`

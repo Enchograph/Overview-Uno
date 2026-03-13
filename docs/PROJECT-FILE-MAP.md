@@ -48,6 +48,8 @@
   - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
 - `Overview.Client/Overview.Client/Application/Ai/`
   - 客户端 AI 应用层目录，包含事项摘要检索、OpenAI 兼容请求体组装和结构化响应解析入口
+- `Overview.Client/Overview.Client/Application/Sync/`
+  - 客户端同步应用层目录，包含自动/手动同步编排、同步状态模型和冲突收敛逻辑
 - `Overview.Client/Overview.Client/Application/Items/`
   - 客户端事项应用层目录，包含 CRUD、完成状态切换和查询输入模型
 - `Overview.Client/Overview.Client/Application/Settings/`
@@ -91,7 +93,7 @@
 - `Overview.Client/Overview.Client/Infrastructure/Persistence/`
   - 客户端 SQLite 数据层，包含数据库选项、表记录、仓储接口与实现、连接工厂
 - `Overview.Client/Overview.Client/Infrastructure/Settings/`
-  - 客户端本地设置与登录态存储目录，当前包含认证会话存储和设备标识存储
+  - 客户端本地设置与登录态存储目录，当前包含认证会话存储、同步游标状态存储和设备标识存储
 - `Overview.Client/Overview.Client/Infrastructure/Widgets/`
   - 客户端小组件快照抽象目录，包含快照模型与默认内存存储
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`

@@ -7,6 +7,7 @@ using Overview.Client.Application.Home;
 using Overview.Client.Application.Items;
 using Overview.Client.Application.Lists;
 using Overview.Client.Application.Settings;
+using Overview.Client.Application.Sync;
 using Overview.Client.Domain.Rules;
 using Overview.Client.Infrastructure.Api.Auth;
 using Overview.Client.Infrastructure.Api.Sync;
@@ -44,7 +45,9 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<ITimeRuleService>(() => new TimeRuleService());
         registry.RegisterSingleton<IHomeInteractionRuleService>(() => new HomeInteractionRuleService());
         registry.RegisterSingleton<IAuthSessionStore>(() => new FileAuthSessionStore());
+        registry.RegisterSingleton<ISyncStateStore>(() => new FileSyncStateStore());
         registry.RegisterSingleton<IDeviceIdStore>(() => new FileDeviceIdStore());
+        registry.RegisterSingleton(() => TimeProvider.System);
         registry.RegisterSingleton<IAuthRemoteClient>(() => new AuthRemoteClient(registry.Resolve<HttpClient>()));
         registry.RegisterSingleton<IAuthenticationService>(() => new AuthenticationService(
             registry.Resolve<IAuthRemoteClient>(),
@@ -73,6 +76,16 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<ITimeSelectionService>(() => new TimeSelectionService(
             registry.Resolve<IUserSettingsService>(),
             registry.Resolve<ITimeRuleService>()));
+        registry.RegisterSingleton<ISyncOrchestrationService>(() => new SyncOrchestrationService(
+            registry.Resolve<IAuthenticationService>(),
+            registry.Resolve<IItemRepository>(),
+            registry.Resolve<IUserSettingsRepository>(),
+            registry.Resolve<ISyncChangeRepository>(),
+            registry.Resolve<ISyncRemoteClient>(),
+            registry.Resolve<ISyncStateStore>(),
+            registry.Resolve<IDeviceIdStore>(),
+            registry.Resolve<IOverviewLoggerFactory>(),
+            registry.Resolve<TimeProvider>()));
         return registry;
     }
 
