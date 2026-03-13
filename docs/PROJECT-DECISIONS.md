@@ -120,3 +120,10 @@
 - Topic: 开发流程顺序
 - Decision: 接力开发必须按 MVVM 分层推进，顺序为 Shell -> Domain -> Infrastructure -> Application -> Presentation -> Platform -> QA/Release
 - Reason: 这样才能避免页面层提前侵入业务与数据逻辑，并保证流程做完后应用可直接用起来
+
+## DEC-017
+
+- Status: `confirmed`
+- Topic: 提交粒度
+- Decision: 每完成 `PROJECT-TODO.md` 中的一个最小任务项，都必须创建一次 git commit
+- Reason: 这样可以让代码变更、状态文档和任务边界保持一致，降低接力开发时的回溯成本

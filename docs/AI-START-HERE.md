@@ -45,6 +45,8 @@
 5. `PROJECT-CHANGELOG.md`
 6. `PROJECT-FILE-MAP.md`（仅当新增代码结构或文件时）
 
+如果本次完成了 `PROJECT-TODO.md` 中的一个最小任务项，更新完上述文档后必须立即创建一次 git commit。commit message 必须包含任务 ID。
+
 ## 5. 明确禁止事项
 
 - 不得跳过状态文件直接修改代码
