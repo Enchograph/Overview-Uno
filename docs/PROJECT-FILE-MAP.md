@@ -53,11 +53,13 @@
 - `Overview.Client/Overview.Client/Application/Lists/`
   - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
 - `Overview.Client/Overview.Client/Application/Ai/`
-  - 客户端 AI 应用层目录，当前包含事项摘要检索、OpenAI 兼容请求体组装、结构化响应解析，以及 AI 聊天加载/发送/按日存储服务
+  - 客户端 AI 应用层目录，当前包含事项摘要检索、OpenAI 兼容请求体组装、结构化响应解析，以及 AI 聊天加载/发送/按日周月范围读取服务
 - `Overview.Client/Overview.Client/Application/Ai/AiChatService.cs`
-  - 客户端 AI 聊天应用服务，负责当日消息读取、直连 AI 接口并将用户/助手消息按日写入 SQLite
+  - 客户端 AI 聊天应用服务，负责范围消息读取、直连 AI 接口并将用户/助手消息按日写入 SQLite
 - `Overview.Client/Overview.Client/Application/Ai/AiChatDaySnapshot.cs`
   - 客户端 AI 聊天日快照模型，承载当前日期与消息列表
+- `Overview.Client/Overview.Client/Application/Ai/AiChatPeriodSnapshot.cs`
+  - 客户端 AI 聊天范围快照模型，承载选中日/周/月范围与消息列表
 - `Overview.Client/Overview.Client/Application/Sync/`
   - 客户端同步应用层目录，包含自动/手动同步编排、同步状态模型和冲突收敛逻辑
 - `Overview.Client/Overview.Client/Application/Items/`
@@ -73,7 +75,7 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
   - 客户端列表页真实骨架，当前支持六个标签筛选、五种排序、完成/重要切换、手动重排、四种主题切换、“更多设置”跳转、左右滑动编辑删除、浮动添加按钮、未完成/已完成分组和空态展示
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
-  - 客户端 AI 聊天页，当前支持显示当日消息、输入消息、发送请求和空态展示
+  - 客户端 AI 聊天页，当前支持按日/周/月切换查看聊天记录、展开时间选择器、输入消息、发送请求和空态展示
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
   - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口、详情卡片接入，以及来自主页长按的预填导航参数支持
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemNavigationRequest.cs`
@@ -107,7 +109,7 @@
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AiSettingsFormModel.cs`
   - 客户端 AI 设置表单模型，承载 Base URL、API Key、Model 的页面草稿状态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AiPageViewModel.cs`
-  - 客户端 AI 页 ViewModel，负责认证态校验、当日消息加载、发送状态和输入草稿
+  - 客户端 AI 页 ViewModel，负责认证态校验、当前范围加载、日/周/月模式切换、时间选择确认、发送状态和输入草稿
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AiChatMessageEntryViewModel.cs`
   - 客户端 AI 聊天消息展示模型，用于页面消息列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/TimeSelectionViewModel.cs`
@@ -129,7 +131,7 @@
 - `tests/Overview.Client.Tests/AiChatServiceTests.cs`
   - 客户端 AI 聊天应用服务测试，当前覆盖按用户时区解析当天日期、按日过滤和发送后本地落库
 - `tests/Overview.Client.Tests/AiPageViewModelTests.cs`
-  - 客户端 AI 页 ViewModel 测试，当前覆盖初始化加载、发送后清空草稿和未登录提示
+  - 客户端 AI 页 ViewModel 测试，当前覆盖初始化加载、日/周/月范围切换、发送后刷新当前范围和未登录提示
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
   - 客户端设置页分区入口模型，用于设置主页卡片列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`

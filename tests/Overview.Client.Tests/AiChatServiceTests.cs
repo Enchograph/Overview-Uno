@@ -2,6 +2,7 @@ using Overview.Client.Application.Ai;
 using Overview.Client.Application.Settings;
 using Overview.Client.Domain.Entities;
 using Overview.Client.Domain.Enums;
+using Overview.Client.Domain.ValueObjects;
 using Overview.Client.Infrastructure.Api.Ai;
 using Overview.Client.Infrastructure.Persistence.Repositories;
 
@@ -109,6 +110,50 @@ public sealed class AiChatServiceTests
 
         Assert.Contains("AI settings are incomplete", exception.Message, StringComparison.Ordinal);
         Assert.Empty(repository.Messages);
+    }
+
+    [Fact]
+    public async Task GetSnapshotAsync_ReturnsMessagesAcrossRequestedWeekRange()
+    {
+        var repository = new FakeAiChatMessageRepository();
+        repository.Messages.Add(new AiChatMessage
+        {
+            UserId = UserId,
+            OccurredOn = new DateOnly(2026, 3, 9),
+            Role = AiChatRole.User,
+            Message = "Monday",
+            CreatedAt = new DateTimeOffset(2026, 3, 9, 1, 0, 0, TimeSpan.Zero)
+        });
+        repository.Messages.Add(new AiChatMessage
+        {
+            UserId = UserId,
+            OccurredOn = new DateOnly(2026, 3, 12),
+            Role = AiChatRole.Assistant,
+            Message = "Thursday",
+            CreatedAt = new DateTimeOffset(2026, 3, 12, 2, 0, 0, TimeSpan.Zero)
+        });
+        repository.Messages.Add(new AiChatMessage
+        {
+            UserId = UserId,
+            OccurredOn = new DateOnly(2026, 3, 18),
+            Role = AiChatRole.Assistant,
+            Message = "Outside week",
+            CreatedAt = new DateTimeOffset(2026, 3, 18, 2, 0, 0, TimeSpan.Zero)
+        });
+
+        var service = CreateService(repository);
+
+        var snapshot = await service.GetSnapshotAsync(UserId, new CalendarPeriod
+        {
+            Mode = TimeSelectionMode.Week,
+            ReferenceDate = new DateOnly(2026, 3, 10),
+            StartDate = new DateOnly(2026, 3, 9),
+            EndDate = new DateOnly(2026, 3, 15)
+        });
+
+        Assert.Equal(TimeSelectionMode.Week, snapshot.Period.Mode);
+        Assert.Equal(2, snapshot.Messages.Count);
+        Assert.Equal(["Monday", "Thursday"], snapshot.Messages.Select(message => message.Message).ToArray());
     }
 
     private static AiChatService CreateService(

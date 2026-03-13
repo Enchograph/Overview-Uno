@@ -50,6 +50,7 @@
 - `LIST-750`
 - `AI-800`
 - `AI-810`
+- `AI-820`
 
 ## 正在进行任务 ID
 
@@ -57,7 +58,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `AI-820`
+- `AI-830`
 
 ## 当前阻塞
 
@@ -65,6 +66,24 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，35/35 用例通过，0 failed
+- 已确认客户端 AI 页已新增日 / 周 / 月聊天范围切换与时间选择联动：
+  - `Presentation/Pages/AiPage.xaml`
+  - `Presentation/Pages/AiPage.xaml.cs`
+- 已确认客户端 AI 页状态 ViewModel 已接入：
+  - 当前范围加载
+  - 日 / 周 / 月模式切换
+  - 时间选择确认后范围刷新
+  - 发送后按当前范围重新加载
+  - `Presentation/ViewModels/AiPageViewModel.cs`
+- 已确认客户端 AI 聊天应用层已新增范围快照读取入口：
+  - `Application/Ai/IAiChatService.cs`
+  - `Application/Ai/AiChatPeriodSnapshot.cs`
+  - `Application/Ai/AiChatService.cs`
+- 已确认客户端新增 AI 范围聚合测试：
+  - `tests/Overview.Client.Tests/AiChatServiceTests.cs`
+  - `tests/Overview.Client.Tests/AiPageViewModelTests.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，33/33 用例通过，0 failed
 - 已确认客户端 AI 页已从占位实现切换为真实聊天页：

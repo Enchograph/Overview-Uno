@@ -1,5 +1,7 @@
 using Overview.Client.Application.Settings;
 using Overview.Client.Domain.Entities;
+using Overview.Client.Domain.Enums;
+using Overview.Client.Domain.ValueObjects;
 using Overview.Client.Infrastructure.Api.Ai;
 using Overview.Client.Infrastructure.Persistence.Repositories;
 
@@ -33,7 +35,28 @@ public sealed class AiChatService : IAiChatService
     {
         var settings = await userSettingsService.GetAsync(userId, cancellationToken).ConfigureAwait(false);
         var occurredOn = ResolveOccurredOn(settings.TimeZoneId, timeProvider.GetUtcNow());
-        return await GetSnapshotAsync(userId, occurredOn, settings.TimeZoneId, cancellationToken).ConfigureAwait(false);
+        var snapshot = await BuildSnapshotAsync(
+            userId,
+            CreateDayPeriod(occurredOn),
+            settings.TimeZoneId,
+            cancellationToken).ConfigureAwait(false);
+        return new AiChatDaySnapshot
+        {
+            OccurredOn = occurredOn,
+            TimeZoneId = snapshot.TimeZoneId,
+            Messages = snapshot.Messages
+        };
+    }
+
+    public async Task<AiChatPeriodSnapshot> GetSnapshotAsync(
+        Guid userId,
+        CalendarPeriod period,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(period);
+
+        var settings = await userSettingsService.GetAsync(userId, cancellationToken).ConfigureAwait(false);
+        return await BuildSnapshotAsync(userId, period, settings.TimeZoneId, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<AiChatDaySnapshot> SendMessageAsync(
@@ -90,26 +113,47 @@ public sealed class AiChatService : IAiChatService
             LinkedItemIds = linkedItemIds
         }, cancellationToken).ConfigureAwait(false);
 
-        return await GetSnapshotAsync(userId, occurredOn, settings.TimeZoneId, cancellationToken).ConfigureAwait(false);
+        var snapshot = await BuildSnapshotAsync(
+            userId,
+            CreateDayPeriod(occurredOn),
+            settings.TimeZoneId,
+            cancellationToken).ConfigureAwait(false);
+        return new AiChatDaySnapshot
+        {
+            OccurredOn = occurredOn,
+            TimeZoneId = snapshot.TimeZoneId,
+            Messages = snapshot.Messages
+        };
     }
 
-    private async Task<AiChatDaySnapshot> GetSnapshotAsync(
+    private async Task<AiChatPeriodSnapshot> BuildSnapshotAsync(
         Guid userId,
-        DateOnly occurredOn,
+        CalendarPeriod period,
         string timeZoneId,
         CancellationToken cancellationToken)
     {
         var messages = await aiChatMessageRepository.ListByDateRangeAsync(
             userId,
-            occurredOn,
-            occurredOn,
+            period.StartDate,
+            period.EndDate,
             cancellationToken).ConfigureAwait(false);
 
-        return new AiChatDaySnapshot
+        return new AiChatPeriodSnapshot
         {
-            OccurredOn = occurredOn,
+            Period = period,
             TimeZoneId = string.IsNullOrWhiteSpace(timeZoneId) ? "UTC" : timeZoneId,
             Messages = messages.OrderBy(message => message.CreatedAt).ToArray()
+        };
+    }
+
+    private static CalendarPeriod CreateDayPeriod(DateOnly occurredOn)
+    {
+        return new CalendarPeriod
+        {
+            Mode = TimeSelectionMode.Day,
+            ReferenceDate = occurredOn,
+            StartDate = occurredOn,
+            EndDate = occurredOn
         };
     }
 

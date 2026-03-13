@@ -641,12 +641,17 @@
 - Title: 实现 AI 按日周月聚合展示
 - Phase: 阶段 8
 - Depends On: AI-810, HOME-600
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持 AI 页按日/周/月展示聊天记录
 - Implementation Notes: 复用时间选择组件或同规则逻辑
 - Done When: AI 时间范围展示完成
-- Verification: 可定位聚合展示逻辑
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/ViewModels/AiPageViewModel.cs`
+  - 可定位 `Overview.Client/Overview.Client/Application/Ai/AiChatPeriodSnapshot.cs`
 - Files Expected: AI 页展示逻辑
 
 ### Task ID: AI-830

@@ -45,7 +45,8 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IListPageService>()));
         registry.RegisterSingleton(() => new AiPageViewModel(
             registry.Resolve<IAuthenticationService>(),
-            registry.Resolve<IAiChatService>()));
+            registry.Resolve<IAiChatService>(),
+            registry.Resolve<ITimeSelectionService>()));
         registry.RegisterSingleton(() => new AddItemPageViewModel(
             registry.Resolve<IAuthenticationService>(),
             registry.Resolve<IItemService>(),
