@@ -261,6 +261,15 @@
 
 ### Round 29
 
+- 完成 `UI-520`
+- 新增统一事项详情组件 `Presentation/Components/ItemDetailCard`
+- 新增 `Presentation/ViewModels/ItemDetailViewModel.cs`
+- 更新 `AddItemPage` 与 `AddItemPageViewModel`，提供已有事项的查看入口与详情区编辑跳转
+- 事项详情展示已覆盖标题、类型、时间、地点、详情、提醒、重复、状态和编辑入口
+- 验证客户端桌面目标可无警告构建
+
+### Round 29
+
 - 完成 `APP-440`
 - 在客户端新增 AI 应用层目录 `Application/Ai`
 - 新增 `IAiOrchestrationService`、`AiOrchestrationService`

@@ -1,0 +1,49 @@
+<UserControl x:Class="Overview.Client.Presentation.Components.ItemDetailCard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Border
+    Padding="20"
+    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+    BorderThickness="1"
+    CornerRadius="24">
+    <StackPanel Spacing="12">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+        <Border
+          Width="14"
+          Height="14"
+          VerticalAlignment="Top"
+          Background="{Binding AccentColor}"
+          CornerRadius="7" />
+        <StackPanel Grid.Column="1" Spacing="4">
+          <TextBlock FontSize="22" FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
+          <TextBlock Opacity="0.72" Text="{Binding TypeText}" TextWrapping="WrapWholeWords" />
+        </StackPanel>
+      </Grid>
+
+      <TextBlock Text="{Binding TimeText}" TextWrapping="WrapWholeWords" />
+
+      <StackPanel x:Name="LocationPanel" Spacing="4">
+        <TextBlock FontWeight="SemiBold" Text="Location" />
+        <TextBlock Text="{Binding LocationText}" TextWrapping="WrapWholeWords" />
+      </StackPanel>
+
+      <StackPanel x:Name="DescriptionPanel" Spacing="4">
+        <TextBlock FontWeight="SemiBold" Text="Details" />
+        <TextBlock Text="{Binding DescriptionText}" TextWrapping="WrapWholeWords" />
+      </StackPanel>
+
+      <TextBlock Text="{Binding ReminderText}" TextWrapping="WrapWholeWords" />
+      <TextBlock Text="{Binding RepeatText}" TextWrapping="WrapWholeWords" />
+      <TextBlock Text="{Binding StatusText}" TextWrapping="WrapWholeWords" />
+      <TextBlock Opacity="0.72" Text="{Binding MetadataText}" TextWrapping="WrapWholeWords" />
+
+      <Button
+        x:Name="EditButton"
+        HorizontalAlignment="Left"
+        Click="OnEditButtonClick"
+        Content="Edit This Item"
+        Style="{StaticResource AccentButtonStyle}" />
+    </StackPanel>
+  </Border>
+</UserControl>

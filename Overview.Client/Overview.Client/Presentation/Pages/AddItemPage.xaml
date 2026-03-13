@@ -1,6 +1,7 @@
 <Page x:Class="Overview.Client.Presentation.Pages.AddItemPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:components="using:Overview.Client.Presentation.Components"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
   <Grid Padding="24">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -147,16 +148,40 @@
                     Padding="14"
                     Background="{ThemeResource LayerFillColorDefaultBrush}"
                     CornerRadius="18">
-                    <StackPanel Spacing="4">
-                      <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
-                      <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
-                    </StackPanel>
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                      <StackPanel Spacing="4">
+                        <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
+                        <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
+                      </StackPanel>
+                      <Button
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Click="OnViewItemButtonClick"
+                        Content="View"
+                        Tag="{Binding Id}" />
+                      <Button
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Click="OnEditItemButtonClick"
+                        Content="Edit"
+                        Tag="{Binding Id}" />
+                    </Grid>
                   </Border>
                 </DataTemplate>
               </ListView.ItemTemplate>
             </ListView>
           </StackPanel>
         </Border>
+
+        <StackPanel Spacing="12">
+          <TextBlock FontSize="22" FontWeight="SemiBold" Text="Item Details" />
+          <TextBlock
+            Opacity="0.72"
+            Style="{ThemeResource BodyStrongTextBlockStyle}"
+            Text="Unified detail card for later Home and List interactions."
+            TextWrapping="WrapWholeWords" />
+          <components:ItemDetailCard x:Name="ItemDetailCard" EditRequested="OnDetailEditRequested" />
+        </StackPanel>
       </StackPanel>
     </ScrollViewer>
   </Grid>

@@ -48,9 +48,33 @@ public sealed partial class AddItemPage : Page
     {
         if (e.ClickedItem is AddItemListEntry entry)
         {
-            await ViewModel.LoadForEditAsync(entry.Id).ConfigureAwait(true);
+            await ViewModel.LoadDetailAsync(entry.Id).ConfigureAwait(true);
             ApplyViewModelState();
         }
+    }
+
+    private async void OnViewItemButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (TryGetItemIdFromSender(sender, out var itemId))
+        {
+            await ViewModel.LoadDetailAsync(itemId).ConfigureAwait(true);
+            ApplyViewModelState();
+        }
+    }
+
+    private async void OnEditItemButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (TryGetItemIdFromSender(sender, out var itemId))
+        {
+            await ViewModel.LoadForEditAsync(itemId).ConfigureAwait(true);
+            ApplyViewModelState();
+        }
+    }
+
+    private async void OnDetailEditRequested(object sender, Guid itemId)
+    {
+        await ViewModel.LoadForEditAsync(itemId).ConfigureAwait(true);
+        ApplyViewModelState();
     }
 
     private void OnItemTypeChanged(object sender, SelectionChangedEventArgs e)
@@ -146,6 +170,7 @@ public sealed partial class AddItemPage : Page
 
         ExistingItemsListView.ItemsSource = ViewModel.ExistingItems;
         ExistingItemsListView.Visibility = ViewModel.IsAuthenticated ? Visibility.Visible : Visibility.Collapsed;
+        ItemDetailCard.DataContext = ViewModel.Detail;
         SubmitButton.Content = ViewModel.SubmitButtonText;
         StatusTextBlock.Text = ViewModel.StatusMessage;
         BusyIndicator.IsActive = ViewModel.IsBusy;
@@ -177,5 +202,17 @@ public sealed partial class AddItemPage : Page
         }
 
         comboBox.SelectedIndex = 0;
+    }
+
+    private static bool TryGetItemIdFromSender(object sender, out Guid itemId)
+    {
+        if (sender is FrameworkElement { Tag: Guid id })
+        {
+            itemId = id;
+            return true;
+        }
+
+        itemId = Guid.Empty;
+        return false;
     }
 }

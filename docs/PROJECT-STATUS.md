@@ -36,6 +36,7 @@
 - `APP-450`
 - `UI-500`
 - `UI-510`
+- `UI-520`
 
 ## 正在进行任务 ID
 
@@ -43,7 +44,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `UI-520`
+- `UI-530`
 
 ## 当前阻塞
 
@@ -51,6 +52,23 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端新增统一事项详情组件：
+  - `Presentation/Components/ItemDetailCard.xaml`
+  - `Presentation/Components/ItemDetailCard.xaml.cs`
+- 已确认客户端新增事项详情展示 ViewModel：
+  - `Presentation/ViewModels/ItemDetailViewModel.cs`
+- 已确认客户端事项详情组件当前已覆盖：
+  - 标题
+  - 类型
+  - 时间信息
+  - 地点
+  - 详情
+  - 提醒
+  - 重复
+  - 重要/完成状态
+  - 编辑入口
+- 已确认客户端 `AddItemPage` 已接入事项详情查看入口，可在已有事项列表中查看并切换到编辑态
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - 已确认客户端添加/编辑事项页已从占位实现切换为真实基础表单：
   - `Presentation/Pages/AddItemPage.xaml`

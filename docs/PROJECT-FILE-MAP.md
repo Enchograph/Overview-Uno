@@ -65,19 +65,23 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
   - 当前 AI 页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
-  - 客户端添加/编辑事项页，当前包含三类事项基础表单和已有事项编辑入口
+  - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口和详情卡片接入
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
   - 当前设置页壳层占位页
+- `Overview.Client/Overview.Client/Presentation/Components/ItemDetailCard.xaml`
+  - 客户端统一事项详情组件，当前展示标题、类型、时间、地点、详情、提醒、重复、状态和编辑入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/`
   - 当前五页壳层的 ViewModel 集合
 - `Overview.Client/Overview.Client/Presentation/ViewModels/LoginPageViewModel.cs`
   - 客户端登录页 ViewModel，封装登录、注册、验证码发送和会话恢复入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AddItemPageViewModel.cs`
-  - 客户端添加/编辑事项页 ViewModel，封装当前用户校验、已有事项加载、新建/编辑模式切换和保存入口
+  - 客户端添加/编辑事项页 ViewModel，封装当前用户校验、已有事项加载、详情展示、新建/编辑模式切换和保存入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AddItemFormModel.cs`
   - 客户端添加/编辑事项页表单模型，承载日程/任务/备忘三类字段并转换为 `ItemUpsertRequest`
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AddItemListEntry.cs`
   - 客户端添加/编辑事项页已有事项摘要模型，用于页面内编辑入口列表
+- `Overview.Client/Overview.Client/Presentation/ViewModels/ItemDetailViewModel.cs`
+  - 客户端事项详情展示 ViewModel，负责把统一领域事项格式化为可复用的详情卡片字段
 - `Overview.Client/Overview.Client/Domain/DomainAssemblyMarker.cs`
   - 客户端 Domain 层目录落点
 - `Overview.Client/Overview.Client/Domain/Entities/`

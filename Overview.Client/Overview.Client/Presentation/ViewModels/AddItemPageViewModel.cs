@@ -27,6 +27,8 @@ public sealed class AddItemPageViewModel
 
     public IReadOnlyList<AddItemListEntry> ExistingItems { get; private set; } = Array.Empty<AddItemListEntry>();
 
+    public ItemDetailViewModel Detail { get; private set; } = ItemDetailViewModel.Empty;
+
     public bool IsBusy { get; private set; }
 
     public string StatusMessage { get; private set; } = string.Empty;
@@ -55,6 +57,7 @@ public sealed class AddItemPageViewModel
                 var settings = await userSettingsService.GetAsync(userId, cancellationToken).ConfigureAwait(false);
                 Form = AddItemFormModel.CreateDefault(settings.TimeZoneId, settings.DayPlanStartTime);
                 EditingItemId = null;
+                Detail = ItemDetailViewModel.Empty;
                 await LoadExistingItemsAsync(userId, cancellationToken).ConfigureAwait(false);
                 StatusMessage = ExistingItems.Count == 0
                     ? "No items yet. Fill the form to create your first item."
@@ -77,6 +80,7 @@ public sealed class AddItemPageViewModel
                 var settings = await userSettingsService.GetAsync(userId, cancellationToken).ConfigureAwait(false);
                 Form = AddItemFormModel.CreateDefault(settings.TimeZoneId, settings.DayPlanStartTime);
                 EditingItemId = null;
+                Detail = ItemDetailViewModel.Empty;
                 StatusMessage = "Create mode ready.";
                 return true;
             }).ConfigureAwait(false);
@@ -102,7 +106,33 @@ public sealed class AddItemPageViewModel
 
                 Form = AddItemFormModel.FromItem(item);
                 EditingItemId = item.Id;
+                Detail = ItemDetailViewModel.FromItem(item);
                 StatusMessage = "Edit mode ready.";
+                return true;
+            }).ConfigureAwait(false);
+    }
+
+    public async Task LoadDetailAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        await ExecuteBusyActionAsync(
+            async () =>
+            {
+                if (!TryGetUserId(out var userId))
+                {
+                    ResetForLoggedOutState();
+                    return false;
+                }
+
+                var item = await itemService.GetAsync(userId, itemId, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (item is null)
+                {
+                    Detail = ItemDetailViewModel.Empty;
+                    StatusMessage = "The selected item was not found.";
+                    return false;
+                }
+
+                Detail = ItemDetailViewModel.FromItem(item);
+                StatusMessage = "Detail view updated.";
                 return true;
             }).ConfigureAwait(false);
     }
@@ -140,6 +170,7 @@ public sealed class AddItemPageViewModel
                     if (refreshedItem is not null)
                     {
                         Form = AddItemFormModel.FromItem(refreshedItem);
+                        Detail = ItemDetailViewModel.FromItem(refreshedItem);
                     }
                 }
 
@@ -175,6 +206,7 @@ public sealed class AddItemPageViewModel
         Form = AddItemFormModel.CreateDefault();
         EditingItemId = null;
         ExistingItems = Array.Empty<AddItemListEntry>();
+        Detail = ItemDetailViewModel.Empty;
         StatusMessage = "Sign in first to create or edit items.";
     }
 

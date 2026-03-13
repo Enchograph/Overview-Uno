@@ -400,13 +400,17 @@
 - Title: 实现事项详情组件
 - Phase: 阶段 5
 - Depends On: UI-510
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 提供统一详情展示组件
-- Implementation Notes: 供主页点击事项后调用
+- Implementation Notes: 已新增统一详情卡片组件，并在 `AddItemPage` 中提供查看与编辑联动入口，后续主页点击事项时可直接复用
 - Done When: 详情组件存在
-- Verification: 可定位组件和展示字段
-- Files Expected: 详情组件
+- Verification:
+  - 可定位组件和展示字段
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+- Files Expected:
+  - 详情组件
+  - 详情 ViewModel
 
 ### Task ID: UI-530
 
