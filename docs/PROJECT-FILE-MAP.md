@@ -54,6 +54,12 @@
   - 当前五页壳层的 ViewModel 集合
 - `Overview.Client/Overview.Client/Domain/DomainAssemblyMarker.cs`
   - 客户端 Domain 层目录落点
+- `Overview.Client/Overview.Client/Domain/Entities/`
+  - 客户端核心领域实体：事项、用户设置、AI 聊天记录、同步变更
+- `Overview.Client/Overview.Client/Domain/Enums/`
+  - 客户端领域枚举：事项类型、主题、列表排序、AI 请求、同步变更等
+- `Overview.Client/Overview.Client/Domain/ValueObjects/`
+  - 客户端领域值对象：提醒、重复、小组件偏好
 - `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
   - 客户端 Infrastructure 层目录落点
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
@@ -70,6 +76,12 @@
   - 服务端最小 API 返回契约
 - `Overview.Server/Application/DependencyInjection/ApplicationServiceCollectionExtensions.cs`
   - 服务端应用层注册入口
+- `Overview.Server/Domain/Entities/`
+  - 服务端核心领域实体：事项、用户设置、AI 聊天记录、同步变更
+- `Overview.Server/Domain/Enums/`
+  - 服务端领域枚举：事项类型、主题、列表排序、AI 请求、同步变更等
+- `Overview.Server/Domain/ValueObjects/`
+  - 服务端领域值对象：提醒、重复、小组件偏好
 - `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
   - 服务端基础设施层注册入口
 - `Overview.Server/Infrastructure/Configuration/PersistenceOptions.cs`

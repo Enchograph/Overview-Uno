@@ -94,3 +94,11 @@
 - 将客户端默认启动页切换为主页壳层
 - 新增壳层相关 ViewModel 并接入轻量注册中心
 - 验证客户端桌面目标在五页壳层接入后仍可无警告构建
+
+### Round 14
+
+- 完成 `DOMAIN-200`
+- 在客户端和服务端分别新增 `Domain/Entities`、`Domain/Enums`、`Domain/ValueObjects`
+- 定义统一核心领域模型：`Item`、`UserSettings`、`AiChatMessage`、`SyncChange`
+- 为事项、设置、AI 聊天和同步变更补充配套枚举和值对象
+- 验证客户端桌面目标和服务端项目在新领域模型接入后仍可无警告构建

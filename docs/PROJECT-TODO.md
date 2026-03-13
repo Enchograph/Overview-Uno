@@ -121,12 +121,15 @@
 - Title: 定义事项与用户设置领域模型
 - Phase: 阶段 2
 - Depends On: SHELL-110, SHELL-120
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 在客户端和服务端定义统一核心模型
-- Implementation Notes: 必须覆盖三类事项、全部同步设置字段、聊天记录和同步变更模型
+- Implementation Notes: 已在客户端和服务端分别建立同构的 `Entities`、`Enums`、`ValueObjects` 目录，覆盖三类事项、全部同步设置字段、聊天记录和同步变更模型
 - Done When: 核心模型完成
-- Verification: 模型字段与设计文档一致
+- Verification:
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 人工核对模型字段与设计文档一致
 - Files Expected: 领域实体、枚举、值对象
 
 ### Task ID: DOMAIN-210
