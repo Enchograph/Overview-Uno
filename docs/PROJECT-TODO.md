@@ -170,12 +170,16 @@
 - Title: 实现主页重叠透明度与命中领域规则
 - Phase: 阶段 2
 - Depends On: DOMAIN-200, DOMAIN-210
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 实现重叠透明度和点击命中规则
-- Implementation Notes: 必须对齐原始需求中的三条命中规则
+- Implementation Notes: 已在客户端和服务端分别新增主页交互规则服务和值对象；当前支持透明度计算和命中裁决，且命中逻辑不依赖绘制顺序
 - Done When: 命中规则和透明度规则完成
-- Verification: 可定位规则服务，且设计为可单测
+- Verification:
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 `IHomeInteractionRuleService` 与 `HomeInteractionRuleService`
+  - 可定位 `TimelineItem` 与 `TimelineItemOverlap`
 - Files Expected: 命中规则服务
 
 ---

@@ -119,3 +119,12 @@
 - 实现提醒触发器归一化、重复展开和提醒调度领域规则
 - 支持日、周、月、年频率重复及 `Interval`、`Count`、`UntilAt` 约束
 - 验证客户端桌面目标和服务端项目在提醒与重复规则接入后仍可无警告构建
+
+### Round 17
+
+- 完成 `DOMAIN-230`
+- 在客户端和服务端分别新增 `IHomeInteractionRuleService`、`HomeInteractionRuleService`
+- 在客户端和服务端分别新增 `TimelineItem`、`TimelineItemOverlap`
+- 实现主页重叠透明度计算和点击命中领域规则
+- 命中算法按独占区间和完全包裹规则裁决，不依赖绘制顺序
+- 验证客户端桌面目标和服务端项目在主页交互规则接入后仍可无警告构建
