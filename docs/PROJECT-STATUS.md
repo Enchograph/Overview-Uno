@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-- 阶段编号：2
+- 阶段编号：3
 - 阶段名称：Infrastructure 层
 - 阶段状态：`active`
 
@@ -24,6 +24,7 @@
 - `DOMAIN-220`
 - `DOMAIN-230`
 - `INFRA-300`
+- `INFRA-310`
 
 ## 正在进行任务 ID
 
@@ -31,7 +32,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `INFRA-310`
+- `INFRA-320`
 
 ## 当前阻塞
 
@@ -41,6 +42,22 @@
 
 - `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet dotnet-ef migrations add InitialPostgreSqlInfrastructure --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --output-dir Migrations` 通过
+- `dotnet dotnet-ef migrations script --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --idempotent` 通过
+- `dotnet dotnet-ef migrations list --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj` 可列出 `20260313092718_InitialPostgreSqlInfrastructure`
+- 已确认服务端新增 PostgreSQL 基础设施目录：
+  - `Infrastructure/Persistence/Configurations`
+  - `Infrastructure/Persistence/Converters`
+  - `Infrastructure/Persistence/Entities`
+- 已确认服务端新增数据库上下文与设计时工厂：
+  - `OverviewDbContext`
+  - `OverviewDbContextDesignTimeFactory`
+- 已确认服务端 PostgreSQL 映射覆盖：
+  - `users`
+  - `items`
+  - `user_settings`
+  - `sync_changes`
+  - `ai_chat_messages`
 - 已确认客户端与服务端均新增统一领域模型目录：
   - `Domain/Entities`
   - `Domain/Enums`
@@ -103,27 +120,31 @@
 - 已完成提醒配置归一化、重复展开和提醒调度领域规则
 - 已完成主页重叠透明度与点击命中领域规则
 - 已完成客户端 SQLite 数据层、数据库初始化与四类本地仓储骨架
+- 已完成服务端 PostgreSQL 数据层、EF Core 映射与初始迁移基线
 - 已确认 git 仓库已初始化，当前分支为 `main`，且已配置 `origin`
 - 已修正文档与仓库真实 git 状态不一致的问题
-- 阶段 3 已启动，下一步应开始服务端 PostgreSQL 数据层
+- 已修正文档内部“阶段编号仍为 2 / 路线仍显示阶段 3 未开始 / SQLite 验收未勾选”的状态偏差
+- 下一步应进入认证 API 契约与持久化支持
 
 ## 风险与偏差
 
 - 已解决此前“无代码骨架”风险
 - 当前五页仍是占位壳层，尚未承载真实领域规则和数据流
-- 服务端当前只有健康检查和配置样例，尚未进入数据库与认证实现
+- 服务端当前已具备数据库基础设施，但认证、同步 API 和真实业务控制器尚未实现
 - 当前时间标题格式化只提供基础中英文格式，真正的 UI 本地化资源接入仍在后续 Presentation 阶段
 - 当前重复展开对备忘采用“目标日期零点”为锚点，真正的编辑页输入约束和展示语义仍需后续页面与应用层配合收敛
 - 当前主页命中规则已沉到 Domain，但尚未接入页面坐标映射和单元测试工程
 - 当前客户端 SQLite 方案使用 `sqlite-net-pcl`；桌面构建存在 1 条 `NETSDK1206` RID 兼容性警告，后续若影响多平台发布需在平台集成前复核
+- 本地未运行 PostgreSQL 实例，因此本轮只验证了“可生成迁移、可输出脚本”，尚未执行 `database update`
 - 如果跳过应用壳层，后续即使页面分别实现，也不能保证应用直接可用
 - 如果不按 MVVM 顺序推进，页面逻辑会提前侵入数据和同步细节
 - 如果后续实现未同步更新状态文件，接力链路会很快失效
 
 ## 接手 AI 执行准则
 
-- 优先执行 `INFRA-310`
+- 优先执行 `INFRA-320`
 - 除非发现环境或工具限制，否则不要跳到 Domain、同步、主页等后续任务
-- 在现有客户端本地数据层经验基础上实现服务端 PostgreSQL 数据层、实体映射和迁移基础
+- 在现有 PostgreSQL 数据层基础上继续补认证 API 契约、用户持久化访问和密码/验证码相关存储
 - 当前客户端根解决方案依赖仓库根目录 `global.json` 提供 `Uno.Sdk` 版本钉住；不要删除
+- 迁移工具通过仓库根目录 `dotnet-tools.json` 固定；后续执行 EF CLI 前先运行 `dotnet tool restore`
 - 只有在尝试补齐环境后仍无法继续时，才允许在 `PROJECT-HANDOFF.md` 标记阻塞

@@ -207,12 +207,16 @@
 - Title: 建立服务端 PostgreSQL 数据层
 - Phase: 阶段 3
 - Depends On: DOMAIN-200, SHELL-120
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 建立服务端实体映射、数据库上下文和迁移基础
-- Implementation Notes: 覆盖用户、事项、设置、同步变更
+- Implementation Notes: 已新增 `OverviewDbContext`、设计时工厂、EF Core/Npgsql 注册、JSONB 值转换器、五张核心表映射和初始迁移；当前额外补入 `AuthUser` 持久化实体，为后续认证任务提供用户表基础
 - Done When: 服务端数据层存在
-- Verification: 可定位数据库上下文和实体映射
+- Verification:
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet dotnet-ef migrations add InitialPostgreSqlInfrastructure --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --output-dir Migrations`
+  - `dotnet dotnet-ef migrations script --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --idempotent`
+  - 可定位数据库上下文和实体映射
 - Files Expected: 服务端持久化文件
 
 ### Task ID: INFRA-320

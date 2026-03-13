@@ -137,3 +137,14 @@
 - 新增事项、设置、聊天记录、同步变更四类本地仓储接口与实现
 - 采用“索引列 + JSON 载荷”方式保存完整聚合
 - 验证客户端桌面目标可构建；当前存在 1 条 `NETSDK1206` 警告，已记录待后续多平台复核
+
+### Round 19
+
+- 完成 `INFRA-310`
+- 为服务端项目引入 `Npgsql.EntityFrameworkCore.PostgreSQL` 与 `Microsoft.EntityFrameworkCore.Design`
+- 新增 `OverviewDbContext`、设计时工厂、JSONB 转换器和五张核心表映射
+- 新增 `AuthUser` 持久化实体，为后续认证任务提供用户表基础
+- 生成首个 EF Core 迁移 `20260313092718_InitialPostgreSqlInfrastructure`
+- 新增仓库级 `dotnet-tools.json`，固定 `dotnet-ef` 10.0.0
+- 验证服务端项目可构建、迁移可生成且可输出 idempotent 脚本
+- 修正文档中“阶段编号/路线状态/SQLite 验收项”与真实进度不一致的问题

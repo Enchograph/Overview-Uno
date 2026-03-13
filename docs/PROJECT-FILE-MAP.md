@@ -6,6 +6,8 @@
 
 - `global.json`
   - 仓库根目录 SDK 固定文件，提供 .NET SDK 版本和 `Uno.Sdk` 版本
+- `dotnet-tools.json`
+  - 仓库根目录本地工具清单，当前固定 `dotnet-ef` 10.0.0
 - `Overview.Uno.slnx`
   - 仓库主解决方案入口，统一挂接客户端与服务端项目
 - `docs/“一览”用户要求.md`
@@ -92,6 +94,18 @@
   - 服务端基础设施层注册入口
 - `Overview.Server/Infrastructure/Configuration/PersistenceOptions.cs`
   - 服务端持久化配置样例对象
+- `Overview.Server/Infrastructure/Persistence/OverviewDbContext.cs`
+  - 服务端 PostgreSQL `DbContext`
+- `Overview.Server/Infrastructure/Persistence/OverviewDbContextDesignTimeFactory.cs`
+  - 服务端 EF 设计时工厂，用于迁移生成
+- `Overview.Server/Infrastructure/Persistence/Configurations/`
+  - 服务端 PostgreSQL 实体映射配置
+- `Overview.Server/Infrastructure/Persistence/Converters/`
+  - 服务端 JSONB 序列化与值转换基础
+- `Overview.Server/Infrastructure/Persistence/Entities/AuthUser.cs`
+  - 服务端认证用户持久化实体
+- `Overview.Server/Migrations/`
+  - 服务端 EF Core 迁移基线
 - `Overview.Server/appsettings.Sample.json`
   - 服务端 PostgreSQL、认证、邮件、同步配置样例
 
