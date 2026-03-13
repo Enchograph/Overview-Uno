@@ -172,3 +172,17 @@
 - 新增 `ISyncRemoteClient` 与 `SyncRemoteClient`
 - 在客户端轻量注册中心注册 `HttpClient` 与同步远程访问服务
 - 验证服务端与客户端项目均可无警告构建
+
+### Round 22
+
+- 完成 `INFRA-340`
+- 在客户端新增日志抽象：`IOverviewLogger`、`IOverviewLoggerFactory`
+- 在客户端新增通知抽象：`INotificationScheduler`、`NotificationScheduleRequest`
+- 在客户端新增默认通知空实现：`NoOpNotificationScheduler`
+- 在客户端新增小组件快照抽象：`IWidgetSnapshotStore`、`WidgetSnapshot`
+- 在客户端新增默认小组件内存实现：`InMemoryWidgetSnapshotStore`
+- 在客户端轻量注册中心注册日志工厂、通知调度和小组件快照服务
+- 在服务端新增统一日志抽象：`IOverviewLogger`、`IOverviewLoggerFactory`
+- 在服务端新增 `MicrosoftOverviewLoggerFactory` 以桥接 `Microsoft.Extensions.Logging`
+- 将 `VerificationCodeService` 切换到统一日志抽象
+- 验证服务端与客户端项目均可无警告构建

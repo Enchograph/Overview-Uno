@@ -260,12 +260,15 @@
 - Title: 建立通知、小组件、日志基础设施抽象
 - Phase: 阶段 3
 - Depends On: DOMAIN-220
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 提供统一通知接口、小组件快照接口和日志接口
-- Implementation Notes: 先做抽象，不做平台实现
+- Implementation Notes: 已在客户端新增通知调度、小组件快照和日志工厂抽象，默认采用空实现/内存实现；已在服务端新增统一日志工厂抽象并接入验证码服务
 - Done When: 抽象接口存在
-- Verification: 可定位抽象接口
+- Verification:
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位通知、小组件、日志抽象接口与基础实现
 - Files Expected: 接口与基础实现
 
 ---

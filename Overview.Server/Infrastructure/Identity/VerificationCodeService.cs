@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Overview.Server.Infrastructure.Configuration;
+using Overview.Server.Infrastructure.Diagnostics;
 using Overview.Server.Infrastructure.Persistence;
 using Overview.Server.Infrastructure.Persistence.Entities;
 
@@ -14,18 +14,18 @@ public sealed class VerificationCodeService : IVerificationCodeService
     private readonly OverviewDbContext _dbContext;
     private readonly AuthenticationOptions _options;
     private readonly TimeProvider _timeProvider;
-    private readonly ILogger<VerificationCodeService> _logger;
+    private readonly IOverviewLogger _logger;
 
     public VerificationCodeService(
         OverviewDbContext dbContext,
         IOptions<AuthenticationOptions> options,
         TimeProvider timeProvider,
-        ILogger<VerificationCodeService> logger)
+        IOverviewLoggerFactory loggerFactory)
     {
         _dbContext = dbContext;
         _options = options.Value;
         _timeProvider = timeProvider;
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger<VerificationCodeService>();
     }
 
     public async Task<AuthVerificationCode> CreateRegistrationCodeAsync(

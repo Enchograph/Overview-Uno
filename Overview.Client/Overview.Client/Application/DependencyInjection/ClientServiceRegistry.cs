@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using Overview.Client.Infrastructure.Api.Sync;
+using Overview.Client.Infrastructure.Diagnostics;
+using Overview.Client.Infrastructure.Notifications;
+using Overview.Client.Infrastructure.Widgets;
 using Overview.Client.Presentation.ViewModels;
 
 namespace Overview.Client.Application.DependencyInjection;
@@ -20,6 +23,9 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton(() => new AddItemPageViewModel());
         registry.RegisterSingleton(() => new SettingsPageViewModel());
         registry.RegisterSingleton(() => new HttpClient());
+        registry.RegisterSingleton<IOverviewLoggerFactory>(() => NullOverviewLoggerFactory.Instance);
+        registry.RegisterSingleton<INotificationScheduler>(() => new NoOpNotificationScheduler());
+        registry.RegisterSingleton<IWidgetSnapshotStore>(() => new InMemoryWidgetSnapshotStore());
         registry.RegisterSingleton<ISyncRemoteClient>(() => new SyncRemoteClient(registry.Resolve<HttpClient>()));
         return registry;
     }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Overview.Server.Infrastructure.Configuration;
+using Overview.Server.Infrastructure.Diagnostics;
 using Overview.Server.Infrastructure.Identity;
 using Overview.Server.Infrastructure.Persistence;
 
@@ -59,6 +60,7 @@ public static class InfrastructureServiceCollectionExtensions
             });
 
         services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<IOverviewLoggerFactory, MicrosoftOverviewLoggerFactory>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IAuthTokenService, JwtAuthTokenService>();
         services.AddScoped<IVerificationCodeService, VerificationCodeService>();

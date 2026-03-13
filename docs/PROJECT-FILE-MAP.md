@@ -68,8 +68,14 @@
   - 客户端 Infrastructure 层目录落点
 - `Overview.Client/Overview.Client/Infrastructure/Api/Sync/`
   - 客户端远程同步访问层，包含 `pull/push` 契约、接口与 HTTP 客户端实现
+- `Overview.Client/Overview.Client/Infrastructure/Diagnostics/`
+  - 客户端日志抽象目录，包含统一日志接口与默认空实现工厂
+- `Overview.Client/Overview.Client/Infrastructure/Notifications/`
+  - 客户端通知抽象目录，包含统一通知调度接口与默认空实现
 - `Overview.Client/Overview.Client/Infrastructure/Persistence/`
   - 客户端 SQLite 数据层，包含数据库选项、表记录、仓储接口与实现、连接工厂
+- `Overview.Client/Overview.Client/Infrastructure/Widgets/`
+  - 客户端小组件快照抽象目录，包含快照模型与默认内存存储
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
   - 客户端桌面入口
 - `Overview.Client/Overview.Client/Platforms/WebAssembly/Program.cs`
@@ -102,6 +108,8 @@
   - 服务端领域规则：时间块生成、时间范围计算、周期标题格式化、提醒调度、重复展开、主页命中与重叠计算
 - `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
   - 服务端基础设施层注册入口
+- `Overview.Server/Infrastructure/Diagnostics/`
+  - 服务端日志抽象目录，包含统一日志接口与 `Microsoft.Extensions.Logging` 适配器
 - `Overview.Server/Infrastructure/Configuration/AuthenticationOptions.cs`
   - 服务端认证配置样例对象
 - `Overview.Server/Infrastructure/Configuration/PersistenceOptions.cs`

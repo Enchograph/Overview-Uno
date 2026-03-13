@@ -49,7 +49,7 @@
 
 ## 阶段 3：Infrastructure 层
 
-- 状态：`active`
+- 状态：`complete`
 - 入口条件：
   - 阶段 2 完成
 - 必须产出：
@@ -65,7 +65,7 @@
 
 ## 阶段 4：Application 层
 
-- 状态：`not_started`
+- 状态：`active`
 - 入口条件：
   - 阶段 3 完成
 - 必须产出：

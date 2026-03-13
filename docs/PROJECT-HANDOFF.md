@@ -2,34 +2,32 @@
 
 ## 本轮目标
 
-- 完成 `INFRA-330`，实现同步 API 契约与远程访问层
+- 完成 `INFRA-340`，建立通知、小组件、日志基础设施抽象
 
 ## 本轮完成
 
-- 在服务端新增同步契约目录 `Api/Contracts/Sync`
-- 新增同步控制器 `Api/Controllers/SyncController.cs`
-- 新增同步配置对象 `Infrastructure/Configuration/SyncOptions.cs`
-- 在服务端基础设施注册中接入 `Sync` 配置绑定
-- 为服务端同步接口补入以下基础能力：
-  - `GET /api/sync/pull?since=...`
-  - `POST /api/sync/push`
-  - 基于 JWT 当前用户的数据隔离
-  - 基于 `SyncChange.Id` 的幂等去重
-  - 按 `LastModifiedAt` 返回服务端冲突快照
-  - `push` 批次大小限制
-- 在客户端新增远程同步访问目录 `Infrastructure/Api/Sync`
-- 新增客户端同步远程访问接口 `ISyncRemoteClient`
-- 新增客户端同步远程访问实现 `SyncRemoteClient`
-- 新增客户端 `pull/push` 同步契约 DTO
-- 在 `ClientServiceRegistry` 注册 `HttpClient` 与 `ISyncRemoteClient`
+- 在客户端新增日志抽象目录 `Infrastructure/Diagnostics`
+- 在客户端新增通知抽象目录 `Infrastructure/Notifications`
+- 在客户端新增小组件快照抽象目录 `Infrastructure/Widgets`
+- 新增客户端日志接口 `IOverviewLogger`、`IOverviewLoggerFactory`
+- 新增客户端通知接口 `INotificationScheduler` 与默认空实现 `NoOpNotificationScheduler`
+- 新增客户端小组件快照接口 `IWidgetSnapshotStore` 与默认内存实现 `InMemoryWidgetSnapshotStore`
+- 在客户端 `ClientServiceRegistry` 注册日志工厂、通知调度和小组件快照存储
+- 在服务端新增日志抽象目录 `Infrastructure/Diagnostics`
+- 新增服务端日志接口 `IOverviewLogger`、`IOverviewLoggerFactory`
+- 新增服务端 `MicrosoftOverviewLoggerFactory`，用于桥接 `Microsoft.Extensions.Logging`
+- 在服务端基础设施注册中接入 `IOverviewLoggerFactory`
+- 将 `VerificationCodeService` 从直接依赖 `ILogger<T>` 切换为统一日志抽象
 - 验证结果：
   - `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
   - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 
 ## 本轮未完成
 
-- 通知、小组件、日志基础设施抽象
+- Application 层用例
 - 真实邮件发送提供程序接入
+- 通知平台映射
+- 小组件平台映射
 
 ## 当前阻塞
 
@@ -37,21 +35,23 @@
 
 ## 已更新文件
 
-- `Overview.Server/Api/Contracts/Sync/`
-- `Overview.Server/Api/Controllers/SyncController.cs`
-- `Overview.Server/Infrastructure/Configuration/SyncOptions.cs`
 - `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
+- `Overview.Server/Infrastructure/Diagnostics/`
+- `Overview.Server/Infrastructure/Identity/VerificationCodeService.cs`
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
-- `Overview.Client/Overview.Client/Infrastructure/Api/Sync/`
+- `Overview.Client/Overview.Client/Infrastructure/Diagnostics/`
+- `Overview.Client/Overview.Client/Infrastructure/Notifications/`
+- `Overview.Client/Overview.Client/Infrastructure/Widgets/`
 - `docs/PROJECT-STATUS.md`
 - `docs/PROJECT-TODO.md`
 - `docs/PROJECT-HANDOFF.md`
 - `docs/PROJECT-CHANGELOG.md`
 - `docs/PROJECT-FILE-MAP.md`
+- `docs/PROJECT-ROADMAP.md`
 
 ## 下一步唯一推荐动作
 
-- 执行 `INFRA-340`：建立通知、小组件、日志基础设施抽象
+- 执行 `APP-400`：实现认证用例与登录态管理
 
 ## 接手 AI 注意事项
 
@@ -61,7 +61,7 @@
 - 若从仓库根目录执行 `dotnet restore/build`，必须保留根级 `global.json`，否则 `Uno.Sdk` 无法解析
 - Uno 模板还生成了 `Overview.Client/Overview.Client.sln`，当前以仓库根解决方案为主
 - `DOMAIN-200`、`DOMAIN-210`、`DOMAIN-220`、`DOMAIN-230`、`INFRA-300`、`INFRA-310` 已完成；后续基础设施实现应继续复用既有领域规则，而不是重写算法
-- `INFRA-320`、`INFRA-330` 已完成；当前服务端已具备认证与同步 API 基础设施，客户端已具备远程同步访问封装
+- `INFRA-320`、`INFRA-330`、`INFRA-340` 已完成；当前服务端已具备认证与同步 API 基础设施，客户端已具备远程同步访问封装以及通知/小组件/日志抽象
 - 当前时间标题只做了基础格式化规则，真正的多语言资源化应放在后续 Presentation/i18n 阶段，不要在 Domain 层引入资源依赖
 - 当前提醒规则服务已提供 `NormalizeReminderConfig`、`ExpandOccurrences`、`BuildReminderSchedule` 三个入口；后续应用层和基础设施层应复用，而不是各自再写一套时间展开
 - 当前主页交互规则服务已提供 `CalculateOverlapStates`、`ResolveHit` 两个入口；后续 Presentation 主页应只负责把坐标映射成时间点和可见事项集合
@@ -72,8 +72,8 @@
 - 当前 `send-verification-code` 端点会生成 6 位验证码、持久化哈希，并把明文验证码写入服务端日志；这是为了完成当前最小基础设施任务，真实邮件发送链路仍需后续补齐
 - 当前密码哈希采用 PBKDF2-SHA256，自定义格式为 `PBKDF2.{saltHex}.{hashHex}`
 - 当前刷新令牌按单条记录持久化，`refresh` 端点会吊销旧令牌并写入替换后的哈希
-- 当前已进入 Infrastructure 阶段，不应跳去做 Application 或 Presentation 细节，除非先完成当前剩余基础设施任务
-- 下一步不要回头扩写登录页、同步编排或页面状态，先完成 `INFRA-340`
+- 当前已进入 Application 阶段，不应跳去做 Presentation 或 Platform 细节
+- 下一步不要回头扩写页面壳层或平台映射，先完成 `APP-400`
 - 运行 EF CLI 前先执行 `dotnet tool restore`
 - 本地没有可连接的 PostgreSQL 实例；如果下轮需要验证 `database update` 或真实读写，请先启动数据库或调整连接串
 - 不要跳过 Shell/Domain/Application 直接做页面细节
