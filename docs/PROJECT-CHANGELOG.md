@@ -110,3 +110,12 @@
 - 定义 `ITimeRuleService`、`TimeRuleService`、`CalendarPeriod`、`TimeBlockDefinition`
 - 实现时间块生成、日周月范围计算、前后周期切换和基础标题格式化
 - 验证客户端桌面目标和服务端项目在时间规则接入后仍可无警告构建
+
+### Round 16
+
+- 完成 `DOMAIN-220`
+- 在客户端和服务端分别新增 `IReminderRuleService`、`ReminderRuleService`
+- 在客户端和服务端分别新增 `ItemOccurrence`、`ScheduledReminder`
+- 实现提醒触发器归一化、重复展开和提醒调度领域规则
+- 支持日、周、月、年频率重复及 `Interval`、`Count`、`UntilAt` 约束
+- 验证客户端桌面目标和服务端项目在提醒与重复规则接入后仍可无警告构建

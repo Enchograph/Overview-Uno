@@ -153,12 +153,16 @@
 - Title: 实现提醒与重复领域规则
 - Phase: 阶段 2
 - Depends On: DOMAIN-200
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 定义提醒配置、重复规则和展开规则
-- Implementation Notes: 供通知和列表/主页展示复用
-- Done When: 提醒与重复规则完成
-- Verification: 可定位规则对象
+- Implementation Notes: 已在客户端和服务端分别新增提醒规则服务、展开结果和值对象；当前支持提醒触发器归一化、日/周/月/年重复展开、按时区生成提醒调度
+- Done When: 提醒与重复规则完成，并可被通知与列表/主页复用
+- Verification:
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 `IReminderRuleService` 与 `ReminderRuleService`
+  - 可定位 `ItemOccurrence` 与 `ScheduledReminder`
 - Files Expected: 提醒/重复规则
 
 ### Task ID: DOMAIN-230
