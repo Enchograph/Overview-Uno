@@ -1,5 +1,6 @@
 using Overview.Client.Domain.Entities;
 using Overview.Client.Domain.Enums;
+using Overview.Client.Application.Notifications;
 using Overview.Client.Infrastructure.Persistence.Repositories;
 using Overview.Client.Infrastructure.Settings;
 
@@ -10,15 +11,18 @@ public sealed class UserSettingsService : IUserSettingsService
     private readonly IUserSettingsRepository userSettingsRepository;
     private readonly ISyncChangeRepository syncChangeRepository;
     private readonly IDeviceIdStore deviceIdStore;
+    private readonly INotificationRefreshService notificationRefreshService;
 
     public UserSettingsService(
         IUserSettingsRepository userSettingsRepository,
         ISyncChangeRepository syncChangeRepository,
-        IDeviceIdStore deviceIdStore)
+        IDeviceIdStore deviceIdStore,
+        INotificationRefreshService? notificationRefreshService = null)
     {
         this.userSettingsRepository = userSettingsRepository;
         this.syncChangeRepository = syncChangeRepository;
         this.deviceIdStore = deviceIdStore;
+        this.notificationRefreshService = notificationRefreshService ?? NoOpNotificationRefreshService.Instance;
     }
 
     public async Task<UserSettings> GetAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -92,6 +96,7 @@ public sealed class UserSettingsService : IUserSettingsService
             CreatedAt = settings.CreatedAt,
             LastModifiedAt = settings.LastModifiedAt
         }, cancellationToken).ConfigureAwait(false);
+        await notificationRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
 
         return settings;
     }

@@ -52,6 +52,8 @@
   - 客户端主页交互解析结果模型，承载列日期、命中时间、单元格起始时间和命中事项 ID
 - `Overview.Client/Overview.Client/Application/Lists/`
   - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
+- `Overview.Client/Overview.Client/Application/Notifications/`
+  - 客户端通知应用层目录，当前包含本地提醒重建接口与实现
 - `Overview.Client/Overview.Client/Application/Ai/`
   - 客户端 AI 应用层目录，当前包含事项摘要检索、OpenAI 兼容请求体组装、结构化响应解析、自然语言意图执行，以及 AI 聊天加载/发送/按日周月范围读取服务
 - `Overview.Client/Overview.Client/Application/Ai/AiChatService.cs`
@@ -62,6 +64,8 @@
   - 客户端 AI 聊天范围快照模型，承载选中日/周/月范围与消息列表
 - `Overview.Client/Overview.Client/Application/Sync/`
   - 客户端同步应用层目录，包含自动/手动同步编排、同步状态模型和冲突收敛逻辑
+- `Overview.Client/Overview.Client/Application/Notifications/NotificationRefreshService.cs`
+  - 客户端通知刷新应用服务，负责基于当前事项和设置重建未来 30 天本地提醒
 - `Overview.Client/Overview.Client/Application/Sync/ISyncLifecycleCoordinator.cs`
   - 客户端同步生命周期协调接口，负责把自动同步接到壳层和应用窗口事件
 - `Overview.Client/Overview.Client/Application/Sync/SyncLifecycleCoordinator.cs`
@@ -142,6 +146,8 @@
   - 客户端同步生命周期测试，当前覆盖壳层加载启动自动同步、窗口激活补同步和壳层卸载停止自动同步
 - `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
   - 客户端同步编排验证测试，当前覆盖双设备在仅启动自动同步时对事项和设置的自动收敛
+- `tests/Overview.Client.Tests/NotificationRefreshServiceTests.cs`
+  - 客户端通知刷新测试，当前覆盖提醒调度、失效提醒取消，以及事项/设置服务接入通知重建
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
   - 客户端设置页分区入口模型，用于设置主页卡片列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`
@@ -169,13 +175,23 @@
 - `Overview.Client/Overview.Client/Infrastructure/Diagnostics/`
   - 客户端日志抽象目录，包含统一日志接口与默认空实现工厂
 - `Overview.Client/Overview.Client/Infrastructure/Notifications/`
-  - 客户端通知抽象目录，包含统一通知调度接口与默认空实现
+  - 客户端通知基础设施目录，当前包含统一通知调度接口、平台调度入口、通知状态存储和默认空实现
+- `Overview.Client/Overview.Client/Infrastructure/Notifications/INotificationStateStore.cs`
+  - 客户端通知状态存储接口与文件 / 内存实现，负责按用户跟踪已调度通知 ID
+- `Overview.Client/Overview.Client/Infrastructure/Notifications/PlatformNotificationScheduler.cs`
+  - 客户端平台通知调度入口，当前在 Android 上转到真实调度器，在 Desktop / Web 上降级为空实现
 - `Overview.Client/Overview.Client/Infrastructure/Persistence/`
   - 客户端 SQLite 数据层，包含数据库选项、表记录、仓储接口与实现、连接工厂
 - `Overview.Client/Overview.Client/Infrastructure/Settings/`
   - 客户端本地设置与登录态存储目录，当前包含认证会话存储、同步游标状态存储和设备标识存储
 - `Overview.Client/Overview.Client/Infrastructure/Widgets/`
   - 客户端小组件快照抽象目录，包含快照模型与默认内存存储
+- `Overview.Client/Overview.Client/Platforms/Android/MainActivity.Android.cs`
+  - 客户端 Android 活动入口，当前负责 Android 13+ 通知权限请求
+- `Overview.Client/Overview.Client/Platforms/Android/Notifications/AndroidNotificationScheduler.cs`
+  - 客户端 Android 通知调度器，基于 `AlarmManager` 调度和取消本地提醒
+- `Overview.Client/Overview.Client/Platforms/Android/Notifications/ReminderBroadcastReceiver.cs`
+  - 客户端 Android 提醒广播接收器，负责把闹钟广播转换为系统通知并回到应用
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
   - 客户端桌面入口
 - `Overview.Client/Overview.Client/Platforms/WebAssembly/Program.cs`

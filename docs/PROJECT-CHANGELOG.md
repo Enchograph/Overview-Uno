@@ -2,6 +2,17 @@
 
 ## 2026-03-13
 
+### Round 48
+
+- 完成 `PLATFORM-1000`
+- 新增 `INotificationRefreshService` / `NotificationRefreshService`，统一收敛本地提醒重建
+- 将通知刷新接入事项新增、编辑、完成、删除，设置保存，以及同步拉取/冲突收敛完成后的链路
+- 新增 `INotificationStateStore` / `FileNotificationStateStore`，按用户跟踪已调度通知 ID
+- 新增 `PlatformNotificationScheduler`，当前在 Android 映射到 `AlarmManager + BroadcastReceiver + NotificationCompat`
+- 新增 Android 通知接收器和 Android 13+ `POST_NOTIFICATIONS` 权限请求
+- Desktop / Web 当前显式降级到 `NoOpNotificationScheduler`
+- 新增通知刷新测试并扩展同步测试，验证客户端桌面构建通过、客户端测试 54/54 通过
+
 ### Round 47
 
 - 完成 `SYNC-920`

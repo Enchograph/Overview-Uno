@@ -2,29 +2,43 @@
 
 ## 本轮目标
 
-- 完成 `SYNC-920`，验证事项与设置在不手动触发的情况下也能自动收敛
+- 完成 `PLATFORM-1000`，按平台实现本地通知能力映射
 
 ## 本轮完成
 
-- 新增同步自动收敛验证测试：
+- 新增通知刷新应用层：
+  - `Overview.Client/Overview.Client/Application/Notifications/INotificationRefreshService.cs`
+  - `Overview.Client/Overview.Client/Application/Notifications/NotificationRefreshService.cs`
+- 新增通知状态存储与平台调度入口：
+  - `Overview.Client/Overview.Client/Infrastructure/Notifications/INotificationStateStore.cs`
+  - `Overview.Client/Overview.Client/Infrastructure/Notifications/PlatformNotificationScheduler.cs`
+- 已把本地提醒重建接入以下链路：
+  - `ItemService` 的新增、编辑、完成、删除
+  - `UserSettingsService` 的保存
+  - `SyncOrchestrationService` 的远端拉取/冲突收敛完成后
+- 已新增 Android 平台通知映射：
+  - `Platforms/Android/Notifications/AndroidNotificationScheduler.cs`
+  - `Platforms/Android/Notifications/ReminderBroadcastReceiver.cs`
+  - `Platforms/Android/MainActivity.Android.cs`
+  - `Platforms/Android/AndroidManifest.xml`
+- 当前平台行为：
+  - Android 使用 `AlarmManager + BroadcastReceiver + NotificationCompat` 调度和取消提醒
+  - Android 13+ 启动时主动请求 `POST_NOTIFICATIONS` 权限
+  - Desktop / Web 当前继续降级到 `NoOpNotificationScheduler`
+- 新增验证测试：
+  - `tests/Overview.Client.Tests/NotificationRefreshServiceTests.cs`
   - `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
-- 当前验证方式：
-  - 使用共享内存远端和两套独立客户端仓储模拟双设备
-  - 两端只调用 `StartAutoSyncAsync`，不调用手动同步入口
-  - 分别验证事项自动收敛与设置自动收敛
-- 已确认阶段 9 验收闭环：
-  - 自动后台同步已接入
-  - 手动同步入口和同步状态展示已存在
-  - 自动收敛测试已通过
 - 验证结果：
   - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
-  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，49/49 用例通过
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，54/54 用例通过
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-android` 已生成 `bin/Debug/net10.0-android/Overview.Client.dll`，当前环境下构建进程未正常回收，但 Android 通知相关代码已编译通过并只剩警告
 
 ## 本轮未完成
 
 - 真实邮件发送提供程序接入
-- 通知平台映射
 - 小组件平台映射
+- 平板横竖屏适配
+- Windows / Web 主流程适配与通知降级说明收尾
 
 ## 当前阻塞
 
@@ -32,10 +46,22 @@
 
 ## 已更新文件
 
+- `Overview.Client/Overview.Client/Application/Notifications/INotificationRefreshService.cs`
+- `Overview.Client/Overview.Client/Application/Notifications/NotificationRefreshService.cs`
+- `Overview.Client/Overview.Client/Infrastructure/Notifications/INotificationStateStore.cs`
+- `Overview.Client/Overview.Client/Infrastructure/Notifications/PlatformNotificationScheduler.cs`
+- `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
+- `Overview.Client/Overview.Client/Application/Items/ItemService.cs`
+- `Overview.Client/Overview.Client/Application/Settings/UserSettingsService.cs`
+- `Overview.Client/Overview.Client/Application/Sync/SyncOrchestrationService.cs`
+- `Overview.Client/Overview.Client/Platforms/Android/Notifications/AndroidNotificationScheduler.cs`
+- `Overview.Client/Overview.Client/Platforms/Android/Notifications/ReminderBroadcastReceiver.cs`
+- `Overview.Client/Overview.Client/Platforms/Android/MainActivity.Android.cs`
+- `Overview.Client/Overview.Client/Platforms/Android/AndroidManifest.xml`
+- `tests/Overview.Client.Tests/NotificationRefreshServiceTests.cs`
 - `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
 - `docs/PROJECT-STATUS.md`
 - `docs/PROJECT-TODO.md`
-- `docs/PROJECT-ROADMAP.md`
 - `docs/PROJECT-ACCEPTANCE.md`
 - `docs/PROJECT-HANDOFF.md`
 - `docs/PROJECT-CHANGELOG.md`
@@ -43,7 +69,7 @@
 
 ## 下一步唯一推荐动作
 
-- 执行 `PLATFORM-1000`：按平台实现本地通知能力映射
+- 执行 `PLATFORM-1010`：设计并实现四类小组件的平台映射
 
 ## 接手 AI 注意事项
 
@@ -52,7 +78,7 @@
 - 根解决方案入口是 `Overview.Uno.slnx`，不是 `.sln`
 - 若从仓库根目录执行 `dotnet restore/build`，必须保留根级 `global.json`，否则 `Uno.Sdk` 无法解析
 - 当前列表页已完成标签筛选、排序、完成切换、重要切换、手动重排、主题切换、“更多设置”联动、滑动编辑删除和浮动添加；当前已推进到 AI 任务
-- 当前阶段 9 已完成；下一轮应切换到阶段 10 的 `PLATFORM-1000`
+- 当前阶段 10 已开始；`PLATFORM-1000` 已完成，下一轮应切换到 `PLATFORM-1010`
 - 新增的客户端测试项目当前通过直接引用桌面构建产物 `Overview.Client.dll` 运行；执行 `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 前，先确保客户端桌面目标已经构建过
 - 当前列表页采用“ViewModel 聚合状态 + 页面手动 Apply”模式；后续列表页任务应延续该模式，避免额外引入状态库
 - 当前设置页 AI 分区也沿用“ViewModel 聚合状态 + 页面手动 Apply”模式；后续 AI 页若需要新增表单或状态，优先复用这一模式
@@ -61,6 +87,9 @@
 - 当前应用窗口激活会执行一次前台同步；若后续需要更细粒度退避、网络感知或平台后台任务，优先在协调层扩展，不要修改各业务 ViewModel
 - 当前手动同步入口只在设置页 `sync` 分区；状态展示依赖 `ISyncOrchestrationService.StatusChanged` 驱动刷新，不要在页面里直接拼接同步逻辑
 - 当前 `SyncOrchestrationServiceTests` 使用共享内存远端验证双设备自动收敛；后续若修改同步协议，应先保持这些验证通过
+- 当前本地提醒重建统一收敛在 `NotificationRefreshService`；后续不要把平台通知调度逻辑散到页面或 ViewModel
+- 当前 Desktop / Web 仍通过 `PlatformNotificationScheduler -> NoOpNotificationScheduler` 降级；后续做 `PLATFORM-1030` 时要把降级说明和实际平台分支补完整
+- 当前 Android 构建在本环境里会长时间停留在收尾阶段，但已产出 `bin/Debug/net10.0-android/Overview.Client.dll`；若下轮继续做 Android 平台能力，建议优先复查构建脚本或增加显式超时
 - 运行 EF CLI 前先执行 `dotnet tool restore`
 - 本地没有可连接的 PostgreSQL 实例；如果下轮需要验证 `database update` 或真实读写，请先启动数据库或调整连接串
 - 每完成一个最小任务项后，要先更新状态文件，再立即创建一次包含任务 ID 的 git commit

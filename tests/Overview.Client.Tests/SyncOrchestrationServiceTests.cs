@@ -1,5 +1,6 @@
 using Overview.Client.Application.Auth;
 using Overview.Client.Application.Items;
+using Overview.Client.Application.Notifications;
 using Overview.Client.Application.Settings;
 using Overview.Client.Application.Sync;
 using Overview.Client.Domain.Entities;
@@ -80,7 +81,36 @@ public sealed class SyncOrchestrationServiceTests
         await deviceB.SyncService.StopAutoSyncAsync();
     }
 
-    private static TestHarness CreateHarness(string deviceId, SharedSyncBackend backend)
+    [Fact]
+    public async Task StartAutoSyncAsync_RefreshesNotificationsAfterApplyingRemoteChanges()
+    {
+        var backend = new SharedSyncBackend();
+        var deviceA = CreateHarness("device-a", backend);
+        var recordingNotifications = new RecordingNotificationRefreshService();
+        var deviceB = CreateHarness("device-b", backend, recordingNotifications);
+
+        await deviceA.ItemService.CreateAsync(UserId, new ItemUpsertRequest
+        {
+            Type = ItemType.Task,
+            Title = "Review reminder sync",
+            PlannedStartAt = new DateTimeOffset(2026, 3, 13, 9, 0, 0, TimeSpan.Zero),
+            PlannedEndAt = new DateTimeOffset(2026, 3, 13, 10, 0, 0, TimeSpan.Zero),
+            DeadlineAt = new DateTimeOffset(2026, 3, 13, 18, 0, 0, TimeSpan.Zero)
+        });
+
+        await deviceA.SyncService.StartAutoSyncAsync(TimeSpan.FromMinutes(5));
+        await deviceB.SyncService.StartAutoSyncAsync(TimeSpan.FromMinutes(5));
+
+        Assert.Equal([UserId], recordingNotifications.RefreshedUsers);
+
+        await deviceA.SyncService.StopAutoSyncAsync();
+        await deviceB.SyncService.StopAutoSyncAsync();
+    }
+
+    private static TestHarness CreateHarness(
+        string deviceId,
+        SharedSyncBackend backend,
+        INotificationRefreshService? notificationRefreshService = null)
     {
         var session = new AuthSession
         {
@@ -104,13 +134,14 @@ public sealed class SyncOrchestrationServiceTests
             new InMemorySyncStateStore(),
             new FixedDeviceIdStore(deviceId),
             NullOverviewLoggerFactory.Instance,
-            TimeProvider.System);
+            TimeProvider.System,
+            notificationRefreshService);
 
         return new TestHarness(
             itemRepository,
             userSettingsRepository,
-            new ItemService(itemRepository, syncChangeRepository, new FixedDeviceIdStore(deviceId)),
-            new UserSettingsService(userSettingsRepository, syncChangeRepository, new FixedDeviceIdStore(deviceId)),
+            new ItemService(itemRepository, syncChangeRepository, new FixedDeviceIdStore(deviceId), notificationRefreshService),
+            new UserSettingsService(userSettingsRepository, syncChangeRepository, new FixedDeviceIdStore(deviceId), notificationRefreshService),
             syncService);
     }
 
@@ -176,6 +207,17 @@ public sealed class SyncOrchestrationServiceTests
         public Task<string> GetOrCreateAsync(CancellationToken cancellationToken = default)
         {
             return Task.FromResult(deviceId);
+        }
+    }
+
+    private sealed class RecordingNotificationRefreshService : INotificationRefreshService
+    {
+        public List<Guid> RefreshedUsers { get; } = [];
+
+        public Task RefreshAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            RefreshedUsers.Add(userId);
+            return Task.CompletedTask;
         }
     }
 

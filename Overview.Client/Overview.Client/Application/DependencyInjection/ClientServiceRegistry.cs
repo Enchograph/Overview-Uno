@@ -6,6 +6,7 @@ using Overview.Client.Application.Auth;
 using Overview.Client.Application.Home;
 using Overview.Client.Application.Items;
 using Overview.Client.Application.Lists;
+using Overview.Client.Application.Notifications;
 using Overview.Client.Application.Settings;
 using Overview.Client.Application.Sync;
 using Overview.Client.Infrastructure.Api.Ai;
@@ -57,7 +58,8 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<ISyncOrchestrationService>()));
         registry.RegisterSingleton(() => new HttpClient());
         registry.RegisterSingleton<IOverviewLoggerFactory>(() => NullOverviewLoggerFactory.Instance);
-        registry.RegisterSingleton<INotificationScheduler>(() => new NoOpNotificationScheduler());
+        registry.RegisterSingleton<INotificationScheduler>(() => new PlatformNotificationScheduler());
+        registry.RegisterSingleton<INotificationStateStore>(() => new FileNotificationStateStore());
         registry.RegisterSingleton<IWidgetSnapshotStore>(() => new InMemoryWidgetSnapshotStore());
         registry.RegisterSingleton<ISqliteConnectionFactory>(() => new SqliteConnectionFactory());
         registry.RegisterSingleton<IItemRepository>(() => new SqliteItemRepository(registry.Resolve<ISqliteConnectionFactory>()));
@@ -66,6 +68,7 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<ISyncChangeRepository>(() => new SqliteSyncChangeRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<ITimeRuleService>(() => new TimeRuleService());
         registry.RegisterSingleton<IHomeInteractionRuleService>(() => new HomeInteractionRuleService());
+        registry.RegisterSingleton<IReminderRuleService>(() => new ReminderRuleService());
         registry.RegisterSingleton<IAuthSessionStore>(() => new FileAuthSessionStore());
         registry.RegisterSingleton<ISyncStateStore>(() => new FileSyncStateStore());
         registry.RegisterSingleton<IDeviceIdStore>(() => new FileDeviceIdStore());
@@ -76,15 +79,24 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IAuthRemoteClient>(),
             registry.Resolve<IAuthSessionStore>(),
             registry.Resolve<IOverviewLoggerFactory>()));
+        registry.RegisterSingleton<INotificationRefreshService>(() => new NotificationRefreshService(
+            registry.Resolve<IItemRepository>(),
+            registry.Resolve<IUserSettingsRepository>(),
+            registry.Resolve<IReminderRuleService>(),
+            registry.Resolve<INotificationScheduler>(),
+            registry.Resolve<INotificationStateStore>(),
+            registry.Resolve<TimeProvider>()));
         registry.RegisterSingleton<ISyncRemoteClient>(() => new SyncRemoteClient(registry.Resolve<HttpClient>()));
         registry.RegisterSingleton<IItemService>(() => new ItemService(
             registry.Resolve<IItemRepository>(),
             registry.Resolve<ISyncChangeRepository>(),
-            registry.Resolve<IDeviceIdStore>()));
+            registry.Resolve<IDeviceIdStore>(),
+            registry.Resolve<INotificationRefreshService>()));
         registry.RegisterSingleton<IUserSettingsService>(() => new UserSettingsService(
             registry.Resolve<IUserSettingsRepository>(),
             registry.Resolve<ISyncChangeRepository>(),
-            registry.Resolve<IDeviceIdStore>()));
+            registry.Resolve<IDeviceIdStore>(),
+            registry.Resolve<INotificationRefreshService>()));
         registry.RegisterSingleton<IHomeLayoutService>(() => new HomeLayoutService(
             registry.Resolve<IItemService>(),
             registry.Resolve<IUserSettingsService>(),
@@ -117,7 +129,8 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<ISyncStateStore>(),
             registry.Resolve<IDeviceIdStore>(),
             registry.Resolve<IOverviewLoggerFactory>(),
-            registry.Resolve<TimeProvider>()));
+            registry.Resolve<TimeProvider>(),
+            registry.Resolve<INotificationRefreshService>()));
         registry.RegisterSingleton<ISyncLifecycleCoordinator>(() => new SyncLifecycleCoordinator(
             registry.Resolve<ISyncOrchestrationService>()));
         return registry;

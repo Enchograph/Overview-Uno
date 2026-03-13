@@ -731,12 +731,16 @@
 - Title: 按平台实现本地通知能力映射
 - Phase: 阶段 10
 - Depends On: SYNC-920, INFRA-340, UI-510
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 让提醒在目标平台按平台能力触发和取消
-- Implementation Notes: 各平台支持差异需明确记录
+- Implementation Notes: 已新增通知刷新服务，把事项/设置/同步后的提醒重建统一收敛到应用层；Android 已接入 `AlarmManager + BroadcastReceiver + NotificationCompat` 本地提醒映射，Desktop / Web 当前保留 `NoOp` 降级并待 `PLATFORM-1030` 补明确能力说明
 - Done When: 通知能力接入完成
-- Verification: 可定位平台通知实现
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-android`
+  - 可定位平台通知实现
 - Files Expected: 平台通知实现
 
 ### Task ID: PLATFORM-1010

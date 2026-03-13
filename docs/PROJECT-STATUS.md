@@ -55,6 +55,7 @@
 - `SYNC-900`
 - `SYNC-910`
 - `SYNC-920`
+- `PLATFORM-1000`
 
 ## 正在进行任务 ID
 
@@ -62,7 +63,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `PLATFORM-1000`
+- `PLATFORM-1010`
 
 ## 当前阻塞
 
@@ -70,6 +71,27 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-android` 已生成 `bin/Debug/net10.0-android/Overview.Client.dll`，当前环境下构建进程未正常回收，但 Android 通知平台代码已完成编译并只暴露警告
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，54/54 用例通过，0 failed
+- 已确认客户端新增通知刷新与接入验证测试：
+  - `tests/Overview.Client.Tests/NotificationRefreshServiceTests.cs`
+  - `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
+- 已确认客户端通知当前已接入：
+  - 事项新增、编辑、完成、删除后自动重建本地提醒
+  - 设置保存后自动重建本地提醒
+  - 自动同步拉取/冲突收敛后自动重建本地提醒
+  - `Overview.Client/Overview.Client/Application/Notifications/NotificationRefreshService.cs`
+  - `Overview.Client/Overview.Client/Application/Items/ItemService.cs`
+  - `Overview.Client/Overview.Client/Application/Settings/UserSettingsService.cs`
+  - `Overview.Client/Overview.Client/Application/Sync/SyncOrchestrationService.cs`
+- 已确认客户端平台通知映射当前已新增：
+  - Android `AlarmManager + BroadcastReceiver + NotificationCompat` 调度与取消
+  - Android 13+ `POST_NOTIFICATIONS` 权限请求
+  - Desktop / Web 继续显式降级到 `NoOpNotificationScheduler`
+  - `Overview.Client/Overview.Client/Infrastructure/Notifications/PlatformNotificationScheduler.cs`
+  - `Overview.Client/Overview.Client/Platforms/Android/Notifications/AndroidNotificationScheduler.cs`
+  - `Overview.Client/Overview.Client/Platforms/Android/Notifications/ReminderBroadcastReceiver.cs`
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，49/49 用例通过，0 failed
 - 已确认客户端新增自动收敛验证测试：
   - `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
@@ -658,7 +680,7 @@
 - 当前主页布局应用层已输出比例和选择映射结果，但尚未接入真实页面坐标、手势和渲染层
 - 本地未运行 PostgreSQL 实例，因此本轮只验证了“可生成迁移、可输出脚本”，尚未执行 `database update`
 - 当前 `send-verification-code` 仅把验证码写入数据库并记录到服务端日志，尚未接入真实 SMTP/邮件供应商发送链路
-- 当前通知调度仅提供 `INotificationScheduler` 抽象和空实现，尚未接入 Android/Windows/Web 平台本地通知
+- 当前通知已接入 Android 平台本地提醒调度与取消；Desktop / Web 仍暂时降级到 `NoOpNotificationScheduler`，待 `PLATFORM-1030` 补齐明确降级说明与平台适配
 - 当前小组件只提供快照存储抽象；实际平台 Widget/Shortcut 映射仍在平台集成阶段
 - 当前客户端日志抽象默认注册为 no-op 工厂，后续若要把应用层日志接入 Uno 日志管线，需要在平台集成前补具体适配器
 - 当前同步控制器直接操作 `DbContext` 完成基础设施闭环；真正的自动同步编排、状态机和本地收敛仍在后续 Application/Sync 阶段
