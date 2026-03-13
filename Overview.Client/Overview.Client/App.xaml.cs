@@ -1,10 +1,12 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Uno.Resizetizer;
+using Overview.Client.Application.DependencyInjection;
+using Overview.Client.Presentation.Pages;
 
 namespace Overview.Client;
 
-public partial class App : Application
+public partial class App : Microsoft.UI.Xaml.Application
 {
     /// <summary>
     /// Initializes the singleton application object. This is the first line of authored code
@@ -13,9 +15,11 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
+        Services = ClientServiceRegistry.CreateDefault();
     }
 
     protected Window? MainWindow { get; private set; }
+    internal static ClientServiceRegistry Services { get; private set; } = null!;
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {

@@ -67,3 +67,12 @@
 - 新增根级 `global.json`，固定 `Uno.Sdk` 版本并支持从仓库根目录恢复
 - 验证客户端桌面目标和服务端项目可成功构建
 - 修正文档中关于 git 初始化状态的过期描述
+
+### Round 11
+
+- 完成 `SHELL-110`
+- 在客户端项目中建立 `Presentation`、`Application`、`Domain`、`Infrastructure` 分层目录
+- 将默认页面迁移到 `Presentation/Pages`
+- 新增 `Presentation/ViewModels/MainViewModel.cs`
+- 新增轻量注册点 `Application/DependencyInjection/ClientServiceRegistry.cs`
+- 验证客户端桌面目标在分层调整后仍可无警告构建

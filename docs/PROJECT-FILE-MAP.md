@@ -36,12 +36,20 @@
   - 接力变更记录
 - `Overview.Client/Overview.Client/Overview.Client.csproj`
   - Uno Platform 客户端主项目
+- `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
+  - 客户端轻量注册中心，作为后续服务注册的基础落点
+- `Overview.Client/Overview.Client/Presentation/Pages/MainPage.xaml`
+  - 当前客户端占位首页
+- `Overview.Client/Overview.Client/Presentation/ViewModels/MainViewModel.cs`
+  - 当前客户端占位首页 ViewModel
+- `Overview.Client/Overview.Client/Domain/DomainAssemblyMarker.cs`
+  - 客户端 Domain 层目录落点
+- `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
+  - 客户端 Infrastructure 层目录落点
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
   - 客户端桌面入口
 - `Overview.Client/Overview.Client/Platforms/WebAssembly/Program.cs`
   - 客户端 WebAssembly 入口
-- `Overview.Client/Overview.Client/MainPage.xaml`
-  - 当前客户端默认占位页面
 - `Overview.Server/Overview.Server.csproj`
   - ASP.NET Core 服务端主项目
 - `Overview.Server/Program.cs`
@@ -49,14 +57,6 @@
 
 ## 当前不存在但未来应出现的关键路径
 
-- `Overview.Client/Presentation/`
-  - 客户端 Presentation 分层目录
-- `Overview.Client/Application/`
-  - 客户端 Application 分层目录
-- `Overview.Client/Domain/`
-  - 客户端 Domain 分层目录
-- `Overview.Client/Infrastructure/`
-  - 客户端 Infrastructure 分层目录
 - `Overview.Server/Api/`
   - 服务端 API 分层目录
 - `Overview.Server/Application/`

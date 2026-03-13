@@ -62,13 +62,18 @@
 - Title: 建立客户端 MVVM 分层目录
 - Phase: 阶段 1
 - Depends On: BOOT-100
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 建立 Presentation、Application、Domain、Infrastructure 目录和基础注册点
-- Implementation Notes: 页面只做最小占位，不做业务逻辑
+- Implementation Notes: 已将默认页面迁入 `Presentation/Pages`，新增 `Presentation/ViewModels`，并创建轻量注册中心 `Application/DependencyInjection/ClientServiceRegistry.cs`；未引入业务逻辑
 - Done When: 客户端分层目录存在
-- Verification: 可定位 MVVM 分层目录
-- Files Expected: 客户端分层目录
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 MVVM 分层目录
+  - 可定位基础注册点
+- Files Expected:
+  - 客户端分层目录
+  - 基础注册点
 
 ### Task ID: SHELL-120
 
