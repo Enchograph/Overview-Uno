@@ -107,6 +107,73 @@ public sealed class SyncOrchestrationServiceTests
         await deviceB.SyncService.StopAutoSyncAsync();
     }
 
+    [Fact]
+    public async Task SynchronizeNowAsync_WhenServerItemIsNewer_AppliesServerSnapshotAndClearsOlderPendingChange()
+    {
+        var backend = new SharedSyncBackend();
+        var itemId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+        backend.SeedItem(new Item
+        {
+            Id = itemId,
+            UserId = UserId,
+            Type = ItemType.Task,
+            Title = "Server wins",
+            PlannedStartAt = new DateTimeOffset(2026, 3, 13, 9, 0, 0, TimeSpan.Zero),
+            PlannedEndAt = new DateTimeOffset(2026, 3, 13, 10, 0, 0, TimeSpan.Zero),
+            DeadlineAt = new DateTimeOffset(2026, 3, 13, 18, 0, 0, TimeSpan.Zero),
+            TimeZoneId = "UTC",
+            CreatedAt = new DateTimeOffset(2026, 3, 13, 8, 0, 0, TimeSpan.Zero),
+            UpdatedAt = new DateTimeOffset(2026, 3, 13, 12, 0, 0, TimeSpan.Zero),
+            LastModifiedAt = new DateTimeOffset(2026, 3, 13, 12, 0, 0, TimeSpan.Zero),
+            SourceDeviceId = "device-b"
+        });
+
+        var itemRepository = new InMemoryItemRepository();
+        var settingsRepository = new InMemoryUserSettingsRepository();
+        var changeRepository = new InMemorySyncChangeRepository();
+        var localOlderItem = new Item
+        {
+            Id = itemId,
+            UserId = UserId,
+            Type = ItemType.Task,
+            Title = "Local older draft",
+            PlannedStartAt = new DateTimeOffset(2026, 3, 13, 9, 0, 0, TimeSpan.Zero),
+            PlannedEndAt = new DateTimeOffset(2026, 3, 13, 10, 0, 0, TimeSpan.Zero),
+            DeadlineAt = new DateTimeOffset(2026, 3, 13, 18, 0, 0, TimeSpan.Zero),
+            TimeZoneId = "UTC",
+            CreatedAt = new DateTimeOffset(2026, 3, 13, 8, 0, 0, TimeSpan.Zero),
+            UpdatedAt = new DateTimeOffset(2026, 3, 13, 11, 0, 0, TimeSpan.Zero),
+            LastModifiedAt = new DateTimeOffset(2026, 3, 13, 11, 0, 0, TimeSpan.Zero),
+            SourceDeviceId = "device-a"
+        };
+
+        await itemRepository.UpsertAsync(localOlderItem);
+        await changeRepository.UpsertAsync(new SyncChange
+        {
+            Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+            UserId = UserId,
+            DeviceId = "device-a",
+            EntityType = SyncEntityType.Item,
+            ChangeType = SyncChangeType.Upsert,
+            EntityId = itemId,
+            ItemSnapshot = localOlderItem,
+            CreatedAt = localOlderItem.CreatedAt,
+            LastModifiedAt = localOlderItem.LastModifiedAt
+        });
+
+        var service = CreateSyncService(itemRepository, settingsRepository, changeRepository, "device-a", backend);
+
+        var status = await service.SynchronizeNowAsync();
+        var resolved = await itemRepository.GetAsync(UserId, itemId);
+        var pending = await changeRepository.ListPendingAsync(UserId);
+
+        Assert.NotNull(resolved);
+        Assert.Equal("Server wins", resolved!.Title);
+        Assert.Empty(pending);
+        Assert.Equal(1, status.ConflictCount);
+        Assert.Equal(SyncLifecycleState.Succeeded, status.State);
+    }
+
     private static TestHarness CreateHarness(
         string deviceId,
         SharedSyncBackend backend,
@@ -143,6 +210,37 @@ public sealed class SyncOrchestrationServiceTests
             new ItemService(itemRepository, syncChangeRepository, new FixedDeviceIdStore(deviceId), notificationRefreshService),
             new UserSettingsService(userSettingsRepository, syncChangeRepository, new FixedDeviceIdStore(deviceId), notificationRefreshService),
             syncService);
+    }
+
+    private static SyncOrchestrationService CreateSyncService(
+        InMemoryItemRepository itemRepository,
+        InMemoryUserSettingsRepository userSettingsRepository,
+        InMemorySyncChangeRepository syncChangeRepository,
+        string deviceId,
+        SharedSyncBackend backend,
+        INotificationRefreshService? notificationRefreshService = null)
+    {
+        var session = new AuthSession
+        {
+            UserId = UserId,
+            Email = "sync@example.com",
+            BaseUrl = "https://sync.example.com",
+            AccessToken = "token",
+            RefreshToken = "refresh",
+            AccessTokenExpiresAt = DateTimeOffset.UtcNow.AddHours(1)
+        };
+
+        return new SyncOrchestrationService(
+            new FakeAuthenticationService(session),
+            itemRepository,
+            userSettingsRepository,
+            syncChangeRepository,
+            new FakeSyncRemoteClient(UserId, backend),
+            new InMemorySyncStateStore(),
+            new FixedDeviceIdStore(deviceId),
+            NullOverviewLoggerFactory.Instance,
+            TimeProvider.System,
+            notificationRefreshService);
     }
 
     private sealed record TestHarness(
@@ -375,6 +473,22 @@ public sealed class SyncOrchestrationServiceTests
         private readonly Dictionary<Guid, Dictionary<Guid, Item>> itemsByUser = [];
         private readonly Dictionary<Guid, UserSettings> settingsByUser = [];
         private DateTimeOffset serverTime = new(2026, 3, 13, 0, 0, 0, TimeSpan.Zero);
+
+        public void SeedItem(Item item)
+        {
+            lock (gate)
+            {
+                GetUserItems(item.UserId)[item.Id] = item;
+            }
+        }
+
+        public void SeedSettings(UserSettings settings)
+        {
+            lock (gate)
+            {
+                settingsByUser[settings.UserId] = settings;
+            }
+        }
 
         public SyncPushResponse Push(Guid userId, SyncPushRequest request)
         {

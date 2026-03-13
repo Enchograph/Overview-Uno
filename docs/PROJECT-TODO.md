@@ -795,7 +795,7 @@
 - Title: 补齐自动化测试与原始需求映射验收
 - Phase: 阶段 11
 - Depends On: PLATFORM-1030
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 为核心领域规则、同步、AI、主页交互补齐测试，并按原始需求逐条验收
 - Implementation Notes: 至少覆盖验收清单中的关键场景

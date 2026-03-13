@@ -36,10 +36,12 @@
   - 当前文件地图
 - `docs/PROJECT-CHANGELOG.md`
   - 接力变更记录
+- `docs/PROJECT-REQUIREMENTS-TRACE.md`
+  - 原始需求逐条映射、降级说明和 QA 验收基线
 - `Overview.Client/Overview.Client/Overview.Client.csproj`
   - Uno Platform 客户端主项目
 - `tests/Overview.Client.Tests/`
-  - 客户端测试项目，当前覆盖主页命中规则、列表页状态、设置页分页联动以及 AI 聊天页/服务
+  - 客户端测试项目，当前覆盖主页命中规则、时间/提醒领域规则、同步冲突收敛、列表页状态、设置页分页联动以及 AI 聊天页/服务
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
   - 客户端轻量注册中心，作为后续服务注册的基础落点；当前已为 WebAssembly 切换到内存仓储 / 状态存储分支
 - `Overview.Client/Overview.Client/Application/Auth/`

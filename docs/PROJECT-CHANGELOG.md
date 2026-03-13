@@ -2,6 +2,16 @@
 
 ## 2026-03-13
 
+### Round 52
+
+- 完成 `QA-1100`
+- 新增 `PROJECT-REQUIREMENTS-TRACE.md`，把原始需求逐条映射到当前实现、降级说明和剩余缺口
+- 新增 `TimeRuleServiceTests`，直接覆盖时间块切分、周起始日和中英文周期标题规则
+- 新增 `ReminderRuleServiceTests`，直接覆盖提醒归一化、周重复展开和提醒调度顺序
+- 扩展 `SyncOrchestrationServiceTests`，新增“最后修改时间更新者获胜”的同步冲突收敛测试
+- 更新终局验收与状态文档，确认同步冲突、越界范围检查、核心领域规则测试和文档一致性条目已闭环
+- 验证客户端桌面构建通过、客户端测试 66/66 通过
+
 ### Round 51
 
 - 完成 `PLATFORM-1030`

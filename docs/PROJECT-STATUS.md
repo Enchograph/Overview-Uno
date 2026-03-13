@@ -59,6 +59,7 @@
 - `PLATFORM-1010`
 - `PLATFORM-1020`
 - `PLATFORM-1030`
+- `QA-1100`
 
 ## 正在进行任务 ID
 
@@ -66,7 +67,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `QA-1100`
+- `QA-1110`
 
 ## 当前阻塞
 
@@ -74,6 +75,18 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，66/66 用例通过，0 failed
+- 已确认客户端新增 QA 直接验证覆盖：
+  - `tests/Overview.Client.Tests/TimeRuleServiceTests.cs`
+  - `tests/Overview.Client.Tests/ReminderRuleServiceTests.cs`
+  - `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
+- 已确认原始需求映射验收文档已新增：
+  - `docs/PROJECT-REQUIREMENTS-TRACE.md`
+- 已确认本轮新增证明项：
+  - 时间块切分、周起始日与中英文周期标题规则已有直接测试
+  - 提醒归一化、周重复展开与提醒调度顺序已有直接测试
+  - 同步冲突已新增“最后修改时间更新者获胜”的直接测试
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-browserwasm -v q` 通过，0 error；当前仍存在既有 Wasm trimming / SQLite provider warning，但 Web 主流程已切换为内存仓储与会话级本地状态，不再依赖 SQLite / 文件路径
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，59/59 用例通过，0 failed

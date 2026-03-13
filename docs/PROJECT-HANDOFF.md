@@ -2,35 +2,32 @@
 
 ## 本轮目标
 
-- 完成 `PLATFORM-1030`，完成 Windows 与 Web 主流程适配和能力降级
+- 完成 `QA-1100`，补齐自动化测试与原始需求映射验收
 
 ## 本轮完成
 
-- 新增平台能力描述模型：
-  - `Overview.Client/Overview.Client/Infrastructure/Platform/IPlatformCapabilities.cs`
-- 已在客户端注册中心增加平台分支：
-  - WebAssembly 当前切换到内存事项仓储、设置仓储、AI 聊天仓储、同步变更仓储
-  - WebAssembly 当前切换到内存登录态、同步状态和设备 ID 存储
-  - Desktop / Android 继续保留原有 SQLite 与文件存储链路
-  - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
-  - `Overview.Client/Overview.Client/Infrastructure/Persistence/Repositories/InMemoryRepositories.cs`
-  - `Overview.Client/Overview.Client/Infrastructure/Settings/InMemoryStores.cs`
-- 已将设置页 `About` 分区升级为平台能力说明入口：
-  - 展示当前平台、平台家族、主流程状态
-  - 展示本地数据能力、通知能力、小组件能力
-  - 展示明确降级策略，避免伪造 Windows / Web 不具备的平台能力
-  - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
-- 已补充平台降级说明测试：
-  - `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
+- 新增领域规则直接测试：
+  - `tests/Overview.Client.Tests/TimeRuleServiceTests.cs`
+  - `tests/Overview.Client.Tests/ReminderRuleServiceTests.cs`
+- 扩展同步测试，新增“最后修改时间更新者获胜”冲突收敛验证：
+  - `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
+- 新增原始需求映射验收文档：
+  - `docs/PROJECT-REQUIREMENTS-TRACE.md`
+- 已将终局验收中的以下条目标记为通过：
+  - 同步冲突按最后修改时间收敛
+  - 无多人协作、附件、服务端 AI 代理等越界实现
+  - 自动化测试覆盖核心领域规则
+  - 所有状态文档与代码现状一致
 - 验证结果：
   - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
-  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-browserwasm -v q` 通过，0 error；仍有既有 Wasm trimming / SQLite provider warning
-  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，59/59 用例通过
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，66/66 用例通过
 
 ## 本轮未完成
 
+- 中文/英文主流程缺失文案验收
+- 性能验证与指标记录
+- 最终 git 推送收尾
 - 真实邮件发送提供程序接入
-- 阶段 11 的测试补齐、需求映射验收与性能验证
 
 ## 当前阻塞
 
@@ -38,12 +35,10 @@
 
 ## 已更新文件
 
-- `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
-- `Overview.Client/Overview.Client/Infrastructure/Persistence/Repositories/InMemoryRepositories.cs`
-- `Overview.Client/Overview.Client/Infrastructure/Settings/InMemoryStores.cs`
-- `Overview.Client/Overview.Client/Infrastructure/Platform/IPlatformCapabilities.cs`
-- `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
-- `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
+- `tests/Overview.Client.Tests/TimeRuleServiceTests.cs`
+- `tests/Overview.Client.Tests/ReminderRuleServiceTests.cs`
+- `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
+- `docs/PROJECT-REQUIREMENTS-TRACE.md`
 - `docs/PROJECT-STATUS.md`
 - `docs/PROJECT-TODO.md`
 - `docs/PROJECT-ACCEPTANCE.md`
@@ -53,7 +48,7 @@
 
 ## 下一步唯一推荐动作
 
-- 执行 `QA-1100`：补齐自动化测试与原始需求映射验收
+- 执行 `QA-1110`：完成性能、文档一致性和最终验收收尾
 
 ## 接手 AI 注意事项
 
@@ -69,6 +64,7 @@
 - 当前 WebAssembly 已切到内存仓储和会话级状态存储，主流程不再依赖 SQLite / 文件路径；但 `browserwasm build` 仍有既有 SQLite provider 警告，后续若要彻底消除需进一步拆分包引用或裁剪共享文件
 - 当前 Android 构建在本环境里会长时间停留在收尾阶段，但已产出 `bin/Debug/net10.0-android/Overview.Client.dll`
 - 当前外部导航协议统一走 `overview://...`，如需新增平台入口或小组件动作，优先扩展 `AppNavigationRequest`
+- 当前 `PROJECT-REQUIREMENTS-TRACE.md` 已成为原始需求映射的工作基线；后续终局验收应继续基于该文档补齐“中英双语”和性能项
 - 运行 EF CLI 前先执行 `dotnet tool restore`
 - 本地没有可连接的 PostgreSQL 实例；如果下轮需要验证 `database update` 或真实读写，请先启动数据库或调整连接串
 - 每完成一个最小任务项后，要先更新状态文件，再立即创建一次包含任务 ID 的 git commit
