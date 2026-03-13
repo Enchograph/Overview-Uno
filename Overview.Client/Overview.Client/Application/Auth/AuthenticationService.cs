@@ -1,6 +1,7 @@
 using Overview.Client.Infrastructure.Api.Auth;
 using Overview.Client.Infrastructure.Diagnostics;
 using Overview.Client.Infrastructure.Settings;
+using Overview.Client.Application.Widgets;
 
 namespace Overview.Client.Application.Auth;
 
@@ -9,17 +10,20 @@ public sealed class AuthenticationService : IAuthenticationService
     private readonly IAuthRemoteClient authRemoteClient;
     private readonly IAuthSessionStore authSessionStore;
     private readonly IOverviewLogger logger;
+    private readonly IWidgetRefreshService widgetRefreshService;
     private readonly SemaphoreSlim sessionLock = new(1, 1);
     private AuthSession? currentSession;
 
     public AuthenticationService(
         IAuthRemoteClient authRemoteClient,
         IAuthSessionStore authSessionStore,
-        IOverviewLoggerFactory loggerFactory)
+        IOverviewLoggerFactory loggerFactory,
+        IWidgetRefreshService? widgetRefreshService = null)
     {
         this.authRemoteClient = authRemoteClient;
         this.authSessionStore = authSessionStore;
         logger = loggerFactory.CreateLogger<AuthenticationService>();
+        this.widgetRefreshService = widgetRefreshService ?? NoOpWidgetRefreshService.Instance;
     }
 
     public AuthSession? CurrentSession => currentSession;
@@ -100,6 +104,7 @@ public sealed class AuthenticationService : IAuthenticationService
                     RestoredAt = DateTimeOffset.UtcNow
                 };
                 logger.LogInformation("Authentication session restored for user {UserId}.", storedSession.UserId);
+                await widgetRefreshService.RefreshAsync(currentSession.UserId, cancellationToken).ConfigureAwait(false);
                 return currentSession;
             }
 
@@ -109,6 +114,7 @@ public sealed class AuthenticationService : IAuthenticationService
                 currentSession = refreshed;
                 await authSessionStore.SaveAsync(refreshed, cancellationToken).ConfigureAwait(false);
                 logger.LogInformation("Authentication session refreshed during restore for user {UserId}.", refreshed.UserId);
+                await widgetRefreshService.RefreshAsync(refreshed.UserId, cancellationToken).ConfigureAwait(false);
                 return refreshed;
             }
             catch (Exception ex) when (ex is AuthRemoteException || ex is HttpRequestException)
@@ -141,6 +147,7 @@ public sealed class AuthenticationService : IAuthenticationService
             currentSession = refreshed;
             await authSessionStore.SaveAsync(refreshed, cancellationToken).ConfigureAwait(false);
             logger.LogInformation("Authentication session refreshed for user {UserId}.", refreshed.UserId);
+            await widgetRefreshService.RefreshAsync(refreshed.UserId, cancellationToken).ConfigureAwait(false);
             return refreshed;
         }
         finally
@@ -155,9 +162,14 @@ public sealed class AuthenticationService : IAuthenticationService
 
         try
         {
+            var previousUserId = currentSession?.UserId;
             currentSession = null;
             await authSessionStore.ClearAsync(cancellationToken).ConfigureAwait(false);
             logger.LogInformation("Authentication session cleared.");
+            if (previousUserId is Guid userId)
+            {
+                await widgetRefreshService.ClearAsync(userId, cancellationToken).ConfigureAwait(false);
+            }
         }
         finally
         {
@@ -174,6 +186,7 @@ public sealed class AuthenticationService : IAuthenticationService
             currentSession = session;
             await authSessionStore.SaveAsync(session, cancellationToken).ConfigureAwait(false);
             logger.LogInformation("Authentication session saved for user {UserId}.", session.UserId);
+            await widgetRefreshService.RefreshAsync(session.UserId, cancellationToken).ConfigureAwait(false);
         }
         finally
         {

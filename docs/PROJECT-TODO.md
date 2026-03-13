@@ -748,12 +748,16 @@
 - Title: 设计并实现四类小组件的平台映射
 - Phase: 阶段 10
 - Depends On: HOME-630, LIST-750, AI-830, INFRA-340
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 完成主页、列表、AI、新建事项四类小组件
-- Implementation Notes: 先统一快照协议，再做平台实现
+- Implementation Notes: 已新增统一小组件快照 / 渲染协议、文件快照存储、Android `AppWidgetProvider + RemoteViews` 平台实现，以及 `overview://...` 深链跳转；当前 Desktop / Web 的小组件降级说明继续留待 `PLATFORM-1030`
 - Done When: 四类小组件可用或降级规则明确
-- Verification: 可定位快照模型和平台实现
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-android -v q`
+  - 可定位快照模型和 Android 平台实现
 - Files Expected: 小组件实现文件
 
 ### Task ID: PLATFORM-1020

@@ -1,6 +1,7 @@
 using System.Net;
 using Overview.Client.Application.Auth;
 using Overview.Client.Application.Notifications;
+using Overview.Client.Application.Widgets;
 using Overview.Client.Domain.Entities;
 using Overview.Client.Domain.Enums;
 using Overview.Client.Infrastructure.Api.Sync;
@@ -25,6 +26,7 @@ public sealed class SyncOrchestrationService : ISyncOrchestrationService
     private readonly IOverviewLogger logger;
     private readonly TimeProvider timeProvider;
     private readonly INotificationRefreshService notificationRefreshService;
+    private readonly IWidgetRefreshService widgetRefreshService;
     private readonly SemaphoreSlim syncLock = new(1, 1);
 
     private readonly object autoSyncGate = new();
@@ -43,7 +45,8 @@ public sealed class SyncOrchestrationService : ISyncOrchestrationService
         IDeviceIdStore deviceIdStore,
         IOverviewLoggerFactory loggerFactory,
         TimeProvider timeProvider,
-        INotificationRefreshService? notificationRefreshService = null)
+        INotificationRefreshService? notificationRefreshService = null,
+        IWidgetRefreshService? widgetRefreshService = null)
     {
         this.authenticationService = authenticationService;
         this.itemRepository = itemRepository;
@@ -55,6 +58,7 @@ public sealed class SyncOrchestrationService : ISyncOrchestrationService
         logger = loggerFactory.CreateLogger<SyncOrchestrationService>();
         this.timeProvider = timeProvider;
         this.notificationRefreshService = notificationRefreshService ?? NoOpNotificationRefreshService.Instance;
+        this.widgetRefreshService = widgetRefreshService ?? NoOpWidgetRefreshService.Instance;
         CurrentStatus = new SyncStatusSnapshot();
     }
 
@@ -310,6 +314,7 @@ public sealed class SyncOrchestrationService : ISyncOrchestrationService
             var pulledItemCount = await ApplyPulledItemsAsync(session.UserId, pullResponse.Items, currentPendingChanges, cancellationToken).ConfigureAwait(false);
             var settingsApplied = await ApplyPulledSettingsAsync(session.UserId, pullResponse.Settings, currentPendingChanges, cancellationToken).ConfigureAwait(false);
             await notificationRefreshService.RefreshAsync(session.UserId, cancellationToken).ConfigureAwait(false);
+            await widgetRefreshService.RefreshAsync(session.UserId, cancellationToken).ConfigureAwait(false);
 
             var checkpoint = new SyncCheckpoint
             {

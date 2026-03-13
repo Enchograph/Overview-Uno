@@ -9,6 +9,7 @@ using Overview.Client.Application.Lists;
 using Overview.Client.Application.Notifications;
 using Overview.Client.Application.Settings;
 using Overview.Client.Application.Sync;
+using Overview.Client.Application.Widgets;
 using Overview.Client.Infrastructure.Api.Ai;
 using Overview.Client.Domain.Rules;
 using Overview.Client.Infrastructure.Api.Auth;
@@ -60,7 +61,8 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<IOverviewLoggerFactory>(() => NullOverviewLoggerFactory.Instance);
         registry.RegisterSingleton<INotificationScheduler>(() => new PlatformNotificationScheduler());
         registry.RegisterSingleton<INotificationStateStore>(() => new FileNotificationStateStore());
-        registry.RegisterSingleton<IWidgetSnapshotStore>(() => new InMemoryWidgetSnapshotStore());
+        registry.RegisterSingleton<IWidgetSnapshotStore>(() => new FileWidgetSnapshotStore());
+        registry.RegisterSingleton<IWidgetRenderer>(() => new PlatformWidgetRenderer());
         registry.RegisterSingleton<ISqliteConnectionFactory>(() => new SqliteConnectionFactory());
         registry.RegisterSingleton<IItemRepository>(() => new SqliteItemRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<IUserSettingsRepository>(() => new SqliteUserSettingsRepository(registry.Resolve<ISqliteConnectionFactory>()));
@@ -78,7 +80,8 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<IAuthenticationService>(() => new AuthenticationService(
             registry.Resolve<IAuthRemoteClient>(),
             registry.Resolve<IAuthSessionStore>(),
-            registry.Resolve<IOverviewLoggerFactory>()));
+            registry.Resolve<IOverviewLoggerFactory>(),
+            registry.Resolve<IWidgetRefreshService>()));
         registry.RegisterSingleton<INotificationRefreshService>(() => new NotificationRefreshService(
             registry.Resolve<IItemRepository>(),
             registry.Resolve<IUserSettingsRepository>(),
@@ -86,17 +89,27 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<INotificationScheduler>(),
             registry.Resolve<INotificationStateStore>(),
             registry.Resolve<TimeProvider>()));
+        registry.RegisterSingleton<IWidgetRefreshService>(() => new WidgetRefreshService(
+            registry.Resolve<IItemRepository>(),
+            registry.Resolve<IUserSettingsRepository>(),
+            registry.Resolve<IAiChatMessageRepository>(),
+            registry.Resolve<ITimeRuleService>(),
+            registry.Resolve<IWidgetSnapshotStore>(),
+            registry.Resolve<IWidgetRenderer>(),
+            registry.Resolve<TimeProvider>()));
         registry.RegisterSingleton<ISyncRemoteClient>(() => new SyncRemoteClient(registry.Resolve<HttpClient>()));
         registry.RegisterSingleton<IItemService>(() => new ItemService(
             registry.Resolve<IItemRepository>(),
             registry.Resolve<ISyncChangeRepository>(),
             registry.Resolve<IDeviceIdStore>(),
-            registry.Resolve<INotificationRefreshService>()));
+            registry.Resolve<INotificationRefreshService>(),
+            registry.Resolve<IWidgetRefreshService>()));
         registry.RegisterSingleton<IUserSettingsService>(() => new UserSettingsService(
             registry.Resolve<IUserSettingsRepository>(),
             registry.Resolve<ISyncChangeRepository>(),
             registry.Resolve<IDeviceIdStore>(),
-            registry.Resolve<INotificationRefreshService>()));
+            registry.Resolve<INotificationRefreshService>(),
+            registry.Resolve<IWidgetRefreshService>()));
         registry.RegisterSingleton<IHomeLayoutService>(() => new HomeLayoutService(
             registry.Resolve<IItemService>(),
             registry.Resolve<IUserSettingsService>(),
@@ -130,7 +143,8 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IDeviceIdStore>(),
             registry.Resolve<IOverviewLoggerFactory>(),
             registry.Resolve<TimeProvider>(),
-            registry.Resolve<INotificationRefreshService>()));
+            registry.Resolve<INotificationRefreshService>(),
+            registry.Resolve<IWidgetRefreshService>()));
         registry.RegisterSingleton<ISyncLifecycleCoordinator>(() => new SyncLifecycleCoordinator(
             registry.Resolve<ISyncOrchestrationService>()));
         return registry;

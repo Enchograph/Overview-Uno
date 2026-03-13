@@ -56,6 +56,7 @@
 - `SYNC-910`
 - `SYNC-920`
 - `PLATFORM-1000`
+- `PLATFORM-1010`
 
 ## 正在进行任务 ID
 
@@ -63,7 +64,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `PLATFORM-1010`
+- `PLATFORM-1020`
 
 ## 当前阻塞
 
@@ -71,6 +72,30 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，58/58 用例通过，0 failed
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-android -v q` 在 120 秒超时前未出现编译错误，已生成 `bin/Debug/net10.0-android/Overview.Client.dll`；当前环境下 Android 构建收尾仍未正常回收，但小组件 Provider / Resources / MainActivity 跳转链路已通过编译阶段，仅剩既有平台警告
+- 已确认客户端小组件快照与刷新链路当前已新增：
+  - `Application/Widgets/IWidgetRefreshService.cs`
+  - `Application/Widgets/WidgetRefreshService.cs`
+  - `Infrastructure/Widgets/IWidgetRenderer.cs`
+  - `Infrastructure/Widgets/IWidgetSnapshotStore.cs`
+- 已确认客户端小组件当前已接入：
+  - 主页大组件快照
+  - 列表大组件快照
+  - AI 小组件快照
+  - 新建事项小组件快照
+  - 事项 / 设置 / 登录态恢复 / 自动同步后自动刷新小组件
+  - `Overview.Client/Overview.Client/Application/Auth/AuthenticationService.cs`
+  - `Overview.Client/Overview.Client/Application/Items/ItemService.cs`
+  - `Overview.Client/Overview.Client/Application/Settings/UserSettingsService.cs`
+  - `Overview.Client/Overview.Client/Application/Sync/SyncOrchestrationService.cs`
+- 已确认 Android 小组件平台映射当前已新增：
+  - 四类 `AppWidgetProvider`
+  - `RemoteViews` 统一布局与 Provider 元数据
+  - 点击小组件后通过 `overview://...` 深链跳转到对应页面
+  - `Overview.Client/Overview.Client/Platforms/Android/Widgets/`
+  - `Overview.Client/Overview.Client/Platforms/Android/MainActivity.Android.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-android` 已生成 `bin/Debug/net10.0-android/Overview.Client.dll`，当前环境下构建进程未正常回收，但 Android 通知平台代码已完成编译并只暴露警告
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，54/54 用例通过，0 failed
 - 已确认客户端新增通知刷新与接入验证测试：

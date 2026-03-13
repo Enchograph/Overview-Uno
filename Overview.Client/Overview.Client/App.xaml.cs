@@ -2,6 +2,7 @@ using System;
 using Microsoft.Extensions.Logging;
 using Uno.Resizetizer;
 using Overview.Client.Application.DependencyInjection;
+using Overview.Client.Application.Navigation;
 using Overview.Client.Application.Sync;
 using Overview.Client.Presentation.Pages;
 
@@ -10,6 +11,8 @@ namespace Overview.Client;
 public partial class App : Microsoft.UI.Xaml.Application
 {
     private ISyncLifecycleCoordinator? syncLifecycleCoordinator;
+    private static readonly object NavigationGate = new();
+    private static AppNavigationRequest? pendingNavigationRequest;
 
     /// <summary>
     /// Initializes the singleton application object. This is the first line of authored code
@@ -24,6 +27,7 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     protected Window? MainWindow { get; private set; }
     internal static ClientServiceRegistry Services { get; private set; } = null!;
+    internal Frame? RootFrame { get; private set; }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
@@ -46,6 +50,8 @@ public partial class App : Microsoft.UI.Xaml.Application
             rootFrame.NavigationFailed += OnNavigationFailed;
         }
 
+        RootFrame = rootFrame;
+
         MainWindow.Activated -= OnMainWindowActivated;
         MainWindow.Activated += OnMainWindowActivated;
         MainWindow.Closed -= OnMainWindowClosed;
@@ -62,6 +68,58 @@ public partial class App : Microsoft.UI.Xaml.Application
         MainWindow.SetWindowIcon();
         // Ensure the current window is active
         MainWindow.Activate();
+    }
+
+    public static AppNavigationRequest? PeekPendingNavigationRequest()
+    {
+        lock (NavigationGate)
+        {
+            return pendingNavigationRequest;
+        }
+    }
+
+    public static void ClearPendingNavigationRequest()
+    {
+        lock (NavigationGate)
+        {
+            pendingNavigationRequest = null;
+        }
+    }
+
+    public static void HandleExternalNavigation(string? deepLink)
+    {
+        var request = AppNavigationRequest.Parse(deepLink);
+        if (request is null)
+        {
+            return;
+        }
+
+        lock (NavigationGate)
+        {
+            pendingNavigationRequest = request;
+        }
+
+        if (Current is App app)
+        {
+            app.TryDispatchNavigation(request);
+        }
+    }
+
+    private void TryDispatchNavigation(AppNavigationRequest request)
+    {
+        if (RootFrame?.Content is ShellPage shellPage)
+        {
+            shellPage.HandleNavigationRequest(request);
+            ClearPendingNavigationRequest();
+            return;
+        }
+
+        if (RootFrame?.Content is LoginPage)
+        {
+            return;
+        }
+
+        RootFrame?.Navigate(typeof(LoginPage));
     }
 
     private async void OnMainWindowActivated(object sender, WindowActivatedEventArgs e)

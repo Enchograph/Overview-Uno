@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Overview.Client.Application.Auth;
+using Overview.Client.Application.Navigation;
 using Overview.Client.Presentation.ViewModels;
 
 namespace Overview.Client.Presentation.Pages;
@@ -63,9 +64,10 @@ public sealed partial class LoginPage : Page
 
     private void OnAuthenticationSucceeded(object? sender, AuthSession session)
     {
+        var request = App.PeekPendingNavigationRequest();
         if (Frame?.CurrentSourcePageType != typeof(ShellPage))
         {
-            Frame?.Navigate(typeof(ShellPage));
+            Frame?.Navigate(typeof(ShellPage), request);
         }
     }
 

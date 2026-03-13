@@ -44,6 +44,8 @@
   - 客户端轻量注册中心，作为后续服务注册的基础落点
 - `Overview.Client/Overview.Client/Application/Auth/`
   - 客户端认证应用层目录，包含登录、注册、登出、登录态恢复和刷新用例
+- `Overview.Client/Overview.Client/Application/Navigation/AppNavigationRequest.cs`
+  - 客户端统一外部导航协议，当前供 Android 小组件与应用壳层共享 `overview://...` 深链解析和页面参数转换
 - `Overview.Client/Overview.Client/Application/Home/`
   - 客户端主页应用层目录，包含主页布局快照、跨格分段计算和时间选择映射服务
 - `Overview.Client/Overview.Client/Application/Home/HomeTimelineInteractionService.cs`
@@ -54,6 +56,8 @@
   - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
 - `Overview.Client/Overview.Client/Application/Notifications/`
   - 客户端通知应用层目录，当前包含本地提醒重建接口与实现
+- `Overview.Client/Overview.Client/Application/Widgets/`
+  - 客户端小组件应用层目录，当前包含统一小组件刷新接口与四类快照生成实现
 - `Overview.Client/Overview.Client/Application/Ai/`
   - 客户端 AI 应用层目录，当前包含事项摘要检索、OpenAI 兼容请求体组装、结构化响应解析、自然语言意图执行，以及 AI 聊天加载/发送/按日周月范围读取服务
 - `Overview.Client/Overview.Client/Application/Ai/AiChatService.cs`
@@ -185,13 +189,23 @@
 - `Overview.Client/Overview.Client/Infrastructure/Settings/`
   - 客户端本地设置与登录态存储目录，当前包含认证会话存储、同步游标状态存储和设备标识存储
 - `Overview.Client/Overview.Client/Infrastructure/Widgets/`
-  - 客户端小组件快照抽象目录，包含快照模型与默认内存存储
+  - 客户端小组件基础设施目录，当前包含快照模型、文件 / 内存快照存储、平台渲染接口与默认空实现
+- `Overview.Client/Overview.Client/Infrastructure/Widgets/IWidgetRenderer.cs`
+  - 客户端统一小组件平台渲染入口，当前在 Android 映射到真实 `AppWidgetProvider` 刷新，在 Desktop / Web 降级为空实现
 - `Overview.Client/Overview.Client/Platforms/Android/MainActivity.Android.cs`
-  - 客户端 Android 活动入口，当前负责 Android 13+ 通知权限请求
+  - 客户端 Android 活动入口，当前负责 Android 13+ 通知权限请求和小组件外部导航深链接收
 - `Overview.Client/Overview.Client/Platforms/Android/Notifications/AndroidNotificationScheduler.cs`
   - 客户端 Android 通知调度器，基于 `AlarmManager` 调度和取消本地提醒
 - `Overview.Client/Overview.Client/Platforms/Android/Notifications/ReminderBroadcastReceiver.cs`
   - 客户端 Android 提醒广播接收器，负责把闹钟广播转换为系统通知并回到应用
+- `Overview.Client/Overview.Client/Platforms/Android/Widgets/`
+  - 客户端 Android 小组件目录，当前包含四类 `AppWidgetProvider`、统一 Provider 基类、渲染器和深链常量
+- `Overview.Client/Overview.Client/Platforms/Android/Resources/layout/overview_widget.xml`
+  - Android 小组件统一 `RemoteViews` 布局
+- `Overview.Client/Overview.Client/Platforms/Android/Resources/xml/`
+  - Android 小组件 Provider 元数据目录，当前包含主页、列表、AI、新建事项四类小组件配置
+- `tests/Overview.Client.Tests/WidgetRefreshServiceTests.cs`
+  - 客户端小组件刷新测试，当前覆盖四类快照生成、禁用时清理，以及事项 / 设置服务接入小组件刷新
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
   - 客户端桌面入口
 - `Overview.Client/Overview.Client/Platforms/WebAssembly/Program.cs`

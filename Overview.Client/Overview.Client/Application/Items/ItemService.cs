@@ -1,6 +1,7 @@
 using Overview.Client.Domain.Entities;
 using Overview.Client.Domain.Enums;
 using Overview.Client.Application.Notifications;
+using Overview.Client.Application.Widgets;
 using Overview.Client.Infrastructure.Persistence.Repositories;
 using Overview.Client.Infrastructure.Settings;
 
@@ -12,17 +13,20 @@ public sealed class ItemService : IItemService
     private readonly ISyncChangeRepository syncChangeRepository;
     private readonly IDeviceIdStore deviceIdStore;
     private readonly INotificationRefreshService notificationRefreshService;
+    private readonly IWidgetRefreshService widgetRefreshService;
 
     public ItemService(
         IItemRepository itemRepository,
         ISyncChangeRepository syncChangeRepository,
         IDeviceIdStore deviceIdStore,
-        INotificationRefreshService? notificationRefreshService = null)
+        INotificationRefreshService? notificationRefreshService = null,
+        IWidgetRefreshService? widgetRefreshService = null)
     {
         this.itemRepository = itemRepository;
         this.syncChangeRepository = syncChangeRepository;
         this.deviceIdStore = deviceIdStore;
         this.notificationRefreshService = notificationRefreshService ?? NoOpNotificationRefreshService.Instance;
+        this.widgetRefreshService = widgetRefreshService ?? NoOpWidgetRefreshService.Instance;
     }
 
     public async Task<Item?> GetAsync(
@@ -77,6 +81,7 @@ public sealed class ItemService : IItemService
 
         await PersistItemAsync(item, SyncChangeType.Upsert, cancellationToken).ConfigureAwait(false);
         await notificationRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
+        await widgetRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
         return item;
     }
 
@@ -100,6 +105,7 @@ public sealed class ItemService : IItemService
 
         await PersistItemAsync(item, SyncChangeType.Upsert, cancellationToken).ConfigureAwait(false);
         await notificationRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
+        await widgetRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
         return item;
     }
 
@@ -152,6 +158,7 @@ public sealed class ItemService : IItemService
         };
         await PersistItemAsync(updatedItem, SyncChangeType.Upsert, cancellationToken).ConfigureAwait(false);
         await notificationRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
+        await widgetRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
         return updatedItem;
     }
 
@@ -205,6 +212,7 @@ public sealed class ItemService : IItemService
 
         await PersistItemAsync(updatedItem, SyncChangeType.Upsert, cancellationToken).ConfigureAwait(false);
         await notificationRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
+        await widgetRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
         return updatedItem;
     }
 
@@ -252,6 +260,7 @@ public sealed class ItemService : IItemService
 
         await PersistItemAsync(deletedItem, SyncChangeType.Delete, cancellationToken).ConfigureAwait(false);
         await notificationRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
+        await widgetRefreshService.RefreshAsync(userId, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<Item> BuildItemAsync(

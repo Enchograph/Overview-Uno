@@ -2,6 +2,17 @@
 
 ## 2026-03-13
 
+### Round 49
+
+- 完成 `PLATFORM-1010`
+- 新增 `AppNavigationRequest`，统一 `overview://...` 小组件深链协议
+- 新增 `IWidgetRefreshService` / `WidgetRefreshService`，按用户生成主页、列表、AI、新建事项四类小组件快照
+- 将小组件刷新接入认证恢复、事项变更、设置保存和同步收敛链路
+- 新增 `FileWidgetSnapshotStore` 与 `PlatformWidgetRenderer`，为平台小组件渲染提供文件快照和统一入口
+- 新增 Android 四类 `AppWidgetProvider`、统一 `RemoteViews` 布局和 Provider 元数据
+- 新增 `WidgetRefreshServiceTests`，并验证客户端桌面构建通过、客户端测试 58/58 通过
+- 验证 Android 目标在当前环境中已生成新的 `bin/Debug/net10.0-android/Overview.Client.dll`，构建仅在收尾阶段超时，期间未出现小组件编译错误
+
 ### Round 48
 
 - 完成 `PLATFORM-1000`
