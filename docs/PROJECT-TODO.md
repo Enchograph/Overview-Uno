@@ -137,12 +137,15 @@
 - Title: 实现时间块和时间范围领域规则
 - Phase: 阶段 2
 - Depends On: DOMAIN-200
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 定义主页时间块、周/月标题、日周月范围计算规则
 - Implementation Notes: 必须支持用户可配置的一周起始日
 - Done When: 时间相关规则可复用
-- Verification: 可定位规则服务
+- Verification:
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 `ITimeRuleService` 和 `TimeRuleService`
 - Files Expected: 时间规则服务
 
 ### Task ID: DOMAIN-220

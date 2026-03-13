@@ -102,3 +102,11 @@
 - 定义统一核心领域模型：`Item`、`UserSettings`、`AiChatMessage`、`SyncChange`
 - 为事项、设置、AI 聊天和同步变更补充配套枚举和值对象
 - 验证客户端桌面目标和服务端项目在新领域模型接入后仍可无警告构建
+
+### Round 15
+
+- 完成 `DOMAIN-210`
+- 在客户端和服务端分别新增 `Domain/Rules`
+- 定义 `ITimeRuleService`、`TimeRuleService`、`CalendarPeriod`、`TimeBlockDefinition`
+- 实现时间块生成、日周月范围计算、前后周期切换和基础标题格式化
+- 验证客户端桌面目标和服务端项目在时间规则接入后仍可无警告构建

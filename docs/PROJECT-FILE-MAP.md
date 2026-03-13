@@ -60,6 +60,8 @@
   - 客户端领域枚举：事项类型、主题、列表排序、AI 请求、同步变更等
 - `Overview.Client/Overview.Client/Domain/ValueObjects/`
   - 客户端领域值对象：提醒、重复、小组件偏好
+- `Overview.Client/Overview.Client/Domain/Rules/`
+  - 客户端时间领域规则：时间块生成、时间范围计算、周期标题格式化
 - `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
   - 客户端 Infrastructure 层目录落点
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
@@ -82,6 +84,8 @@
   - 服务端领域枚举：事项类型、主题、列表排序、AI 请求、同步变更等
 - `Overview.Server/Domain/ValueObjects/`
   - 服务端领域值对象：提醒、重复、小组件偏好
+- `Overview.Server/Domain/Rules/`
+  - 服务端时间领域规则：时间块生成、时间范围计算、周期标题格式化
 - `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
   - 服务端基础设施层注册入口
 - `Overview.Server/Infrastructure/Configuration/PersistenceOptions.cs`
