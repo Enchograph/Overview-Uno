@@ -123,6 +123,33 @@ public sealed class ListPageServiceTests
             reorderedSnapshot.ActiveItems.Select(item => item.Title));
     }
 
+    [Fact]
+    public async Task SetThemeAsync_PersistsThemeAndBuildSnapshotReflectsIt()
+    {
+        var settingsService = new FakeUserSettingsService(new UserSettings
+        {
+            UserId = UserId,
+            TimeZoneId = TimeZone.Id,
+            ListPageDefaultTab = ListPageTab.MyDay,
+            ListPageSortBy = ListSortBy.Alphabetical,
+            ListPageTheme = "default",
+            ListManualOrder = new ListManualOrderPreferences()
+        });
+        var service = CreateService(settingsService);
+
+        await service.SetThemeAsync(UserId, "forest");
+
+        var snapshot = await service.BuildSnapshotAsync(
+            UserId,
+            new ListPageQuery
+            {
+                Tab = ListPageTab.AllItems,
+                ReferenceDate = ReferenceDate
+            });
+
+        Assert.Equal("forest", snapshot.Theme);
+    }
+
     private static ListPageService CreateService(FakeUserSettingsService? settingsService = null)
     {
         return new ListPageService(

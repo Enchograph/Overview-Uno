@@ -5,7 +5,18 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:viewModels="using:Overview.Client.Presentation.ViewModels"
       mc:Ignorable="d"
-      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+      Background="{StaticResource ListPagePageBackgroundBrush}">
+  <Page.Resources>
+    <SolidColorBrush x:Key="ListPagePageBackgroundBrush" Color="#FFF6F4EF" />
+    <SolidColorBrush x:Key="ListPageHeaderBackgroundBrush" Color="#FFFDFBF4" />
+    <SolidColorBrush x:Key="ListPageHeaderBorderBrush" Color="#FFD9D2C3" />
+    <SolidColorBrush x:Key="ListPageSectionBackgroundBrush" Color="#FFFFFCF5" />
+    <SolidColorBrush x:Key="ListPageSectionBorderBrush" Color="#FFD9D2C3" />
+    <SolidColorBrush x:Key="ListPageItemBackgroundBrush" Color="#FFF6F0E6" />
+    <SolidColorBrush x:Key="ListPageActiveBadgeBrush" Color="#FFD3A15D" />
+    <SolidColorBrush x:Key="ListPageCompletedBadgeBrush" Color="#FFE2CFAE" />
+    <SolidColorBrush x:Key="ListPageStatusBrush" Color="#FF8A5A2B" />
+  </Page.Resources>
   <Grid Padding="24" RowDefinitions="Auto,Auto,*">
     <StackPanel Spacing="6">
       <TextBlock x:Name="PageTitleTextBlock" FontSize="30" FontWeight="SemiBold" Text="List" />
@@ -17,11 +28,12 @@
     </StackPanel>
 
     <Border
+      x:Name="ToolbarBorder"
       Grid.Row="1"
       Margin="0,20,0,16"
       Padding="20"
-      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+      Background="{StaticResource ListPageHeaderBackgroundBrush}"
+      BorderBrush="{StaticResource ListPageHeaderBorderBrush}"
       BorderThickness="1"
       CornerRadius="24">
       <StackPanel Spacing="14">
@@ -44,7 +56,7 @@
           </ItemsControl>
         </ScrollViewer>
 
-        <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
+        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
           <TextBlock
             VerticalAlignment="Center"
             Text="Sort by"
@@ -65,17 +77,29 @@
             Grid.Column="2"
             Click="OnReorderModeButtonClick"
             Content="Reorder Tasks" />
+          <ComboBox
+            x:Name="ThemeComboBox"
+            Grid.Column="3"
+            MinWidth="150"
+            PlaceholderText="Theme"
+            SelectionChanged="OnThemeSelectionChanged">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:ListPageThemeOptionViewModel">
+                <TextBlock Text="{Binding Label}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
           <TextBlock
             x:Name="ActiveSummaryTextBlock"
-            Grid.Column="3"
+            Grid.Column="4"
             Style="{ThemeResource BodyStrongTextBlockStyle}" />
           <TextBlock
             x:Name="CompletedSummaryTextBlock"
-            Grid.Column="4"
+            Grid.Column="5"
             Style="{ThemeResource BodyStrongTextBlockStyle}" />
           <ProgressRing
             x:Name="BusyIndicator"
-            Grid.Column="5"
+            Grid.Column="6"
             Width="24"
             Height="24"
             IsActive="False"
@@ -84,7 +108,7 @@
 
         <TextBlock
           x:Name="StatusTextBlock"
-          Foreground="{ThemeResource SystemFillColorCautionBrush}"
+          Foreground="{StaticResource ListPageStatusBrush}"
           TextWrapping="WrapWholeWords" />
       </StackPanel>
     </Border>
@@ -93,9 +117,10 @@
       <Grid>
         <StackPanel x:Name="ContentPanel" Spacing="16">
           <Border
+            x:Name="ActiveSectionBorder"
             Padding="20"
-            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            Background="{StaticResource ListPageSectionBackgroundBrush}"
+            BorderBrush="{StaticResource ListPageSectionBorderBrush}"
             BorderThickness="1"
             CornerRadius="24">
             <StackPanel Spacing="12">
@@ -107,7 +132,7 @@
                       Tag="{Binding ItemId}"
                       Margin="0,0,0,10"
                       Padding="14"
-                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      Background="{StaticResource ListPageItemBackgroundBrush}"
                       CornerRadius="18"
                       Tapped="OnItemContainerTapped">
                       <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
@@ -122,7 +147,7 @@
                           Grid.Column="1"
                           Width="36"
                           Height="36"
-                          Background="{ThemeResource AccentFillColorSecondaryBrush}"
+                          Background="{StaticResource ListPageActiveBadgeBrush}"
                           CornerRadius="18">
                           <TextBlock
                             HorizontalAlignment="Center"
@@ -171,9 +196,10 @@
           </Border>
 
           <Border
+            x:Name="CompletedSectionBorder"
             Padding="20"
-            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            Background="{StaticResource ListPageSectionBackgroundBrush}"
+            BorderBrush="{StaticResource ListPageSectionBorderBrush}"
             BorderThickness="1"
             CornerRadius="24">
             <StackPanel Spacing="12">
@@ -185,7 +211,7 @@
                       Tag="{Binding ItemId}"
                       Margin="0,0,0,10"
                       Padding="14"
-                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      Background="{StaticResource ListPageItemBackgroundBrush}"
                       CornerRadius="18"
                       Opacity="0.72"
                       Tapped="OnItemContainerTapped">
@@ -201,7 +227,7 @@
                           Grid.Column="1"
                           Width="36"
                           Height="36"
-                          Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                          Background="{StaticResource ListPageCompletedBadgeBrush}"
                           CornerRadius="18">
                           <TextBlock
                             HorizontalAlignment="Center"
@@ -253,8 +279,8 @@
         <Border
           x:Name="EmptyStateBorder"
           Padding="28"
-          Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          Background="{StaticResource ListPageSectionBackgroundBrush}"
+          BorderBrush="{StaticResource ListPageSectionBorderBrush}"
           BorderThickness="1"
           CornerRadius="24"
           Visibility="Collapsed">

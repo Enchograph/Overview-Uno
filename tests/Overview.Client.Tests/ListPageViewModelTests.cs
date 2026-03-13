@@ -75,6 +75,21 @@ public sealed class ListPageViewModelTests
         Assert.True(viewModel.ActiveItems[0].CanMoveDown);
     }
 
+    [Fact]
+    public async Task SelectThemeAsync_UpdatesCurrentThemeAndReloadsOptions()
+    {
+        var itemService = new FakeItemService();
+        var listPageService = new FakeListPageService();
+        var viewModel = CreateViewModel(itemService, listPageService);
+
+        await viewModel.InitializeAsync();
+        await viewModel.SelectThemeAsync("forest");
+
+        Assert.Equal("forest", viewModel.CurrentTheme);
+        Assert.Equal("forest", listPageService.LastTheme);
+        Assert.Equal("Forest", viewModel.ThemeOptions.Single(option => option.IsSelected).Label);
+    }
+
     private static ListPageViewModel CreateViewModel(FakeItemService itemService, FakeListPageService listPageService)
     {
         itemService.ListPageService = listPageService;
@@ -96,6 +111,8 @@ public sealed class ListPageViewModelTests
         public ListSortBy LastSortBy { get; private set; } = ListSortBy.Importance;
 
         public IReadOnlyList<Guid> LastReorderedIds { get; private set; } = Array.Empty<Guid>();
+
+        public string LastTheme { get; private set; } = "default";
 
         public Task<ListPageSnapshot> BuildSnapshotAsync(Guid userId, ListPageQuery? query = null, CancellationToken cancellationToken = default)
         {
@@ -133,6 +150,7 @@ public sealed class ListPageViewModelTests
                 Tab = tab,
                 SortBy = sortBy,
                 ReferenceDate = new DateOnly(2026, 3, 13),
+                Theme = LastTheme,
                 ActiveItems = filtered.Where(item => !item.IsCompleted).Select(ToItem).ToArray(),
                 CompletedItems = filtered.Where(item => item.IsCompleted).Select(ToItem).ToArray()
             });
@@ -166,6 +184,16 @@ public sealed class ListPageViewModelTests
             return Task.FromResult(new UserSettings
             {
                 UserId = userId
+            });
+        }
+
+        public Task<UserSettings> SetThemeAsync(Guid userId, string theme, CancellationToken cancellationToken = default)
+        {
+            LastTheme = theme;
+            return Task.FromResult(new UserSettings
+            {
+                UserId = userId,
+                ListPageTheme = theme
             });
         }
 

@@ -23,6 +23,7 @@ public sealed class ListPageViewModel
         this.listPageService = listPageService;
         Tabs = BuildTabs(ListPageTab.MyDay);
         SortOptions = BuildSortOptions(ListSortBy.Importance);
+        ThemeOptions = BuildThemeOptions("default");
     }
 
     public IReadOnlyList<ListPageTabEntryViewModel> Tabs { get; private set; }
@@ -32,6 +33,8 @@ public sealed class ListPageViewModel
     public IReadOnlyList<ListPageItemEntryViewModel> CompletedItems { get; private set; } = Array.Empty<ListPageItemEntryViewModel>();
 
     public IReadOnlyList<ListPageSortOptionViewModel> SortOptions { get; private set; }
+
+    public IReadOnlyList<ListPageThemeOptionViewModel> ThemeOptions { get; private set; }
 
     public bool IsBusy { get; private set; }
 
@@ -60,6 +63,8 @@ public sealed class ListPageViewModel
 
     public string EmptyStateDescription { get; private set; } =
         "Create your first item from the add page, then return here to filter it by tab.";
+
+    public string CurrentTheme { get; private set; } = "default";
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -140,6 +145,38 @@ public sealed class ListPageViewModel
                 SortBy = sortBy
             },
             cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task SelectThemeAsync(string themeKey, CancellationToken cancellationToken = default)
+    {
+        var normalizedTheme = NormalizeTheme(themeKey);
+        if (IsBusy || string.Equals(CurrentTheme, normalizedTheme, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var session = authenticationService.CurrentSession;
+        if (session is null)
+        {
+            CurrentTheme = normalizedTheme;
+            ThemeOptions = BuildThemeOptions(normalizedTheme);
+            StatusMessage = "Sign in to save and apply list themes.";
+            return;
+        }
+
+        IsBusy = true;
+
+        try
+        {
+            await listPageService.SetThemeAsync(session.UserId, normalizedTheme, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        await RefreshAsync(cancellationToken).ConfigureAwait(false);
+        StatusMessage = $"List theme switched to {GetThemeLabel(CurrentTheme)}.";
     }
 
     public async Task ToggleCompletionAsync(Guid itemId, CancellationToken cancellationToken = default)
@@ -242,6 +279,7 @@ public sealed class ListPageViewModel
                 CurrentSortBy = query?.SortBy ?? CurrentSortBy;
                 Tabs = BuildTabs(CurrentTab);
                 SortOptions = BuildSortOptions(CurrentSortBy);
+                ThemeOptions = BuildThemeOptions(CurrentTheme);
                 activeSnapshotItems = Array.Empty<ListPageItem>();
                 completedSnapshotItems = Array.Empty<ListPageItem>();
                 ActiveItems = Array.Empty<ListPageItemEntryViewModel>();
@@ -263,8 +301,10 @@ public sealed class ListPageViewModel
 
             CurrentTab = snapshot.Tab;
             CurrentSortBy = snapshot.SortBy;
+            CurrentTheme = NormalizeTheme(snapshot.Theme);
             Tabs = BuildTabs(snapshot.Tab);
             SortOptions = BuildSortOptions(snapshot.SortBy);
+            ThemeOptions = BuildThemeOptions(CurrentTheme);
             activeSnapshotItems = snapshot.ActiveItems.ToArray();
             completedSnapshotItems = snapshot.CompletedItems.ToArray();
             RebuildVisibleItems();
@@ -284,6 +324,7 @@ public sealed class ListPageViewModel
             completedSnapshotItems = Array.Empty<ListPageItem>();
             ActiveItems = Array.Empty<ListPageItemEntryViewModel>();
             CompletedItems = Array.Empty<ListPageItemEntryViewModel>();
+            ThemeOptions = BuildThemeOptions(CurrentTheme);
             ActiveSummary = string.Empty;
             CompletedSummary = string.Empty;
             StatusMessage = ex.Message;
@@ -453,6 +494,17 @@ public sealed class ListPageViewModel
         }).ToArray();
     }
 
+    private static IReadOnlyList<ListPageThemeOptionViewModel> BuildThemeOptions(string selectedTheme)
+    {
+        return
+        [
+            CreateThemeOption("default", "Default", selectedTheme),
+            CreateThemeOption("sunrise", "Sunrise", selectedTheme),
+            CreateThemeOption("forest", "Forest", selectedTheme),
+            CreateThemeOption("slate", "Slate", selectedTheme)
+        ];
+    }
+
     private static string GetTabTitle(ListPageTab tab)
     {
         return tab switch
@@ -505,6 +557,46 @@ public sealed class ListPageViewModel
             ListSortBy.Alphabetical => "Alphabetical",
             ListSortBy.CreatedAt => "Created Date",
             _ => sortBy.ToString()
+        };
+    }
+
+    private static ListPageThemeOptionViewModel CreateThemeOption(
+        string themeKey,
+        string label,
+        string selectedTheme)
+    {
+        return new ListPageThemeOptionViewModel
+        {
+            ThemeKey = themeKey,
+            Label = label,
+            IsSelected = string.Equals(themeKey, selectedTheme, StringComparison.Ordinal)
+        };
+    }
+
+    private static string NormalizeTheme(string? themeKey)
+    {
+        if (string.IsNullOrWhiteSpace(themeKey))
+        {
+            return "default";
+        }
+
+        return themeKey.Trim().ToLowerInvariant() switch
+        {
+            "sunrise" => "sunrise",
+            "forest" => "forest",
+            "slate" => "slate",
+            _ => "default"
+        };
+    }
+
+    private static string GetThemeLabel(string themeKey)
+    {
+        return NormalizeTheme(themeKey) switch
+        {
+            "sunrise" => "Sunrise",
+            "forest" => "Forest",
+            "slate" => "Slate",
+            _ => "Default"
         };
     }
 

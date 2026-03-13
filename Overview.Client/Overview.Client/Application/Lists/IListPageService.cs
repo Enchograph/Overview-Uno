@@ -20,4 +20,9 @@ public interface IListPageService
         ListPageTab tab,
         IReadOnlyList<Guid> orderedItemIds,
         CancellationToken cancellationToken = default);
+
+    Task<UserSettings> SetThemeAsync(
+        Guid userId,
+        string theme,
+        CancellationToken cancellationToken = default);
 }

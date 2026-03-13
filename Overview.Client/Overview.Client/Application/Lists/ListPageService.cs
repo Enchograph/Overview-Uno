@@ -95,6 +95,21 @@ public sealed class ListPageService : IListPageService
             cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task<UserSettings> SetThemeAsync(
+        Guid userId,
+        string theme,
+        CancellationToken cancellationToken = default)
+    {
+        var settings = await userSettingsService.GetAsync(userId, cancellationToken).ConfigureAwait(false);
+        return await userSettingsService.SaveAsync(
+            userId,
+            ToUpdateRequest(settings) with
+            {
+                ListPageTheme = NormalizeTheme(theme)
+            },
+            cancellationToken).ConfigureAwait(false);
+    }
+
     private async Task<IReadOnlyList<Item>> GetFilteredItemsAsync(
         Guid userId,
         ListPageTab tab,
@@ -403,5 +418,21 @@ public sealed class ListPageService : IListPageService
         }
 
         return TimeZoneInfo.Utc;
+    }
+
+    private static string NormalizeTheme(string? theme)
+    {
+        if (string.IsNullOrWhiteSpace(theme))
+        {
+            return "default";
+        }
+
+        return theme.Trim().ToLowerInvariant() switch
+        {
+            "sunrise" => "sunrise",
+            "forest" => "forest",
+            "slate" => "slate",
+            _ => "default"
+        };
     }
 }

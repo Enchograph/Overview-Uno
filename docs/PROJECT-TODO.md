@@ -552,13 +552,18 @@
 - Title: 实现列表页主题切换
 - Phase: 阶段 7
 - Depends On: UI-530
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持列表页主题选择和展示切换
-- Implementation Notes: 至少支持主题设置入口和生效
+- Implementation Notes: 已在列表页顶部工具栏新增主题选择下拉框，支持 `default`、`sunrise`、`forest`、`slate` 四种主题；主题写入 `UserSettings.ListPageTheme` 并即时刷新页面配色
 - Done When: 主题切换完成
-- Verification: 可定位主题选择组件和应用效果
-- Files Expected: 主题相关页面和状态
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位主题选择组件和应用效果
+- Files Expected:
+  - 主题相关页面和状态
+  - 主题持久化逻辑
 
 ### Task ID: LIST-740
 
