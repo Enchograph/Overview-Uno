@@ -78,8 +78,12 @@
   - 服务端入口文件
 - `Overview.Server/Api/Controllers/HealthController.cs`
   - 服务端最小健康检查控制器
+- `Overview.Server/Api/Controllers/AuthController.cs`
+  - 服务端认证控制器，提供验证码、注册、登录、刷新令牌端点
 - `Overview.Server/Api/Contracts/HealthResponse.cs`
   - 服务端最小 API 返回契约
+- `Overview.Server/Api/Contracts/Auth/`
+  - 服务端认证请求/响应契约
 - `Overview.Server/Application/DependencyInjection/ApplicationServiceCollectionExtensions.cs`
   - 服务端应用层注册入口
 - `Overview.Server/Domain/Entities/`
@@ -92,8 +96,12 @@
   - 服务端领域规则：时间块生成、时间范围计算、周期标题格式化、提醒调度、重复展开、主页命中与重叠计算
 - `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
   - 服务端基础设施层注册入口
+- `Overview.Server/Infrastructure/Configuration/AuthenticationOptions.cs`
+  - 服务端认证配置样例对象
 - `Overview.Server/Infrastructure/Configuration/PersistenceOptions.cs`
   - 服务端持久化配置样例对象
+- `Overview.Server/Infrastructure/Identity/`
+  - 服务端认证基础设施，包含密码哈希、JWT 令牌和验证码服务
 - `Overview.Server/Infrastructure/Persistence/OverviewDbContext.cs`
   - 服务端 PostgreSQL `DbContext`
 - `Overview.Server/Infrastructure/Persistence/OverviewDbContextDesignTimeFactory.cs`
@@ -104,8 +112,12 @@
   - 服务端 JSONB 序列化与值转换基础
 - `Overview.Server/Infrastructure/Persistence/Entities/AuthUser.cs`
   - 服务端认证用户持久化实体
+- `Overview.Server/Infrastructure/Persistence/Entities/AuthRefreshToken.cs`
+  - 服务端刷新令牌持久化实体
+- `Overview.Server/Infrastructure/Persistence/Entities/AuthVerificationCode.cs`
+  - 服务端邮箱验证码持久化实体
 - `Overview.Server/Migrations/`
-  - 服务端 EF Core 迁移基线
+  - 服务端 EF Core 迁移基线，当前包含认证补充迁移
 - `Overview.Server/appsettings.Sample.json`
   - 服务端 PostgreSQL、认证、邮件、同步配置样例
 

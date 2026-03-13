@@ -148,3 +148,15 @@
 - 新增仓库级 `dotnet-tools.json`，固定 `dotnet-ef` 10.0.0
 - 验证服务端项目可构建、迁移可生成且可输出 idempotent 脚本
 - 修正文档中“阶段编号/路线状态/SQLite 验收项”与真实进度不一致的问题
+
+### Round 20
+
+- 完成 `INFRA-320`
+- 新增认证契约 DTO：注册、登录、发送验证码、刷新令牌
+- 新增 `AuthController`，落地 `register`、`login`、`send-verification-code`、`refresh` 四个端点
+- 为服务端引入 JWT Bearer 认证配置和访问令牌签发
+- 新增 PBKDF2 密码哈希服务、验证码服务、刷新令牌哈希服务
+- 新增 `AuthRefreshToken`、`AuthVerificationCode` 持久化实体与 EF 映射
+- 生成认证补充迁移 `20260313093808_AddAuthInfrastructure`
+- 更新 `appsettings.Sample.json` 认证配置样例
+- 验证服务端项目可无警告构建，认证迁移可生成且可输出 idempotent 脚本

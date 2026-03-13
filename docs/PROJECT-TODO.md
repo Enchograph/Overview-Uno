@@ -224,12 +224,17 @@
 - Title: 实现认证 API 契约和持久化支持
 - Phase: 阶段 3
 - Depends On: INFRA-310
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持邮箱验证码/密码登录所需接口和存储
 - Implementation Notes: 契约应对齐开发设计文档
 - Done When: 认证接口和持久化支持完成
-- Verification: 可定位认证契约与控制器
+- Verification:
+  - `dotnet tool restore`
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet dotnet-ef migrations add AddAuthInfrastructure --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --output-dir Migrations`
+  - `dotnet dotnet-ef migrations script --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --idempotent`
+  - `dotnet dotnet-ef migrations list --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj`
 - Files Expected: 认证控制器、DTO、持久化支持
 
 ### Task ID: INFRA-330
