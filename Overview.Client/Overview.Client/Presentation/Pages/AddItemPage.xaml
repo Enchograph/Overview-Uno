@@ -3,9 +3,161 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
   <Grid Padding="24">
-    <StackPanel Spacing="12" VerticalAlignment="Center">
-      <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding Title}" />
-      <TextBlock Opacity="0.72" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{Binding Description}" TextWrapping="WrapWholeWords" />
-    </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel MaxWidth="720" HorizontalAlignment="Center" Spacing="16">
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="PageTitleTextBlock" FontSize="32" FontWeight="SemiBold" />
+          <TextBlock
+            Opacity="0.72"
+            Style="{ThemeResource BodyStrongTextBlockStyle}"
+            Text="Create schedules, tasks, and notes with the fields needed by later pages."
+            TextWrapping="WrapWholeWords" />
+        </StackPanel>
+
+        <Border
+          Padding="20"
+          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="24">
+          <StackPanel x:Name="FormPanel" Spacing="14">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <ComboBox x:Name="ItemTypeComboBox" Header="Item Type" SelectionChanged="OnItemTypeChanged">
+                <ComboBoxItem Content="Schedule" Tag="Schedule" />
+                <ComboBoxItem Content="Task" Tag="Task" />
+                <ComboBoxItem Content="Note" Tag="Note" />
+              </ComboBox>
+
+              <Button
+                Grid.Column="1"
+                Margin="0,28,0,0"
+                Click="OnNewItemButtonClick"
+                Content="New Item"
+                HorizontalAlignment="Right" />
+            </Grid>
+
+            <TextBox x:Name="TitleTextBox" Header="Title" PlaceholderText="What needs to happen?" />
+            <TextBox x:Name="DescriptionTextBox" Header="Description" AcceptsReturn="True" MinHeight="96" TextWrapping="Wrap" />
+            <TextBox x:Name="LocationTextBox" Header="Location" PlaceholderText="Optional" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+              <TextBox x:Name="ColorTextBox" Header="Color" PlaceholderText="#4F46E5" />
+              <TextBox x:Name="TimeZoneTextBox" Grid.Column="1" Header="Time Zone" PlaceholderText="Asia/Shanghai" />
+            </Grid>
+
+            <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="16">
+              <CheckBox x:Name="ImportantCheckBox" Content="Important" />
+              <CheckBox x:Name="CompletedCheckBox" Grid.Column="1" Content="Completed" />
+            </Grid>
+
+            <Border x:Name="TimedFieldsBorder" Padding="16" Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="18">
+              <StackPanel Spacing="12">
+                <TextBlock x:Name="TimedSectionTitleTextBlock" FontWeight="SemiBold" Text="Time Range" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                  <DatePicker x:Name="StartDatePicker" Header="Start Date" />
+                  <TimePicker x:Name="StartTimePicker" Grid.Column="1" Header="Start Time" />
+                </Grid>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                  <DatePicker x:Name="EndDatePicker" Header="End Date" />
+                  <TimePicker x:Name="EndTimePicker" Grid.Column="1" Header="End Time" />
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <Border x:Name="TaskFieldsBorder" Padding="16" Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="18">
+              <StackPanel Spacing="12">
+                <TextBlock FontWeight="SemiBold" Text="Task Deadline" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                  <DatePicker x:Name="DeadlineDatePicker" Header="Deadline Date" />
+                  <TimePicker x:Name="DeadlineTimePicker" Grid.Column="1" Header="Deadline Time" />
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <Border x:Name="NoteFieldsBorder" Padding="16" Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="18">
+              <StackPanel Spacing="12">
+                <TextBlock FontWeight="SemiBold" Text="Note Planning" />
+                <NumberBox x:Name="ExpectedDurationNumberBox" Header="Expected Duration Minutes" Minimum="1" SmallChange="5" SpinButtonPlacementMode="Compact" Value="30" />
+                <CheckBox x:Name="TargetDateEnabledCheckBox" Checked="OnTargetDateEnabledChanged" Content="Set target date" Unchecked="OnTargetDateEnabledChanged" />
+                <DatePicker x:Name="TargetDatePicker" Header="Target Date" />
+              </StackPanel>
+            </Border>
+
+            <Border Padding="16" Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="18">
+              <StackPanel Spacing="12">
+                <TextBlock FontWeight="SemiBold" Text="Reminder" />
+                <CheckBox x:Name="ReminderEnabledCheckBox" Checked="OnReminderEnabledChanged" Content="Enable local reminder" Unchecked="OnReminderEnabledChanged" />
+                <NumberBox x:Name="ReminderMinutesNumberBox" Header="Minutes Before Start" Minimum="0" SmallChange="5" SpinButtonPlacementMode="Compact" Value="15" />
+              </StackPanel>
+            </Border>
+
+            <Border Padding="16" Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="18">
+              <StackPanel Spacing="12">
+                <TextBlock FontWeight="SemiBold" Text="Repeat" />
+                <ComboBox x:Name="RepeatFrequencyComboBox" Header="Frequency">
+                  <ComboBoxItem Content="None" Tag="None" />
+                  <ComboBoxItem Content="Daily" Tag="Daily" />
+                  <ComboBoxItem Content="Weekly" Tag="Weekly" />
+                  <ComboBoxItem Content="Monthly" Tag="Monthly" />
+                  <ComboBoxItem Content="Yearly" Tag="Yearly" />
+                </ComboBox>
+                <NumberBox x:Name="RepeatIntervalNumberBox" Header="Interval" Minimum="1" SmallChange="1" SpinButtonPlacementMode="Compact" Value="1" />
+                <CheckBox x:Name="RepeatUntilEnabledCheckBox" Checked="OnRepeatUntilEnabledChanged" Content="Repeat until a date" Unchecked="OnRepeatUntilEnabledChanged" />
+                <DatePicker x:Name="RepeatUntilDatePicker" Header="Repeat Until" />
+              </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="StatusTextBlock" Foreground="{ThemeResource SystemFillColorCautionBrush}" TextWrapping="WrapWholeWords" />
+
+            <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="12">
+              <Button
+                x:Name="SubmitButton"
+                Click="OnSubmitButtonClick"
+                Content="Create Item"
+                Style="{StaticResource AccentButtonStyle}" />
+              <ProgressRing
+                x:Name="BusyIndicator"
+                Grid.Column="1"
+                Height="28"
+                IsActive="False"
+                VerticalAlignment="Center"
+                Width="28" />
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border
+          Padding="20"
+          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="24">
+          <StackPanel Spacing="12">
+            <TextBlock FontSize="22" FontWeight="SemiBold" Text="Existing Items" />
+            <TextBlock
+              Opacity="0.72"
+              Style="{ThemeResource BodyStrongTextBlockStyle}"
+              Text="Use this list to reopen an item in edit mode."
+              TextWrapping="WrapWholeWords" />
+            <ListView x:Name="ExistingItemsListView" IsItemClickEnabled="True" ItemClick="OnExistingItemClick" MinHeight="360" SelectionMode="None">
+              <ListView.ItemTemplate>
+                <DataTemplate>
+                  <Border
+                    Margin="0,0,0,8"
+                    Padding="14"
+                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    CornerRadius="18">
+                    <StackPanel Spacing="4">
+                      <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
+                      <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ListView.ItemTemplate>
+            </ListView>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
   </Grid>
 </Page>

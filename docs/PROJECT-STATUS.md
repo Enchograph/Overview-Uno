@@ -35,6 +35,7 @@
 - `APP-440`
 - `APP-450`
 - `UI-500`
+- `UI-510`
 
 ## 正在进行任务 ID
 
@@ -42,7 +43,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `UI-510`
+- `UI-520`
 
 ## 当前阻塞
 
@@ -51,6 +52,18 @@
 ## 最近已验证结果
 
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端添加/编辑事项页已从占位实现切换为真实基础表单：
+  - `Presentation/Pages/AddItemPage.xaml`
+- 已确认客户端新增添加/编辑事项页 ViewModel 与表单模型：
+  - `Presentation/ViewModels/AddItemPageViewModel.cs`
+  - `Presentation/ViewModels/AddItemFormModel.cs`
+  - `Presentation/ViewModels/AddItemListEntry.cs`
+- 已确认客户端添加/编辑事项页已覆盖：
+  - 日程、任务、备忘三类事项切换
+  - 颜色、地点、提醒、重复、重要、完成字段编辑
+  - 新建模式与已有事项编辑模式切换
+  - 基于 `IItemService` 的新增与更新保存
+  - 基于 `IAuthenticationService` 的当前用户态校验
 - 已确认客户端新增登录 Presentation 页面：
   - `Presentation/Pages/LoginPage.xaml`
 - 已确认客户端新增登录 Presentation ViewModel：

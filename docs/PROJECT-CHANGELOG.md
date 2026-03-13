@@ -239,6 +239,28 @@
 
 ### Round 27
 
+- 完成 `UI-500`
+- 新增 `Presentation/Pages/LoginPage.xaml` 与 `LoginPage.xaml.cs`
+- 新增 `Presentation/ViewModels/LoginPageViewModel.cs`
+- 将客户端启动入口切换为 `LoginPage`
+- 接入登录态恢复、登录/注册切换、验证码发送与登录成功后进入壳层
+- 验证客户端桌面目标可无警告构建
+
+### Round 28
+
+- 完成 `UI-510`
+- 将 `Presentation/Pages/AddItemPage.xaml` 从占位页改为真实事项表单
+- 更新 `Presentation/Pages/AddItemPage.xaml.cs`，接入加载、表单同步、编辑态切换和保存动作
+- 重写 `Presentation/ViewModels/AddItemPageViewModel.cs`
+- 新增 `Presentation/ViewModels/AddItemFormModel.cs`
+- 新增 `Presentation/ViewModels/AddItemListEntry.cs`
+- 在 `ClientServiceRegistry` 为添加/编辑事项页接入认证、事项和设置服务
+- 添加/编辑事项页覆盖日程、任务、备忘三类事项的新增与编辑基础字段
+- 同页提供已有事项列表，点击可进入编辑模式
+- 验证客户端桌面目标可无警告构建
+
+### Round 29
+
 - 完成 `APP-440`
 - 在客户端新增 AI 应用层目录 `Application/Ai`
 - 新增 `IAiOrchestrationService`、`AiOrchestrationService`
@@ -249,7 +271,7 @@
 - 在客户端轻量注册中心接入 `IAiOrchestrationService`
 - 验证客户端桌面目标可无警告构建
 
-### Round 28
+### Round 30
 
 - 完成 `APP-450`
 - 在客户端新增同步应用层目录 `Application/Sync`
@@ -261,7 +283,7 @@
 - 在客户端轻量注册中心接入 `ISyncOrchestrationService`、`ISyncStateStore` 与 `TimeProvider`
 - 验证客户端桌面目标可无警告构建
 
-### Round 29
+### Round 31
 
 - 完成 `UI-500`
 - 在客户端新增登录页 `Presentation/Pages/LoginPage.xaml`

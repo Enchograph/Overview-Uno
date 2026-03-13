@@ -33,7 +33,10 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton(() => new HomePageViewModel());
         registry.RegisterSingleton(() => new ListPageViewModel());
         registry.RegisterSingleton(() => new AiPageViewModel());
-        registry.RegisterSingleton(() => new AddItemPageViewModel());
+        registry.RegisterSingleton(() => new AddItemPageViewModel(
+            registry.Resolve<IAuthenticationService>(),
+            registry.Resolve<IItemService>(),
+            registry.Resolve<IUserSettingsService>()));
         registry.RegisterSingleton(() => new SettingsPageViewModel());
         registry.RegisterSingleton(() => new HttpClient());
         registry.RegisterSingleton<IOverviewLoggerFactory>(() => NullOverviewLoggerFactory.Instance);

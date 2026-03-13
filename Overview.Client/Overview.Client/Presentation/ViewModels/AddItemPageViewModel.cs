@@ -1,9 +1,203 @@
+using Overview.Client.Application.Auth;
+using Overview.Client.Application.Items;
+using Overview.Client.Application.Settings;
+using Overview.Client.Domain.Entities;
+using Overview.Client.Domain.Enums;
+using Overview.Client.Domain.ValueObjects;
+
 namespace Overview.Client.Presentation.ViewModels;
 
-public sealed class AddItemPageViewModel : PlaceholderPageViewModel
+public sealed class AddItemPageViewModel
 {
-    public AddItemPageViewModel()
-        : base("Add", "Add item shell placeholder for schedule, task, and note creation.")
+    private readonly IAuthenticationService authenticationService;
+    private readonly IItemService itemService;
+    private readonly IUserSettingsService userSettingsService;
+
+    public AddItemPageViewModel(
+        IAuthenticationService authenticationService,
+        IItemService itemService,
+        IUserSettingsService userSettingsService)
     {
+        this.authenticationService = authenticationService;
+        this.itemService = itemService;
+        this.userSettingsService = userSettingsService;
+    }
+
+    public AddItemFormModel Form { get; private set; } = AddItemFormModel.CreateDefault();
+
+    public IReadOnlyList<AddItemListEntry> ExistingItems { get; private set; } = Array.Empty<AddItemListEntry>();
+
+    public bool IsBusy { get; private set; }
+
+    public string StatusMessage { get; private set; } = string.Empty;
+
+    public string PageTitle => IsEditMode ? "Edit Item" : "Add Item";
+
+    public string SubmitButtonText => IsEditMode ? "Save Changes" : "Create Item";
+
+    public bool IsAuthenticated => authenticationService.CurrentSession is not null;
+
+    public bool IsEditMode => EditingItemId is not null;
+
+    public Guid? EditingItemId { get; private set; }
+
+    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        await ExecuteBusyActionAsync(
+            async () =>
+            {
+                if (!TryGetUserId(out var userId))
+                {
+                    ResetForLoggedOutState();
+                    return false;
+                }
+
+                var settings = await userSettingsService.GetAsync(userId, cancellationToken).ConfigureAwait(false);
+                Form = AddItemFormModel.CreateDefault(settings.TimeZoneId, settings.DayPlanStartTime);
+                EditingItemId = null;
+                await LoadExistingItemsAsync(userId, cancellationToken).ConfigureAwait(false);
+                StatusMessage = ExistingItems.Count == 0
+                    ? "No items yet. Fill the form to create your first item."
+                    : "Select an existing item to edit it, or create a new one.";
+                return true;
+            }).ConfigureAwait(false);
+    }
+
+    public async Task StartCreateAsync(CancellationToken cancellationToken = default)
+    {
+        await ExecuteBusyActionAsync(
+            async () =>
+            {
+                if (!TryGetUserId(out var userId))
+                {
+                    ResetForLoggedOutState();
+                    return false;
+                }
+
+                var settings = await userSettingsService.GetAsync(userId, cancellationToken).ConfigureAwait(false);
+                Form = AddItemFormModel.CreateDefault(settings.TimeZoneId, settings.DayPlanStartTime);
+                EditingItemId = null;
+                StatusMessage = "Create mode ready.";
+                return true;
+            }).ConfigureAwait(false);
+    }
+
+    public async Task LoadForEditAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        await ExecuteBusyActionAsync(
+            async () =>
+            {
+                if (!TryGetUserId(out var userId))
+                {
+                    ResetForLoggedOutState();
+                    return false;
+                }
+
+                var item = await itemService.GetAsync(userId, itemId, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (item is null)
+                {
+                    StatusMessage = "The selected item was not found.";
+                    return false;
+                }
+
+                Form = AddItemFormModel.FromItem(item);
+                EditingItemId = item.Id;
+                StatusMessage = "Edit mode ready.";
+                return true;
+            }).ConfigureAwait(false);
+    }
+
+    public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
+    {
+        return await ExecuteBusyActionAsync(
+            async () =>
+            {
+                if (!TryGetUserId(out var userId))
+                {
+                    ResetForLoggedOutState();
+                    return false;
+                }
+
+                var request = Form.ToRequest();
+                if (EditingItemId is Guid itemId)
+                {
+                    await itemService.UpdateAsync(userId, itemId, request, cancellationToken).ConfigureAwait(false);
+                    StatusMessage = "Item updated.";
+                }
+                else
+                {
+                    var createdItem = await itemService.CreateAsync(userId, request, cancellationToken).ConfigureAwait(false);
+                    EditingItemId = createdItem.Id;
+                    StatusMessage = "Item created.";
+                }
+
+                await LoadExistingItemsAsync(userId, cancellationToken).ConfigureAwait(false);
+
+                if (EditingItemId is Guid refreshedItemId)
+                {
+                    var refreshedItem = await itemService.GetAsync(userId, refreshedItemId, cancellationToken: cancellationToken)
+                        .ConfigureAwait(false);
+                    if (refreshedItem is not null)
+                    {
+                        Form = AddItemFormModel.FromItem(refreshedItem);
+                    }
+                }
+
+                return true;
+            }).ConfigureAwait(false);
+    }
+
+    private async Task LoadExistingItemsAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var items = await itemService.ListAsync(userId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        ExistingItems = items
+            .Where(item => item.DeletedAt is null)
+            .OrderByDescending(item => item.LastModifiedAt)
+            .Select(AddItemListEntry.FromItem)
+            .ToArray();
+    }
+
+    private bool TryGetUserId(out Guid userId)
+    {
+        var session = authenticationService.CurrentSession;
+        if (session is null)
+        {
+            userId = Guid.Empty;
+            return false;
+        }
+
+        userId = session.UserId;
+        return true;
+    }
+
+    private void ResetForLoggedOutState()
+    {
+        Form = AddItemFormModel.CreateDefault();
+        EditingItemId = null;
+        ExistingItems = Array.Empty<AddItemListEntry>();
+        StatusMessage = "Sign in first to create or edit items.";
+    }
+
+    private async Task<bool> ExecuteBusyActionAsync(Func<Task<bool>> action)
+    {
+        if (IsBusy)
+        {
+            return false;
+        }
+
+        try
+        {
+            IsBusy = true;
+            return await action().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+            return false;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }

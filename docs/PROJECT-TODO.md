@@ -382,13 +382,18 @@
 - Title: 实现添加/编辑事项页基础表单
 - Phase: 阶段 5
 - Depends On: APP-410, SHELL-130
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持日程、任务、备忘三类事项新增与编辑
-- Implementation Notes: 字段要覆盖颜色、地点、提醒、重复、重要、完成
+- Implementation Notes: 已在 `AddItemPage` 接入真实表单，支持日程/任务/备忘切换、已有事项载入编辑、颜色/地点/提醒/重复/重要/完成字段编辑，并通过 `IItemService` 保存
 - Done When: 三类事项表单可用
-- Verification: 可从 UI 进入添加/编辑页并看到对应字段
-- Files Expected: 页面、ViewModel、表单模型
+- Verification:
+  - 可从 UI 进入添加/编辑页并看到对应字段
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+- Files Expected:
+  - 页面
+  - ViewModel
+  - 表单模型
 
 ### Task ID: UI-520
 
