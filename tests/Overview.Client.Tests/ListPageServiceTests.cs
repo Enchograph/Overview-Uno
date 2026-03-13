@@ -80,7 +80,50 @@ public sealed class ListPageServiceTests
         Assert.Equal(["Daily Task", "Focus Note", "Morning Schedule", "Future Task", "Weekly Review"], titles);
     }
 
-    private static ListPageService CreateService()
+    [Fact]
+    public async Task ReorderAsync_PersistsManualOrderAndBuildSnapshotReflectsIt()
+    {
+        var settingsService = new FakeUserSettingsService(new UserSettings
+        {
+            UserId = UserId,
+            TimeZoneId = TimeZone.Id,
+            ListPageDefaultTab = ListPageTab.MyDay,
+            ListPageSortBy = ListSortBy.Alphabetical,
+            ListManualOrder = new ListManualOrderPreferences()
+        });
+        var service = CreateService(settingsService);
+
+        var initialSnapshot = await service.BuildSnapshotAsync(
+            UserId,
+            new ListPageQuery
+            {
+                Tab = ListPageTab.AllItems,
+                SortBy = ListSortBy.Alphabetical,
+                ReferenceDate = ReferenceDate
+            });
+
+        var reorderedIds = initialSnapshot.ActiveItems
+            .Select(item => item.ItemId)
+            .Reverse()
+            .ToArray();
+
+        await service.ReorderAsync(UserId, ListPageTab.AllItems, reorderedIds);
+
+        var reorderedSnapshot = await service.BuildSnapshotAsync(
+            UserId,
+            new ListPageQuery
+            {
+                Tab = ListPageTab.AllItems,
+                SortBy = ListSortBy.Alphabetical,
+                ReferenceDate = ReferenceDate
+            });
+
+        Assert.Equal(
+            initialSnapshot.ActiveItems.Select(item => item.Title).Reverse(),
+            reorderedSnapshot.ActiveItems.Select(item => item.Title));
+    }
+
+    private static ListPageService CreateService(FakeUserSettingsService? settingsService = null)
     {
         return new ListPageService(
             new FakeItemService(
@@ -91,7 +134,7 @@ public sealed class ListPageServiceTests
                 CreateNote("Focus Note", new DateOnly(2026, 3, 13), isImportant: true),
                 CreateNote("Weekly Review", new DateOnly(2026, 3, 20))
             ]),
-            new FakeUserSettingsService(new UserSettings
+            settingsService ?? new FakeUserSettingsService(new UserSettings
             {
                 UserId = UserId,
                 TimeZoneId = TimeZone.Id,
@@ -209,8 +252,10 @@ public sealed class ListPageServiceTests
         }
     }
 
-    private sealed class FakeUserSettingsService(UserSettings settings) : IUserSettingsService
+    private sealed class FakeUserSettingsService(UserSettings initialSettings) : IUserSettingsService
     {
+        private UserSettings settings = initialSettings;
+
         public Task<UserSettings> GetAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(settings);
@@ -218,7 +263,32 @@ public sealed class ListPageServiceTests
 
         public Task<UserSettings> SaveAsync(Guid userId, UserSettingsUpdateRequest request, CancellationToken cancellationToken = default)
         {
-            throw new NotSupportedException();
+            settings = new UserSettings
+            {
+                UserId = userId,
+                Language = request.Language,
+                ThemeMode = request.ThemeMode,
+                ThemePreset = request.ThemePreset,
+                WeekStartDay = request.WeekStartDay,
+                HomeViewMode = request.HomeViewMode,
+                DayPlanStartTime = request.DayPlanStartTime,
+                TimeBlockDurationMinutes = request.TimeBlockDurationMinutes,
+                TimeBlockGapMinutes = request.TimeBlockGapMinutes,
+                TimeBlockCount = request.TimeBlockCount,
+                ListPageDefaultTab = request.ListPageDefaultTab,
+                ListPageSortBy = request.ListPageSortBy,
+                ListPageTheme = request.ListPageTheme,
+                ListManualOrder = request.ListManualOrder,
+                AiBaseUrl = request.AiBaseUrl,
+                AiApiKey = request.AiApiKey,
+                AiModel = request.AiModel,
+                SyncServerBaseUrl = request.SyncServerBaseUrl,
+                NotificationEnabled = request.NotificationEnabled,
+                WidgetPreferences = request.WidgetPreferences,
+                TimeZoneId = request.TimeZoneId ?? settings.TimeZoneId
+            };
+
+            return Task.FromResult(settings);
         }
     }
 }

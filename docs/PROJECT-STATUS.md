@@ -44,6 +44,7 @@
 - `HOME-630`
 - `LIST-700`
 - `LIST-710`
+- `LIST-720`
 
 ## 正在进行任务 ID
 
@@ -51,7 +52,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `LIST-720`
+- `LIST-730`
 
 ## 当前阻塞
 
@@ -59,6 +60,26 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，17/17 用例通过，0 failed
+- 已确认客户端列表应用层手动顺序当前会真实影响列表快照顺序：
+  - `Application/Lists/ListPageService.cs`
+- 已确认客户端列表页已新增手动重排入口：
+  - `Presentation/Pages/ListPage.xaml`
+  - `Presentation/Pages/ListPage.xaml.cs`
+- 已确认客户端列表页状态 ViewModel 已接入：
+  - 重排模式开关
+  - 未完成 / 已完成分组内上下移动
+  - 手动顺序保存后即时刷新
+  - `Presentation/ViewModels/ListPageViewModel.cs`
+  - `Presentation/ViewModels/ListPageItemEntryViewModel.cs`
+- 已确认客户端列表页当前已新增覆盖：
+  - 独立于排序切换的手动重新排序模式
+  - 手动顺序持久化后重新进入列表仍保留
+  - 手动顺序优先于列表排序规则，并保留未完成 / 已完成分组
+- 已确认客户端新增列表页手动重排测试：
+  - `tests/Overview.Client.Tests/ListPageServiceTests.cs`
+  - `tests/Overview.Client.Tests/ListPageViewModelTests.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，15/15 用例通过，0 failed
 - 已确认客户端列表页已新增排序与状态切换入口：

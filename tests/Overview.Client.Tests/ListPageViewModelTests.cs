@@ -57,6 +57,24 @@ public sealed class ListPageViewModelTests
         Assert.Equal(ListPageTab.Important, viewModel.CurrentTab);
     }
 
+    [Fact]
+    public async Task MoveItemDownAsync_SavesManualOrderAndRefreshesVisibleSequence()
+    {
+        var itemService = new FakeItemService();
+        var listPageService = new FakeListPageService();
+        var viewModel = CreateViewModel(itemService, listPageService);
+
+        await viewModel.InitializeAsync();
+        await viewModel.SelectSortAsync(ListSortBy.Alphabetical);
+        viewModel.ToggleReorderMode();
+        await viewModel.MoveItemDownAsync(TaskItemId);
+
+        Assert.Equal([ScheduleItemId, TaskItemId], viewModel.ActiveItems.Select(item => item.ItemId));
+        Assert.Equal([ScheduleItemId, TaskItemId], listPageService.LastReorderedIds);
+        Assert.False(viewModel.ActiveItems[0].CanMoveUp);
+        Assert.True(viewModel.ActiveItems[0].CanMoveDown);
+    }
+
     private static ListPageViewModel CreateViewModel(FakeItemService itemService, FakeListPageService listPageService)
     {
         itemService.ListPageService = listPageService;
@@ -76,6 +94,8 @@ public sealed class ListPageViewModelTests
         ];
 
         public ListSortBy LastSortBy { get; private set; } = ListSortBy.Importance;
+
+        public IReadOnlyList<Guid> LastReorderedIds { get; private set; } = Array.Empty<Guid>();
 
         public Task<ListPageSnapshot> BuildSnapshotAsync(Guid userId, ListPageQuery? query = null, CancellationToken cancellationToken = default)
         {
@@ -97,6 +117,16 @@ public sealed class ListPageViewModelTests
                 ListSortBy.Alphabetical => filtered.OrderBy(item => item.Title, StringComparer.Ordinal),
                 _ => filtered.OrderBy(item => item.Type)
             };
+
+            if (LastReorderedIds.Count > 0)
+            {
+                var orderedLookup = LastReorderedIds
+                    .Select((itemId, index) => new { itemId, index })
+                    .ToDictionary(entry => entry.itemId, entry => entry.index);
+                filtered = filtered
+                    .OrderBy(item => orderedLookup.TryGetValue(item.ItemId, out var index) ? index : int.MaxValue)
+                    .ThenBy(item => item.Title, StringComparer.Ordinal);
+            }
 
             return Task.FromResult(new ListPageSnapshot
             {
@@ -120,7 +150,23 @@ public sealed class ListPageViewModelTests
 
         public Task<UserSettings> ReorderAsync(Guid userId, ListPageTab tab, IReadOnlyList<Guid> orderedItemIds, CancellationToken cancellationToken = default)
         {
-            throw new NotSupportedException();
+            LastReorderedIds = orderedItemIds.ToArray();
+
+            var orderedLookup = orderedItemIds
+                .Select((itemId, index) => new { itemId, index })
+                .ToDictionary(entry => entry.itemId, entry => entry.index);
+
+            items.Sort((left, right) =>
+            {
+                var leftRank = orderedLookup.TryGetValue(left.ItemId, out var leftIndex) ? leftIndex : int.MaxValue;
+                var rightRank = orderedLookup.TryGetValue(right.ItemId, out var rightIndex) ? rightIndex : int.MaxValue;
+                return leftRank.CompareTo(rightRank);
+            });
+
+            return Task.FromResult(new UserSettings
+            {
+                UserId = userId
+            });
         }
 
         public void SetCompleted(Guid itemId, bool isCompleted)

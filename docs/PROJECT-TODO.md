@@ -536,12 +536,15 @@
 - Title: 实现列表页手动重新排序
 - Phase: 阶段 7
 - Depends On: APP-430, LIST-710
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持手动更改事项顺序
-- Implementation Notes: 必须单独实现，不可只依赖排序切换
+- Implementation Notes: 已在列表页接入独立手动重排模式，支持在未完成 / 已完成分组内通过上下移动按钮调整顺序，并将顺序持久化到 `ListManualOrderPreferences`；当前列表快照会优先应用手动顺序，再应用各排序规则的补充排序
 - Done When: 手动重排完成
-- Verification: 可定位重排行为
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位重排行为
 - Files Expected: 重排逻辑
 
 ### Task ID: LIST-730

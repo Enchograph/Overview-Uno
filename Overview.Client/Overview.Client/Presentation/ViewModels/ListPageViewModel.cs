@@ -10,6 +10,8 @@ public sealed class ListPageViewModel
     private readonly IAuthenticationService authenticationService;
     private readonly IItemService itemService;
     private readonly IListPageService listPageService;
+    private IReadOnlyList<ListPageItem> activeSnapshotItems = Array.Empty<ListPageItem>();
+    private IReadOnlyList<ListPageItem> completedSnapshotItems = Array.Empty<ListPageItem>();
 
     public ListPageViewModel(
         IAuthenticationService authenticationService,
@@ -45,6 +47,10 @@ public sealed class ListPageViewModel
         "Switch between tabs to filter tasks, schedules, notes, and important items.";
 
     public string StatusMessage { get; private set; } = "Loading list page.";
+
+    public bool IsReorderMode { get; private set; }
+
+    public string ReorderButtonLabel => IsReorderMode ? "Finish Reordering" : "Reorder Tasks";
 
     public string ActiveSummary { get; private set; } = string.Empty;
 
@@ -89,6 +95,15 @@ public sealed class ListPageViewModel
                 SortBy = CurrentSortBy
             },
             cancellationToken).ConfigureAwait(false);
+    }
+
+    public void ToggleReorderMode()
+    {
+        IsReorderMode = !IsReorderMode;
+        RebuildVisibleItems();
+        StatusMessage = IsReorderMode
+            ? "Reorder mode is on. Use the arrow buttons to move items within each section."
+            : $"{PageTitle} reorder mode is off.";
     }
 
     public async Task SelectSortAsync(ListSortBy sortBy, CancellationToken cancellationToken = default)
@@ -162,6 +177,16 @@ public sealed class ListPageViewModel
         await RefreshAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task MoveItemUpAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        await ReorderItemAsync(itemId, moveUp: true, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task MoveItemDownAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        await ReorderItemAsync(itemId, moveUp: false, cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task ToggleImportanceAsync(Guid itemId, CancellationToken cancellationToken = default)
     {
         if (IsBusy)
@@ -217,6 +242,8 @@ public sealed class ListPageViewModel
                 CurrentSortBy = query?.SortBy ?? CurrentSortBy;
                 Tabs = BuildTabs(CurrentTab);
                 SortOptions = BuildSortOptions(CurrentSortBy);
+                activeSnapshotItems = Array.Empty<ListPageItem>();
+                completedSnapshotItems = Array.Empty<ListPageItem>();
                 ActiveItems = Array.Empty<ListPageItemEntryViewModel>();
                 CompletedItems = Array.Empty<ListPageItemEntryViewModel>();
                 PageTitle = GetTabTitle(CurrentTab);
@@ -238,8 +265,9 @@ public sealed class ListPageViewModel
             CurrentSortBy = snapshot.SortBy;
             Tabs = BuildTabs(snapshot.Tab);
             SortOptions = BuildSortOptions(snapshot.SortBy);
-            ActiveItems = snapshot.ActiveItems.Select(ToEntry).ToArray();
-            CompletedItems = snapshot.CompletedItems.Select(ToEntry).ToArray();
+            activeSnapshotItems = snapshot.ActiveItems.ToArray();
+            completedSnapshotItems = snapshot.CompletedItems.ToArray();
+            RebuildVisibleItems();
             PageTitle = GetTabTitle(snapshot.Tab);
             PageSubtitle = GetTabSubtitle(snapshot.Tab);
             ActiveSummary = $"{ActiveItems.Count} active";
@@ -252,6 +280,8 @@ public sealed class ListPageViewModel
         }
         catch (Exception ex)
         {
+            activeSnapshotItems = Array.Empty<ListPageItem>();
+            completedSnapshotItems = Array.Empty<ListPageItem>();
             ActiveItems = Array.Empty<ListPageItemEntryViewModel>();
             CompletedItems = Array.Empty<ListPageItemEntryViewModel>();
             ActiveSummary = string.Empty;
@@ -264,7 +294,64 @@ public sealed class ListPageViewModel
         }
     }
 
-    private static ListPageItemEntryViewModel ToEntry(ListPageItem item)
+    private async Task ReorderItemAsync(
+        Guid itemId,
+        bool moveUp,
+        CancellationToken cancellationToken)
+    {
+        if (IsBusy || !IsReorderMode)
+        {
+            return;
+        }
+
+        var session = authenticationService.CurrentSession;
+        if (session is null)
+        {
+            StatusMessage = "Sign in to save manual list ordering.";
+            return;
+        }
+
+        var activeIds = activeSnapshotItems.Select(item => item.ItemId).ToList();
+        var completedIds = completedSnapshotItems.Select(item => item.ItemId).ToList();
+        if (!TryMove(activeIds, itemId, moveUp) &&
+            !TryMove(completedIds, itemId, moveUp))
+        {
+            return;
+        }
+
+        IsBusy = true;
+
+        try
+        {
+            await listPageService.ReorderAsync(
+                session.UserId,
+                CurrentTab,
+                activeIds.Concat(completedIds).ToArray(),
+                cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        await RefreshAsync(cancellationToken).ConfigureAwait(false);
+        StatusMessage = "Manual list order saved.";
+    }
+
+    private void RebuildVisibleItems()
+    {
+        ActiveItems = activeSnapshotItems
+            .Select((item, index) => ToEntry(item, index, activeSnapshotItems.Count))
+            .ToArray();
+        CompletedItems = completedSnapshotItems
+            .Select((item, index) => ToEntry(item, index, completedSnapshotItems.Count))
+            .ToArray();
+    }
+
+    private ListPageItemEntryViewModel ToEntry(
+        ListPageItem item,
+        int index,
+        int totalCount)
     {
         return new ListPageItemEntryViewModel
         {
@@ -277,8 +364,28 @@ public sealed class ListPageViewModel
             ImportanceBadge = item.IsImportant ? "Important" : string.Empty,
             CompletionBadge = item.IsCompleted ? "Completed" : "Open",
             CompletionGlyph = item.IsCompleted ? "●" : "○",
-            ImportanceGlyph = item.IsImportant ? "★" : "☆"
+            ImportanceGlyph = item.IsImportant ? "★" : "☆",
+            CanMoveUp = IsReorderMode && index > 0,
+            CanMoveDown = IsReorderMode && index < totalCount - 1
         };
+    }
+
+    private static bool TryMove(IList<Guid> itemIds, Guid itemId, bool moveUp)
+    {
+        var index = itemIds.IndexOf(itemId);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        var targetIndex = moveUp ? index - 1 : index + 1;
+        if (targetIndex < 0 || targetIndex >= itemIds.Count)
+        {
+            return false;
+        }
+
+        (itemIds[index], itemIds[targetIndex]) = (itemIds[targetIndex], itemIds[index]);
+        return true;
     }
 
     private ListPageItemEntryViewModel? FindItem(Guid itemId)

@@ -54,6 +54,12 @@ public sealed partial class ListPage : Page
         ApplyViewModelState();
     }
 
+    private void OnReorderModeButtonClick(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ToggleReorderMode();
+        ApplyViewModelState();
+    }
+
     private async void OnCompletionButtonClick(object sender, RoutedEventArgs e)
     {
         if (!TryGetItemId(sender, out var itemId))
@@ -78,12 +84,39 @@ public sealed partial class ListPage : Page
 
     private async void OnItemContainerTapped(object sender, TappedRoutedEventArgs e)
     {
+        if (ViewModel.IsReorderMode)
+        {
+            return;
+        }
+
         if (!TryGetItemId(sender, out var itemId))
         {
             return;
         }
 
         await ViewModel.ToggleCompletionAsync(itemId).ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private async void OnMoveUpButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (!TryGetItemId(sender, out var itemId))
+        {
+            return;
+        }
+
+        await ViewModel.MoveItemUpAsync(itemId).ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private async void OnMoveDownButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (!TryGetItemId(sender, out var itemId))
+        {
+            return;
+        }
+
+        await ViewModel.MoveItemDownAsync(itemId).ConfigureAwait(true);
         ApplyViewModelState();
     }
 
@@ -96,6 +129,7 @@ public sealed partial class ListPage : Page
         ActiveSummaryTextBlock.Text = ViewModel.ActiveSummary;
         CompletedSummaryTextBlock.Text = ViewModel.CompletedSummary;
         StatusTextBlock.Text = ViewModel.StatusMessage;
+        ReorderModeButton.Content = ViewModel.ReorderButtonLabel;
         BusyIndicator.IsActive = ViewModel.IsBusy;
 
         TabItemsControl.ItemsSource = ViewModel.Tabs;

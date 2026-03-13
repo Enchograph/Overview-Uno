@@ -394,3 +394,14 @@
 - 列表页当前支持我的一天、全部、任务、日程、备忘、重要事项六个标签和未完成 / 已完成分组展示
 - 新增列表筛选测试 `tests/Overview.Client.Tests/ListPageServiceTests.cs`
 - 验证客户端桌面目标可无警告构建，且测试项目 10/10 通过
+
+### Round 36
+
+- 完成 `LIST-720`
+- 更新 `Application/Lists/ListPageService.cs`，使手动顺序在列表快照中真实生效，并继续保留未完成 / 已完成分组
+- 更新 `Presentation/ViewModels/ListPageViewModel.cs`，新增重排模式开关、分组内上下移动和保存后刷新逻辑
+- 更新 `Presentation/ViewModels/ListPageItemEntryViewModel.cs`，新增行级上下移动可用状态
+- 更新 `Presentation/Pages/ListPage.xaml` 与 `Presentation/Pages/ListPage.xaml.cs`，接入顶部重排模式入口和行内上下移动按钮
+- 扩展 `tests/Overview.Client.Tests/ListPageServiceTests.cs`，覆盖手动顺序持久化后的快照顺序
+- 扩展 `tests/Overview.Client.Tests/ListPageViewModelTests.cs`，覆盖重排模式下的保存与刷新链路
+- 验证客户端桌面目标可无警告构建，且测试项目 17/17 通过

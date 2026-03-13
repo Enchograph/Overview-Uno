@@ -21,4 +21,8 @@ public sealed record ListPageItemEntryViewModel
     public string CompletionGlyph { get; init; } = string.Empty;
 
     public string ImportanceGlyph { get; init; } = string.Empty;
+
+    public bool CanMoveUp { get; init; }
+
+    public bool CanMoveDown { get; init; }
 }

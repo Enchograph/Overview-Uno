@@ -44,7 +44,7 @@
           </ItemsControl>
         </ScrollViewer>
 
-        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
+        <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
           <TextBlock
             VerticalAlignment="Center"
             Text="Sort by"
@@ -60,17 +60,22 @@
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </ComboBox>
+          <Button
+            x:Name="ReorderModeButton"
+            Grid.Column="2"
+            Click="OnReorderModeButtonClick"
+            Content="Reorder Tasks" />
           <TextBlock
             x:Name="ActiveSummaryTextBlock"
-            Grid.Column="2"
+            Grid.Column="3"
             Style="{ThemeResource BodyStrongTextBlockStyle}" />
           <TextBlock
             x:Name="CompletedSummaryTextBlock"
-            Grid.Column="3"
+            Grid.Column="4"
             Style="{ThemeResource BodyStrongTextBlockStyle}" />
           <ProgressRing
             x:Name="BusyIndicator"
-            Grid.Column="4"
+            Grid.Column="5"
             Width="24"
             Height="24"
             IsActive="False"
@@ -105,7 +110,7 @@
                       Background="{ThemeResource LayerFillColorDefaultBrush}"
                       CornerRadius="18"
                       Tapped="OnItemContainerTapped">
-                      <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
+                      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
                         <Button
                           Width="36"
                           Height="36"
@@ -140,6 +145,23 @@
                           <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
                           <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
                         </StackPanel>
+
+                        <StackPanel Grid.Column="4" Spacing="6" VerticalAlignment="Center">
+                          <Button
+                            Width="36"
+                            Height="32"
+                            Click="OnMoveUpButtonClick"
+                            Content="↑"
+                            IsEnabled="{Binding CanMoveUp}"
+                            Tag="{Binding ItemId}" />
+                          <Button
+                            Width="36"
+                            Height="32"
+                            Click="OnMoveDownButtonClick"
+                            Content="↓"
+                            IsEnabled="{Binding CanMoveDown}"
+                            Tag="{Binding ItemId}" />
+                        </StackPanel>
                       </Grid>
                     </Border>
                   </DataTemplate>
@@ -167,7 +189,7 @@
                       CornerRadius="18"
                       Opacity="0.72"
                       Tapped="OnItemContainerTapped">
-                      <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
+                      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
                         <Button
                           Width="36"
                           Height="36"
@@ -201,6 +223,23 @@
                             Tag="{Binding ItemId}" />
                           <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
                           <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="4" Spacing="6" VerticalAlignment="Center">
+                          <Button
+                            Width="36"
+                            Height="32"
+                            Click="OnMoveUpButtonClick"
+                            Content="↑"
+                            IsEnabled="{Binding CanMoveUp}"
+                            Tag="{Binding ItemId}" />
+                          <Button
+                            Width="36"
+                            Height="32"
+                            Click="OnMoveDownButtonClick"
+                            Content="↓"
+                            IsEnabled="{Binding CanMoveDown}"
+                            Tag="{Binding ItemId}" />
                         </StackPanel>
                       </Grid>
                     </Border>
