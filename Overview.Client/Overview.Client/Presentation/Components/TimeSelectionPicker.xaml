@@ -1,0 +1,90 @@
+<UserControl x:Class="Overview.Client.Presentation.Components.TimeSelectionPicker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shapes="using:Microsoft.UI.Xaml.Shapes">
+  <Border
+    Padding="20"
+    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+    BorderThickness="1"
+    CornerRadius="24"
+    ManipulationCompleted="OnRootManipulationCompleted"
+    ManipulationMode="TranslateX,System">
+    <StackPanel Spacing="16">
+      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+        <Button
+          Click="OnPreviousMonthButtonClick"
+          Content="&lt;"
+          HorizontalAlignment="Left" />
+
+        <TextBlock
+          x:Name="VisibleMonthTextBlock"
+          Grid.Column="1"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          FontSize="24"
+          FontWeight="SemiBold"
+          Text="2026/01" />
+
+        <Button
+          Grid.Column="2"
+          Click="OnConfirmButtonClick"
+          Content="Confirm"
+          Style="{StaticResource AccentButtonStyle}" />
+      </Grid>
+
+      <TextBlock
+        x:Name="StatusTextBlock"
+        Opacity="0.72"
+        Style="{ThemeResource BodyTextBlockStyle}"
+        TextWrapping="WrapWholeWords" />
+
+      <Grid ColumnDefinitions="96,*,*,*,*,*,*,*" ColumnSpacing="8">
+        <Button
+          x:Name="MonthButton"
+          Click="OnMonthButtonClick"
+          HorizontalAlignment="Stretch"
+          HorizontalContentAlignment="Stretch">
+          <Grid Height="52">
+            <Border
+              Background="{ThemeResource LayerFillColorAltBrush}"
+              CornerRadius="18" />
+            <StackPanel
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Spacing="4">
+              <TextBlock
+                x:Name="MonthButtonLabelTextBlock"
+                FontWeight="SemiBold"
+                Text="2026/01"
+                TextAlignment="Center" />
+              <shapes:Ellipse
+                x:Name="MonthSelectionIndicator"
+                Width="8"
+                Height="8"
+                Fill="{ThemeResource AccentFillColorDefaultBrush}"
+                Visibility="Collapsed" />
+            </StackPanel>
+          </Grid>
+        </Button>
+
+        <Grid x:Name="WeekdayHeaderGrid" Grid.Column="1" Grid.ColumnSpan="7" ColumnSpacing="8" />
+      </Grid>
+
+      <StackPanel x:Name="WeekRowsPanel" Spacing="8" />
+
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <TextBlock
+          x:Name="SelectedPeriodTextBlock"
+          VerticalAlignment="Center"
+          TextWrapping="WrapWholeWords" />
+
+        <Button
+          Grid.Column="1"
+          Click="OnNextMonthButtonClick"
+          Content="&gt;"
+          HorizontalAlignment="Right" />
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

@@ -261,6 +261,17 @@
 
 ### Round 29
 
+- 完成 `HOME-600`
+- 新增独立时间选择组件 `TimeSelectionPicker`
+- 新增时间选择确认事件参数 `TimeSelectionConfirmedEventArgs`
+- 新增时间选择 Presentation ViewModel 与日期 / 周行展示模型
+- 在 `HomePage` 接入时间选择组件宿主页，支持日 / 周 / 月模式切换与确认结果展示
+- 在 `ClientServiceRegistry` 接入 `TimeSelectionViewModel`
+- 时间选择组件当前支持月份前后切换、左右滑动切换、日期到周 / 月映射和确认返回
+- 验证客户端桌面目标可无警告构建
+
+### Round 29
+
 - 完成 `UI-520`
 - 新增统一事项详情组件 `Presentation/Components/ItemDetailCard.xaml`
 - 新增 `Presentation/ViewModels/ItemDetailViewModel.cs`

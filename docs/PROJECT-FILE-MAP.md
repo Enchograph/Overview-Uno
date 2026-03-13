@@ -59,7 +59,7 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/LoginPage.xaml`
   - 客户端登录/注册入口页，负责启动时会话恢复和进入壳层前的认证流程
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
-  - 当前主页壳层占位页
+  - 客户端主页当前作为时间选择组件宿主页，已支持日/周/月模式切换和确认结果展示
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
   - 当前列表页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
@@ -70,8 +70,12 @@
   - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架和设置摘要展示
 - `Overview.Client/Overview.Client/Presentation/Components/ItemDetailCard.xaml`
   - 客户端统一事项详情组件，当前展示标题、类型、时间、地点、详情、提醒、重复、状态和编辑入口
+- `Overview.Client/Overview.Client/Presentation/Components/TimeSelectionPicker.xaml`
+  - 客户端可复用时间选择组件，当前支持日/周/月选择、月格/周格/日期格映射、前后月份切换和确认返回
 - `Overview.Client/Overview.Client/Presentation/ViewModels/`
   - 当前五页壳层的 ViewModel 集合
+- `Overview.Client/Overview.Client/Presentation/ViewModels/HomePageViewModel.cs`
+  - 客户端主页宿主页 ViewModel，负责时间选择模式切换提示和确认结果展示
 - `Overview.Client/Overview.Client/Presentation/ViewModels/LoginPageViewModel.cs`
   - 客户端登录页 ViewModel，封装登录、注册、验证码发送和会话恢复入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AddItemPageViewModel.cs`
@@ -84,6 +88,8 @@
   - 客户端事项详情展示 ViewModel，负责把统一领域事项格式化为可复用的详情卡片字段
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
   - 客户端设置页 ViewModel，负责设置主页分区、二级页状态和登录态/设置摘要加载
+- `Overview.Client/Overview.Client/Presentation/ViewModels/TimeSelectionViewModel.cs`
+  - 客户端时间选择组件 ViewModel，负责月份快照加载、日/周/月映射、前后月份切换和确认前状态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
   - 客户端设置页分区入口模型，用于设置主页卡片列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`

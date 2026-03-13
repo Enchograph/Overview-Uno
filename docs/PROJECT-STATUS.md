@@ -38,6 +38,7 @@
 - `UI-510`
 - `UI-520`
 - `UI-530`
+- `HOME-600`
 
 ## 正在进行任务 ID
 
@@ -45,7 +46,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `HOME-600`
+- `HOME-610`
 
 ## 当前阻塞
 
@@ -53,6 +54,22 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端新增可复用时间选择组件：
+  - `Presentation/Components/TimeSelectionPicker.xaml`
+  - `Presentation/Components/TimeSelectionPicker.xaml.cs`
+  - `Presentation/Components/TimeSelectionConfirmedEventArgs.cs`
+- 已确认客户端新增时间选择 Presentation ViewModel：
+  - `Presentation/ViewModels/TimeSelectionViewModel.cs`
+  - `Presentation/ViewModels/TimeSelectionWeekRowViewModel.cs`
+  - `Presentation/ViewModels/TimeSelectionDateCellViewModel.cs`
+- 已确认客户端时间选择组件当前已覆盖：
+  - 日 / 周 / 月三种选择模式
+  - 月份前进 / 后退按钮
+  - 左右滑动切换前后月份
+  - 日期点击到周 / 月的映射选择
+  - 月格、周格、日期格的确认返回链路
+- 已确认客户端 `HomePage` 已从纯占位页切换为时间选择组件宿主页，可切换模式并显示确认结果
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - 已确认客户端设置页已从占位实现切换为真实设置结构：
   - `Presentation/Pages/SettingsPage.xaml`

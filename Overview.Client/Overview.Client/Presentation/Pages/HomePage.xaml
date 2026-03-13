@@ -1,11 +1,57 @@
 <Page x:Class="Overview.Client.Presentation.Pages.HomePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:components="using:Overview.Client.Presentation.Components"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
   <Grid Padding="24">
-    <StackPanel Spacing="12" VerticalAlignment="Center">
-      <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding Title}" />
-      <TextBlock Opacity="0.72" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{Binding Description}" TextWrapping="WrapWholeWords" />
-    </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel MaxWidth="860" HorizontalAlignment="Center" Spacing="18">
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="PageTitleTextBlock" FontSize="32" FontWeight="SemiBold" />
+          <TextBlock
+            x:Name="PageDescriptionTextBlock"
+            Opacity="0.72"
+            Style="{ThemeResource BodyStrongTextBlockStyle}"
+            TextWrapping="WrapWholeWords" />
+        </StackPanel>
+
+        <Border
+          Padding="20"
+          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="24">
+          <StackPanel Spacing="14">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+              <ComboBox x:Name="SelectionModeComboBox" Header="Selection Mode" SelectionChanged="OnSelectionModeChanged">
+                <ComboBoxItem Content="Day" Tag="Day" />
+                <ComboBoxItem Content="Week" Tag="Week" />
+                <ComboBoxItem Content="Month" Tag="Month" />
+              </ComboBox>
+
+              <TextBlock
+                x:Name="StatusTextBlock"
+                Grid.Column="1"
+                VerticalAlignment="Bottom"
+                TextWrapping="WrapWholeWords" />
+            </Grid>
+
+            <components:TimeSelectionPicker x:Name="TimeSelectionPicker" SelectionConfirmed="OnTimeSelectionConfirmed" />
+          </StackPanel>
+        </Border>
+
+        <Border
+          Padding="20"
+          Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="24">
+          <StackPanel Spacing="8">
+            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Last Confirmed Result" />
+            <TextBlock x:Name="ConfirmedSelectionTextBlock" TextWrapping="WrapWholeWords" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
   </Grid>
 </Page>

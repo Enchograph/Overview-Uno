@@ -436,12 +436,15 @@
 - Title: 实现时间选择组件
 - Phase: 阶段 6
 - Depends On: APP-420, UI-530
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持日/周/月选择与映射规则
-- Implementation Notes: 必须支持点击日期映射到周或月
+- Implementation Notes: 已新增独立 `TimeSelectionPicker` 组件与 `TimeSelectionViewModel`，当前覆盖日/周/月选择、月份切换、左右滑动切换、日期到周/月映射与确认返回；`HomePage` 现作为最小宿主页承载调用入口
 - Done When: 时间选择组件完成
-- Verification: 可定位组件逻辑
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 `Presentation/Components/TimeSelectionPicker.xaml`
+  - 可定位 `Presentation/ViewModels/TimeSelectionViewModel.cs`
 - Files Expected: 时间选择组件
 
 ### Task ID: HOME-610
