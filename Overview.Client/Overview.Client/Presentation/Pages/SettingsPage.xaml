@@ -1,11 +1,170 @@
 <Page x:Class="Overview.Client.Presentation.Pages.SettingsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:viewModels="using:Overview.Client.Presentation.ViewModels"
+      mc:Ignorable="d"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <Grid Padding="24">
-    <StackPanel Spacing="12" VerticalAlignment="Center">
-      <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding Title}" />
-      <TextBlock Opacity="0.72" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{Binding Description}" TextWrapping="WrapWholeWords" />
-    </StackPanel>
+  <Grid Padding="24" RowDefinitions="Auto,Auto,*">
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+      <Button
+        x:Name="BackButton"
+        Click="OnBackButtonClick"
+        Content="Back"
+        HorizontalAlignment="Left"
+        Visibility="Collapsed" />
+
+      <StackPanel Grid.Column="1" Spacing="6">
+        <TextBlock
+          x:Name="PageTitleTextBlock"
+          FontSize="30"
+          FontWeight="SemiBold"
+          Text="Settings" />
+        <TextBlock
+          x:Name="PageSubtitleTextBlock"
+          Opacity="0.72"
+          Style="{ThemeResource BodyStrongTextBlockStyle}"
+          Text="Choose a section to manage Overview preferences and integrations."
+          TextWrapping="WrapWholeWords" />
+      </StackPanel>
+    </Grid>
+
+    <Border
+      Grid.Row="1"
+      Margin="0,20,0,16"
+      Padding="20"
+      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+      BorderThickness="1"
+      CornerRadius="24">
+      <StackPanel Spacing="12">
+        <TextBlock
+          x:Name="SessionSummaryTextBlock"
+          Style="{ThemeResource BodyStrongTextBlockStyle}"
+          TextWrapping="WrapWholeWords" />
+
+        <TextBlock
+          x:Name="StatusTextBlock"
+          Foreground="{ThemeResource SystemFillColorCautionBrush}"
+          TextWrapping="WrapWholeWords" />
+
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <Button
+            x:Name="RefreshButton"
+            Click="OnRefreshButtonClick"
+            Content="Refresh Summary" />
+
+          <ProgressRing
+            x:Name="BusyIndicator"
+            Height="24"
+            IsActive="False"
+            Width="24" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+      <Grid>
+        <StackPanel x:Name="RootPanel" Spacing="16">
+          <TextBlock
+            x:Name="RootIntroTextBlock"
+            Opacity="0.8"
+            Style="{ThemeResource BodyTextBlockStyle}"
+            TextWrapping="WrapWholeWords" />
+
+          <ItemsControl x:Name="SectionItemsControl">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:SettingsSectionEntry">
+                <Button
+                  Margin="0,0,0,12"
+                  Click="OnSectionButtonClick"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Stretch"
+                  Tag="{Binding Key}">
+                  <Border
+                    Padding="18"
+                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="20">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                      <StackPanel Spacing="6">
+                        <TextBlock
+                          FontSize="18"
+                          FontWeight="SemiBold"
+                          Text="{Binding Title}" />
+                        <TextBlock
+                          Opacity="0.72"
+                          Style="{ThemeResource BodyTextBlockStyle}"
+                          Text="{Binding Subtitle}"
+                          TextWrapping="WrapWholeWords" />
+                        <TextBlock
+                          Opacity="0.82"
+                          Style="{ThemeResource CaptionTextBlockStyle}"
+                          Text="{Binding Summary}"
+                          TextWrapping="WrapWholeWords" />
+                      </StackPanel>
+
+                      <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        Text=">" />
+                    </Grid>
+                  </Border>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <StackPanel x:Name="DetailPanel" Spacing="16" Visibility="Collapsed">
+          <Border
+            Padding="20"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="24">
+            <StackPanel Spacing="8">
+              <TextBlock
+                x:Name="DetailLeadTextBlock"
+                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                TextWrapping="WrapWholeWords" />
+              <TextBlock
+                x:Name="DetailFootnoteTextBlock"
+                Opacity="0.72"
+                Style="{ThemeResource BodyTextBlockStyle}"
+                TextWrapping="WrapWholeWords" />
+            </StackPanel>
+          </Border>
+
+          <ItemsControl x:Name="DetailItemsControl">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:SettingsSectionField">
+                <Border
+                  Margin="0,0,0,12"
+                  Padding="18"
+                  Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                  BorderThickness="1"
+                  CornerRadius="20">
+                  <StackPanel Spacing="6">
+                    <TextBlock
+                      Opacity="0.72"
+                      Style="{ThemeResource CaptionTextBlockStyle}"
+                      Text="{Binding Label}" />
+                    <TextBlock
+                      Style="{ThemeResource BodyStrongTextBlockStyle}"
+                      Text="{Binding Value}"
+                      TextWrapping="WrapWholeWords" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Grid>
+    </ScrollViewer>
   </Grid>
 </Page>

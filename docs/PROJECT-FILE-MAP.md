@@ -67,7 +67,7 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
   - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口和详情卡片接入
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
-  - 当前设置页壳层占位页
+  - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架和设置摘要展示
 - `Overview.Client/Overview.Client/Presentation/Components/ItemDetailCard.xaml`
   - 客户端统一事项详情组件，当前展示标题、类型、时间、地点、详情、提醒、重复、状态和编辑入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/`
@@ -82,6 +82,12 @@
   - 客户端添加/编辑事项页已有事项摘要模型，用于页面内编辑入口列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ItemDetailViewModel.cs`
   - 客户端事项详情展示 ViewModel，负责把统一领域事项格式化为可复用的详情卡片字段
+- `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
+  - 客户端设置页 ViewModel，负责设置主页分区、二级页状态和登录态/设置摘要加载
+- `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
+  - 客户端设置页分区入口模型，用于设置主页卡片列表
+- `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`
+  - 客户端设置页二级页字段模型，用于展示分区摘要明细
 - `Overview.Client/Overview.Client/Domain/DomainAssemblyMarker.cs`
   - 客户端 Domain 层目录落点
 - `Overview.Client/Overview.Client/Domain/Entities/`

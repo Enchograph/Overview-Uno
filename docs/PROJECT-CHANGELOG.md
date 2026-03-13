@@ -262,6 +262,26 @@
 ### Round 29
 
 - 完成 `UI-520`
+- 新增统一事项详情组件 `Presentation/Components/ItemDetailCard.xaml`
+- 新增 `Presentation/ViewModels/ItemDetailViewModel.cs`
+- 更新 `AddItemPage` 以接入事项详情查看与编辑联动
+- 验证客户端桌面目标可无警告构建
+
+### Round 30
+
+- 完成 `UI-530`
+- 将 `Presentation/Pages/SettingsPage.xaml` 从占位页改为真实设置结构
+- 更新 `Presentation/Pages/SettingsPage.xaml.cs`，接入设置主页、二级页切换、返回导航和摘要刷新
+- 新增 `Presentation/ViewModels/SettingsPageViewModel.cs`
+- 新增 `Presentation/ViewModels/SettingsSectionEntry.cs`
+- 新增 `Presentation/ViewModels/SettingsSectionField.cs`
+- 在 `ClientServiceRegistry` 为设置页接入认证和用户设置服务
+- 修正文档与任务拆解不一致：新增 `DEC-019`，明确删除事项入口属于阶段 7 列表页
+- 验证客户端桌面目标可无警告构建
+
+### Round 29
+
+- 完成 `UI-520`
 - 新增统一事项详情组件 `Presentation/Components/ItemDetailCard`
 - 新增 `Presentation/ViewModels/ItemDetailViewModel.cs`
 - 更新 `AddItemPage` 与 `AddItemPageViewModel`，提供已有事项的查看入口与详情区编辑跳转

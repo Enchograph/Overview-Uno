@@ -417,12 +417,14 @@
 - Title: 建立设置页主结构与二级页骨架
 - Phase: 阶段 5
 - Depends On: APP-410, SHELL-130
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持通用、主页、列表页、AI、账号与同步等设置入口
-- Implementation Notes: 结构必须完整，细节可后续补齐
+- Implementation Notes: 已将 `SettingsPage` 从占位页切换为真实设置结构，当前覆盖设置主页分区入口、二级页返回骨架与摘要展示；具体可编辑控件留待后续分任务补齐
 - Done When: 设置主页和二级页入口存在
-- Verification: 可进入设置主结构
+- Verification:
+  - 可进入设置主结构
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
 - Files Expected: 设置页与子页骨架
 
 ---

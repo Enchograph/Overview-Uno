@@ -2,8 +2,8 @@
 
 ## 当前阶段
 
-- 阶段编号：5
-- 阶段名称：Presentation 基础页面
+- 阶段编号：6
+- 阶段名称：Presentation 主页
 - 阶段状态：`active`
 
 ## 当前里程碑
@@ -37,6 +37,7 @@
 - `UI-500`
 - `UI-510`
 - `UI-520`
+- `UI-530`
 
 ## 正在进行任务 ID
 
@@ -44,7 +45,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `UI-530`
+- `HOME-600`
 
 ## 当前阻塞
 
@@ -52,6 +53,18 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端设置页已从占位实现切换为真实设置结构：
+  - `Presentation/Pages/SettingsPage.xaml`
+- 已确认客户端新增设置页状态 ViewModel 与分区模型：
+  - `Presentation/ViewModels/SettingsPageViewModel.cs`
+  - `Presentation/ViewModels/SettingsSectionEntry.cs`
+  - `Presentation/ViewModels/SettingsSectionField.cs`
+- 已确认客户端设置页当前已覆盖：
+  - 设置主页分区入口
+  - 通用、主页、列表、AI、账号、同步、关于二级页骨架
+  - 二级页返回导航结构
+  - 基于当前登录态与用户设置的摘要展示
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - 已确认客户端新增统一事项详情组件：
   - `Presentation/Components/ItemDetailCard.xaml`
