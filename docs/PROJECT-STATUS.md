@@ -29,6 +29,7 @@
 - `INFRA-330`
 - `INFRA-340`
 - `APP-400`
+- `APP-410`
 
 ## 正在进行任务 ID
 
@@ -36,7 +37,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `APP-410`
+- `APP-420`
 
 ## 当前阻塞
 
@@ -46,6 +47,34 @@
 
 - `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端新增事项应用层目录：
+  - `Application/Items`
+- 已确认客户端新增设置应用层目录：
+  - `Application/Settings`
+- 已确认客户端新增本地设备标识存储：
+  - `Infrastructure/Settings/IDeviceIdStore`
+  - `Infrastructure/Settings/FileDeviceIdStore`
+- 已确认客户端事项应用层已提供：
+  - `IItemService`
+  - `ItemService`
+  - `ItemUpsertRequest`
+  - `ItemQueryOptions`
+- 已确认客户端事项应用层已覆盖：
+  - 事项创建
+  - 事项读取
+  - 事项列表查询
+  - 事项更新
+  - 事项完成状态切换
+  - 事项软删除
+  - 本地待同步变更登记
+- 已确认客户端设置应用层已提供：
+  - `IUserSettingsService`
+  - `UserSettingsService`
+  - `UserSettingsUpdateRequest`
+- 已确认客户端设置应用层已覆盖：
+  - 默认设置读取
+  - 设置保存
+  - 设置待同步变更登记
 - 已确认客户端新增认证应用层目录：
   - `Application/Auth`
 - 已确认客户端新增认证远程访问目录：
@@ -211,10 +240,11 @@
 - 已完成客户端远程同步访问封装与轻量注册中心接入
 - 已完成通知、小组件、日志基础设施抽象，并接入默认基础实现
 - 已完成客户端认证应用层封装，覆盖登录、登出、登录态恢复与刷新
+- 已完成客户端事项 CRUD 与设置读写应用层封装，并接入本地待同步变更登记
 - 已确认 git 仓库已初始化，当前分支为 `main`，且已配置 `origin`
 - 已修正文档与仓库真实 git 状态不一致的问题
 - 已修正文档内部“阶段编号仍为 2 / 路线仍显示阶段 3 未开始 / SQLite 验收未勾选”的状态偏差
-- 下一步应进入事项 CRUD 与设置读写用例
+- 下一步应进入主页布局计算与时间选择应用服务
 
 ## 风险与偏差
 
@@ -232,6 +262,7 @@
 - 当前客户端日志抽象默认注册为 no-op 工厂，后续若要把应用层日志接入 Uno 日志管线，需要在平台集成前补具体适配器
 - 当前同步控制器直接操作 `DbContext` 完成基础设施闭环；真正的自动同步编排、状态机和本地收敛仍在后续 Application/Sync 阶段
 - 当前登录态本地存储为客户端本地 JSON 文件，尚未接入平台级安全存储；首版先满足登录态恢复，后续若进入平台安全加固需在 Platform/QA 阶段补齐
+- 当前 `IUserSettingsService.GetAsync` 在本地无记录时返回默认设置对象，但不会立即持久化；真正写入与同步登记发生在 `SaveAsync`
 - 当前认证应用层依赖调用方传入同步服务器 Base URL；真正的登录页输入、校验和与设置页联动仍在后续 Presentation/Settings 阶段完成
 - 如果跳过应用壳层，后续即使页面分别实现，也不能保证应用直接可用
 - 如果不按 MVVM 顺序推进，页面逻辑会提前侵入数据和同步细节
@@ -239,9 +270,9 @@
 
 ## 接手 AI 执行准则
 
-- 优先执行 `APP-410`
+- 优先执行 `APP-420`
 - 除非发现环境或工具限制，否则不要跳到 Presentation、Platform 或 QA 阶段
-- 当前 `APP-400` 已完成，后续应进入事项 CRUD 与设置读写用例
+- 当前 `APP-410` 已完成，后续应进入主页布局计算与时间选择应用服务
 - 当前客户端根解决方案依赖仓库根目录 `global.json` 提供 `Uno.Sdk` 版本钉住；不要删除
 - 迁移工具通过仓库根目录 `dotnet-tools.json` 固定；后续执行 EF CLI 前先运行 `dotnet tool restore`
 - 只有在尝试补齐环境后仍无法继续时，才允许在 `PROJECT-HANDOFF.md` 标记阻塞

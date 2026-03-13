@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using Overview.Client.Application.Auth;
+using Overview.Client.Application.Items;
+using Overview.Client.Application.Settings;
 using Overview.Client.Infrastructure.Api.Auth;
 using Overview.Client.Infrastructure.Api.Sync;
 using Overview.Client.Infrastructure.Diagnostics;
 using Overview.Client.Infrastructure.Notifications;
+using Overview.Client.Infrastructure.Persistence.Repositories;
+using Overview.Client.Infrastructure.Persistence.Services;
 using Overview.Client.Infrastructure.Settings;
 using Overview.Client.Infrastructure.Widgets;
 using Overview.Client.Presentation.ViewModels;
@@ -29,13 +33,26 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<IOverviewLoggerFactory>(() => NullOverviewLoggerFactory.Instance);
         registry.RegisterSingleton<INotificationScheduler>(() => new NoOpNotificationScheduler());
         registry.RegisterSingleton<IWidgetSnapshotStore>(() => new InMemoryWidgetSnapshotStore());
+        registry.RegisterSingleton<ISqliteConnectionFactory>(() => new SqliteConnectionFactory());
+        registry.RegisterSingleton<IItemRepository>(() => new SqliteItemRepository(registry.Resolve<ISqliteConnectionFactory>()));
+        registry.RegisterSingleton<IUserSettingsRepository>(() => new SqliteUserSettingsRepository(registry.Resolve<ISqliteConnectionFactory>()));
+        registry.RegisterSingleton<ISyncChangeRepository>(() => new SqliteSyncChangeRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<IAuthSessionStore>(() => new FileAuthSessionStore());
+        registry.RegisterSingleton<IDeviceIdStore>(() => new FileDeviceIdStore());
         registry.RegisterSingleton<IAuthRemoteClient>(() => new AuthRemoteClient(registry.Resolve<HttpClient>()));
         registry.RegisterSingleton<IAuthenticationService>(() => new AuthenticationService(
             registry.Resolve<IAuthRemoteClient>(),
             registry.Resolve<IAuthSessionStore>(),
             registry.Resolve<IOverviewLoggerFactory>()));
         registry.RegisterSingleton<ISyncRemoteClient>(() => new SyncRemoteClient(registry.Resolve<HttpClient>()));
+        registry.RegisterSingleton<IItemService>(() => new ItemService(
+            registry.Resolve<IItemRepository>(),
+            registry.Resolve<ISyncChangeRepository>(),
+            registry.Resolve<IDeviceIdStore>()));
+        registry.RegisterSingleton<IUserSettingsService>(() => new UserSettingsService(
+            registry.Resolve<IUserSettingsRepository>(),
+            registry.Resolve<ISyncChangeRepository>(),
+            registry.Resolve<IDeviceIdStore>()));
         return registry;
     }
 

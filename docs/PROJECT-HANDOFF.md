@@ -2,33 +2,40 @@
 
 ## 本轮目标
 
-- 完成 `APP-400`，实现认证用例与登录态管理
+- 完成 `APP-410`，实现事项 CRUD 与设置读写用例
 
 ## 本轮完成
 
-- 在客户端新增认证应用层目录 `Application/Auth`
-- 新增认证会话模型 `AuthSession`
-- 新增认证应用服务接口 `IAuthenticationService`
-- 新增认证应用服务实现 `AuthenticationService`
-- 认证应用服务已覆盖：
-  - 发送验证码
-  - 注册并保存登录态
-  - 登录并保存登录态
-  - 本地登录态恢复
-  - 访问令牌刷新
-  - 登出清理
-- 在客户端新增认证远程访问目录 `Infrastructure/Api/Auth`
-- 新增认证远程访问接口 `IAuthRemoteClient` 与实现 `AuthRemoteClient`
-- 新增客户端认证请求/响应契约 DTO
-- 在客户端新增本地登录态存储目录 `Infrastructure/Settings`
-- 新增 `IAuthSessionStore` 与基于 JSON 文件的 `FileAuthSessionStore`
-- 在客户端 `ClientServiceRegistry` 注册认证远程访问、登录态存储和认证应用服务
+- 在客户端新增事项应用层目录 `Application/Items`
+- 新增事项应用服务接口 `IItemService`
+- 新增事项应用服务实现 `ItemService`
+- 新增事项应用层输入模型 `ItemUpsertRequest` 与 `ItemQueryOptions`
+- 事项应用服务已覆盖：
+  - 事项创建
+  - 单项读取
+  - 列表查询
+  - 事项更新
+  - 完成状态切换
+  - 软删除
+- 在客户端新增设置应用层目录 `Application/Settings`
+- 新增设置应用服务接口 `IUserSettingsService`
+- 新增设置应用服务实现 `UserSettingsService`
+- 新增设置应用层输入模型 `UserSettingsUpdateRequest`
+- 设置应用服务已覆盖：
+  - 读取已保存设置
+  - 返回默认设置对象
+  - 保存设置
+- 在客户端新增本地设备标识存储：
+  - `IDeviceIdStore`
+  - `FileDeviceIdStore`
+- 事项与设置写入已统一登记到 `ISyncChangeRepository`，为后续同步编排提供待同步输入
+- 在客户端 `ClientServiceRegistry` 注册 SQLite 连接工厂、事项/设置/同步变更仓储、设备标识存储和新增应用服务
 - 验证结果：
   - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 
 ## 本轮未完成
 
-- `APP-410` 及后续 Application 层用例
+- `APP-420` 及后续 Application 层用例
 - 登录页与设置页 Presentation 接入
 - 真实邮件发送提供程序接入
 - 通知平台映射
@@ -41,19 +48,18 @@
 ## 已更新文件
 
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
-- `Overview.Client/Overview.Client/Application/Auth/`
-- `Overview.Client/Overview.Client/Infrastructure/Api/Auth/`
+- `Overview.Client/Overview.Client/Application/Items/`
+- `Overview.Client/Overview.Client/Application/Settings/`
 - `Overview.Client/Overview.Client/Infrastructure/Settings/`
 - `docs/PROJECT-STATUS.md`
 - `docs/PROJECT-TODO.md`
 - `docs/PROJECT-HANDOFF.md`
 - `docs/PROJECT-CHANGELOG.md`
 - `docs/PROJECT-FILE-MAP.md`
-- `docs/PROJECT-ROADMAP.md`
 
 ## 下一步唯一推荐动作
 
-- 执行 `APP-410`：实现事项 CRUD 与设置读写用例
+- 执行 `APP-420`：实现主页布局计算与时间选择应用服务
 
 ## 接手 AI 注意事项
 
@@ -63,7 +69,7 @@
 - 若从仓库根目录执行 `dotnet restore/build`，必须保留根级 `global.json`，否则 `Uno.Sdk` 无法解析
 - Uno 模板还生成了 `Overview.Client/Overview.Client.sln`，当前以仓库根解决方案为主
 - `DOMAIN-200`、`DOMAIN-210`、`DOMAIN-220`、`DOMAIN-230`、`INFRA-300`、`INFRA-310` 已完成；后续基础设施实现应继续复用既有领域规则，而不是重写算法
-- `INFRA-320`、`INFRA-330`、`INFRA-340`、`APP-400` 已完成；当前服务端已具备认证与同步 API 基础设施，客户端已具备认证应用层、远程同步访问封装以及通知/小组件/日志抽象
+- `INFRA-320`、`INFRA-330`、`INFRA-340`、`APP-400`、`APP-410` 已完成；当前服务端已具备认证与同步 API 基础设施，客户端已具备认证应用层、事项/设置应用层、远程同步访问封装以及通知/小组件/日志抽象
 - 当前时间标题只做了基础格式化规则，真正的多语言资源化应放在后续 Presentation/i18n 阶段，不要在 Domain 层引入资源依赖
 - 当前提醒规则服务已提供 `NormalizeReminderConfig`、`ExpandOccurrences`、`BuildReminderSchedule` 三个入口；后续应用层和基础设施层应复用，而不是各自再写一套时间展开
 - 当前主页交互规则服务已提供 `CalculateOverlapStates`、`ResolveHit` 两个入口；后续 Presentation 主页应只负责把坐标映射成时间点和可见事项集合
@@ -76,7 +82,8 @@
 - 当前密码哈希采用 PBKDF2-SHA256，自定义格式为 `PBKDF2.{saltHex}.{hashHex}`
 - 当前刷新令牌按单条记录持久化，`refresh` 端点会吊销旧令牌并写入替换后的哈希
 - 当前已进入 Application 阶段，不应跳去做 Presentation 或 Platform 细节
-- 下一步不要回头扩写登录页 UI 或平台映射，先完成 `APP-410`
+- 下一步不要回头扩写登录页 UI 或平台映射，先完成 `APP-420`
+- 当前 `IUserSettingsService.GetAsync` 若本地不存在记录，会返回默认对象但不落库；只有 `SaveAsync` 才会生成同步变更
 - 运行 EF CLI 前先执行 `dotnet tool restore`
 - 本地没有可连接的 PostgreSQL 实例；如果下轮需要验证 `database update` 或真实读写，请先启动数据库或调整连接串
 - 不要跳过 Shell/Domain/Application 直接做页面细节

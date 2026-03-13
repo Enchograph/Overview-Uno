@@ -200,3 +200,15 @@
 - 新增 `IAuthSessionStore` 与基于 JSON 文件的 `FileAuthSessionStore`
 - 在客户端轻量注册中心接入认证远程访问、登录态存储和认证应用服务
 - 验证客户端桌面目标可无警告构建
+
+### Round 24
+
+- 完成 `APP-410`
+- 在客户端新增事项应用层目录 `Application/Items`
+- 新增 `IItemService`、`ItemService`、`ItemUpsertRequest`、`ItemQueryOptions`
+- 在客户端新增设置应用层目录 `Application/Settings`
+- 新增 `IUserSettingsService`、`UserSettingsService`、`UserSettingsUpdateRequest`
+- 在客户端新增本地设备标识存储 `IDeviceIdStore` 与 `FileDeviceIdStore`
+- 事项与设置写入统一接入 `ISyncChangeRepository`，登记本地待同步变更
+- 在客户端轻量注册中心接入 SQLite 仓储、设备标识存储以及事项/设置应用服务
+- 验证客户端桌面目标可无警告构建

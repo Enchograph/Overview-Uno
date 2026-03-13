@@ -42,6 +42,10 @@
   - 客户端轻量注册中心，作为后续服务注册的基础落点
 - `Overview.Client/Overview.Client/Application/Auth/`
   - 客户端认证应用层目录，包含登录、注册、登出、登录态恢复和刷新用例
+- `Overview.Client/Overview.Client/Application/Items/`
+  - 客户端事项应用层目录，包含 CRUD、完成状态切换和查询输入模型
+- `Overview.Client/Overview.Client/Application/Settings/`
+  - 客户端设置应用层目录，包含默认设置读取、设置保存和更新输入模型
 - `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml`
   - 客户端应用壳层和底部导航入口
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
@@ -79,7 +83,7 @@
 - `Overview.Client/Overview.Client/Infrastructure/Persistence/`
   - 客户端 SQLite 数据层，包含数据库选项、表记录、仓储接口与实现、连接工厂
 - `Overview.Client/Overview.Client/Infrastructure/Settings/`
-  - 客户端本地设置与登录态存储目录，当前包含基于 JSON 文件的认证会话存储
+  - 客户端本地设置与登录态存储目录，当前包含认证会话存储和设备标识存储
 - `Overview.Client/Overview.Client/Infrastructure/Widgets/`
   - 客户端小组件快照抽象目录，包含快照模型与默认内存存储
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`

@@ -296,7 +296,7 @@
 - Title: 实现事项 CRUD 与设置读写用例
 - Phase: 阶段 4
 - Depends On: INFRA-300
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 封装事项和设置的核心业务操作
 - Implementation Notes: 所有页面必须通过用例层访问数据
