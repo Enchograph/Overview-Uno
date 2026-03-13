@@ -1,0 +1,43 @@
+# Project Changelog
+
+## 2026-03-13
+
+### Round 1
+
+- 创建 `一览-开发设计文档.md`
+- 创建 `一览-开发任务拆解.md`
+- 补充设计文档中的项目结构、同步契约、AI JSON 契约、验收基线
+
+### Round 2
+
+- 创建无记忆 AI 接力开发文档体系
+- 新增 `AI-START-HERE.md`
+- 新增 `AI-MASTER-PROMPT.md`
+- 新增 `PROJECT-ROADMAP.md`
+- 新增 `PROJECT-TODO.md`
+- 新增 `PROJECT-STATUS.md`
+- 新增 `PROJECT-DECISIONS.md`
+- 新增 `PROJECT-HANDOFF.md`
+- 新增 `PROJECT-ACCEPTANCE.md`
+- 新增 `PROJECT-FILE-MAP.md`
+- 新增 `PROJECT-CHANGELOG.md`
+- 初始化当前项目状态为“文档准备完成，代码未开始”
+
+### Round 3
+
+- 强化接力规则：开始每轮工作前必须重新阅读 `“一览”用户要求.md`
+- 新增最终 git 收尾要求：项目完成时需提交并推送到远端仓库；若仓库尚未就绪则记录阻塞
+
+### Round 4
+
+- 按 MVVM 分层重写开发路线
+- 重写 `PROJECT-ROADMAP.md`
+- 重写 `PROJECT-TODO.md`
+- 重写 `PROJECT-ACCEPTANCE.md`
+- 更新当前状态、交接说明和任务拆解，使其对齐 MVVM 顺序
+
+### Round 5
+
+- 调整接力规则：工具链缺失时默认由 AI 自行安装或补齐环境后继续
+- 将全部 Markdown 文档迁移到 `docs/` 目录
+- 修正文档内部引用路径，使其对齐 `docs/` 结构
