@@ -39,7 +39,7 @@
 - `Overview.Client/Overview.Client/Overview.Client.csproj`
   - Uno Platform 客户端主项目
 - `tests/Overview.Client.Tests/`
-  - 客户端测试项目，当前覆盖主页命中规则、列表页状态以及设置页分页联动
+  - 客户端测试项目，当前覆盖主页命中规则、列表页状态、设置页分页联动以及 AI 聊天页/服务
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
   - 客户端轻量注册中心，作为后续服务注册的基础落点
 - `Overview.Client/Overview.Client/Application/Auth/`
@@ -53,7 +53,11 @@
 - `Overview.Client/Overview.Client/Application/Lists/`
   - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
 - `Overview.Client/Overview.Client/Application/Ai/`
-  - 客户端 AI 应用层目录，包含事项摘要检索、OpenAI 兼容请求体组装和结构化响应解析入口
+  - 客户端 AI 应用层目录，当前包含事项摘要检索、OpenAI 兼容请求体组装、结构化响应解析，以及 AI 聊天加载/发送/按日存储服务
+- `Overview.Client/Overview.Client/Application/Ai/AiChatService.cs`
+  - 客户端 AI 聊天应用服务，负责当日消息读取、直连 AI 接口并将用户/助手消息按日写入 SQLite
+- `Overview.Client/Overview.Client/Application/Ai/AiChatDaySnapshot.cs`
+  - 客户端 AI 聊天日快照模型，承载当前日期与消息列表
 - `Overview.Client/Overview.Client/Application/Sync/`
   - 客户端同步应用层目录，包含自动/手动同步编排、同步状态模型和冲突收敛逻辑
 - `Overview.Client/Overview.Client/Application/Items/`
@@ -69,7 +73,7 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
   - 客户端列表页真实骨架，当前支持六个标签筛选、五种排序、完成/重要切换、手动重排、四种主题切换、“更多设置”跳转、左右滑动编辑删除、浮动添加按钮、未完成/已完成分组和空态展示
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
-  - 当前 AI 页壳层占位页
+  - 客户端 AI 聊天页，当前支持显示当日消息、输入消息、发送请求和空态展示
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
   - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口、详情卡片接入，以及来自主页长按的预填导航参数支持
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemNavigationRequest.cs`
@@ -102,6 +106,10 @@
   - 客户端设置页 ViewModel，负责设置主页分区、二级页状态、登录态/设置摘要加载、指定分区初始化，以及 AI 配置草稿与保存
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AiSettingsFormModel.cs`
   - 客户端 AI 设置表单模型，承载 Base URL、API Key、Model 的页面草稿状态
+- `Overview.Client/Overview.Client/Presentation/ViewModels/AiPageViewModel.cs`
+  - 客户端 AI 页 ViewModel，负责认证态校验、当日消息加载、发送状态和输入草稿
+- `Overview.Client/Overview.Client/Presentation/ViewModels/AiChatMessageEntryViewModel.cs`
+  - 客户端 AI 聊天消息展示模型，用于页面消息列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/TimeSelectionViewModel.cs`
   - 客户端时间选择组件 ViewModel，负责月份快照加载、日/周/月映射、前后月份切换和确认前状态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ListPageViewModel.cs`
@@ -118,6 +126,10 @@
   - 客户端设置页 ViewModel 测试，当前覆盖按导航参数直达列表设置分页、刷新保持分区，以及 AI 配置草稿初始化与保存
 - `tests/Overview.Client.Tests/AddItemPageViewModelTests.cs`
   - 客户端添加页 ViewModel 测试，当前覆盖列表页默认填充导航参数到表单的落地行为
+- `tests/Overview.Client.Tests/AiChatServiceTests.cs`
+  - 客户端 AI 聊天应用服务测试，当前覆盖按用户时区解析当天日期、按日过滤和发送后本地落库
+- `tests/Overview.Client.Tests/AiPageViewModelTests.cs`
+  - 客户端 AI 页 ViewModel 测试，当前覆盖初始化加载、发送后清空草稿和未登录提示
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
   - 客户端设置页分区入口模型，用于设置主页卡片列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`
@@ -136,6 +148,8 @@
   - 客户端领域规则：时间块生成、时间范围计算、周期标题格式化、提醒调度、重复展开、主页命中与重叠计算
 - `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
   - 客户端 Infrastructure 层目录落点
+- `Overview.Client/Overview.Client/Infrastructure/Api/Ai/`
+  - 客户端 AI 远程访问目录，包含 OpenAI 兼容 `chat/completions` 接口封装
 - `Overview.Client/Overview.Client/Infrastructure/Api/Sync/`
   - 客户端远程同步访问层，包含 `pull/push` 契约、接口与 HTTP 客户端实现
 - `Overview.Client/Overview.Client/Infrastructure/Api/Auth/`

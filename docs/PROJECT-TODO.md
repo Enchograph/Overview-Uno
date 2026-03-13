@@ -623,12 +623,17 @@
 - Title: 实现 AI 聊天页与按日存储
 - Phase: 阶段 8
 - Depends On: AI-800, INFRA-300
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 提供基础聊天 UI 和按日存储能力
 - Implementation Notes: 不向模型传历史上下文
 - Done When: 聊天页和聊天记录存储完成
-- Verification: 可定位聊天页和聊天仓储
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
+  - 可定位 `Overview.Client/Overview.Client/Application/Ai/AiChatService.cs`
+  - 可定位 `Overview.Client/Overview.Client/Infrastructure/Persistence/Repositories/SqliteAiChatMessageRepository.cs`
 - Files Expected: AI 页面、聊天记录数据层
 
 ### Task ID: AI-820

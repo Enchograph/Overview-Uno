@@ -8,6 +8,7 @@ using Overview.Client.Application.Items;
 using Overview.Client.Application.Lists;
 using Overview.Client.Application.Settings;
 using Overview.Client.Application.Sync;
+using Overview.Client.Infrastructure.Api.Ai;
 using Overview.Client.Domain.Rules;
 using Overview.Client.Infrastructure.Api.Auth;
 using Overview.Client.Infrastructure.Api.Sync;
@@ -42,7 +43,9 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IAuthenticationService>(),
             registry.Resolve<IItemService>(),
             registry.Resolve<IListPageService>()));
-        registry.RegisterSingleton(() => new AiPageViewModel());
+        registry.RegisterSingleton(() => new AiPageViewModel(
+            registry.Resolve<IAuthenticationService>(),
+            registry.Resolve<IAiChatService>()));
         registry.RegisterSingleton(() => new AddItemPageViewModel(
             registry.Resolve<IAuthenticationService>(),
             registry.Resolve<IItemService>(),
@@ -57,6 +60,7 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<ISqliteConnectionFactory>(() => new SqliteConnectionFactory());
         registry.RegisterSingleton<IItemRepository>(() => new SqliteItemRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<IUserSettingsRepository>(() => new SqliteUserSettingsRepository(registry.Resolve<ISqliteConnectionFactory>()));
+        registry.RegisterSingleton<IAiChatMessageRepository>(() => new SqliteAiChatMessageRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<ISyncChangeRepository>(() => new SqliteSyncChangeRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<ITimeRuleService>(() => new TimeRuleService());
         registry.RegisterSingleton<IHomeInteractionRuleService>(() => new HomeInteractionRuleService());
@@ -65,6 +69,7 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<IDeviceIdStore>(() => new FileDeviceIdStore());
         registry.RegisterSingleton(() => TimeProvider.System);
         registry.RegisterSingleton<IAuthRemoteClient>(() => new AuthRemoteClient(registry.Resolve<HttpClient>()));
+        registry.RegisterSingleton<IAiRemoteClient>(() => new AiRemoteClient(registry.Resolve<HttpClient>()));
         registry.RegisterSingleton<IAuthenticationService>(() => new AuthenticationService(
             registry.Resolve<IAuthRemoteClient>(),
             registry.Resolve<IAuthSessionStore>(),
@@ -91,6 +96,12 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<IAiOrchestrationService>(() => new AiOrchestrationService(
             registry.Resolve<IItemService>(),
             registry.Resolve<IUserSettingsService>()));
+        registry.RegisterSingleton<IAiChatService>(() => new AiChatService(
+            registry.Resolve<IAiChatMessageRepository>(),
+            registry.Resolve<IAiOrchestrationService>(),
+            registry.Resolve<IUserSettingsService>(),
+            registry.Resolve<IAiRemoteClient>(),
+            registry.Resolve<TimeProvider>()));
         registry.RegisterSingleton<ITimeSelectionService>(() => new TimeSelectionService(
             registry.Resolve<IUserSettingsService>(),
             registry.Resolve<ITimeRuleService>()));

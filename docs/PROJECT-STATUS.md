@@ -49,6 +49,7 @@
 - `LIST-740`
 - `LIST-750`
 - `AI-800`
+- `AI-810`
 
 ## 正在进行任务 ID
 
@@ -56,7 +57,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `AI-810`
+- `AI-820`
 
 ## 当前阻塞
 
@@ -64,6 +65,28 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，33/33 用例通过，0 failed
+- 已确认客户端 AI 页已从占位实现切换为真实聊天页：
+  - `Presentation/Pages/AiPage.xaml`
+  - `Presentation/Pages/AiPage.xaml.cs`
+- 已确认客户端 AI 聊天应用层已接入：
+  - 当日消息加载
+  - 发送消息
+  - 本地按日存储
+  - `Application/Ai/IAiChatService.cs`
+  - `Application/Ai/AiChatService.cs`
+- 已确认客户端 AI 远程访问层已新增 OpenAI 兼容聊天请求入口：
+  - `Infrastructure/Api/Ai/IAiRemoteClient.cs`
+  - `Infrastructure/Api/Ai/AiRemoteClient.cs`
+- 已确认客户端 AI 页当前已新增覆盖：
+  - 固定显示当日聊天线程
+  - 不向模型传历史上下文
+  - 用户消息与 AI 回复成对写入 `ai_chat_messages`
+  - 未登录、未配置 AI 参数和空消息边界提示
+- 已确认客户端新增 AI 聊天测试：
+  - `tests/Overview.Client.Tests/AiChatServiceTests.cs`
+  - `tests/Overview.Client.Tests/AiPageViewModelTests.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，25/25 用例通过，0 failed
 - 已确认客户端列表页已新增滑动编辑、滑动删除和浮动添加按钮：

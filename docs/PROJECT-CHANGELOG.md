@@ -2,6 +2,15 @@
 
 ## 2026-03-13
 
+### Round 42
+
+- 完成 `AI-810`
+- 将 `AiPage` 从占位页切换为真实聊天页，当前固定展示当日聊天线程
+- 新增 `IAiChatService`、`AiChatService` 和 `AiChatDaySnapshot`，负责当日消息加载、AI 请求发送和本地按日存储
+- 新增 `IAiRemoteClient` 与 `AiRemoteClient`，直连用户配置的 OpenAI 兼容 `chat/completions` 端点
+- 在客户端注册中心接入 AI 聊天仓储、AI 远程客户端和聊天应用服务
+- 新增 AI 页 ViewModel / 服务测试并验证客户端桌面构建通过、客户端测试 33/33 通过
+
 ### Round 41
 
 - 完成 `AI-800`
