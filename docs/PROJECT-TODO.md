@@ -586,12 +586,15 @@
 - Title: 实现列表页滑动编辑删除和浮动添加按钮
 - Phase: 阶段 7
 - Depends On: LIST-710, UI-510
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 完成左右滑动编辑删除与不同标签的默认填充
 - Implementation Notes: 浮动按钮默认值必须随标签变化
 - Done When: 列表页主流程完整
-- Verification: 可定位编辑删除和浮动按钮逻辑
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位编辑删除和浮动按钮逻辑
 - Files Expected: 列表页交互代码
 
 ---

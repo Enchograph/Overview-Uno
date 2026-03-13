@@ -2,6 +2,7 @@ using Overview.Client.Application.Auth;
 using Overview.Client.Application.Items;
 using Overview.Client.Application.Lists;
 using Overview.Client.Domain.Enums;
+using Overview.Client.Presentation.Pages;
 
 namespace Overview.Client.Presentation.ViewModels;
 
@@ -65,6 +66,8 @@ public sealed class ListPageViewModel
         "Create your first item from the add page, then return here to filter it by tab.";
 
     public string CurrentTheme { get; private set; } = "default";
+
+    public DateOnly CurrentReferenceDate { get; private set; } = DateOnly.FromDateTime(DateTime.Today);
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -259,6 +262,75 @@ public sealed class ListPageViewModel
         await RefreshAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task DeleteItemAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        if (IsBusy)
+        {
+            return;
+        }
+
+        var session = authenticationService.CurrentSession;
+        if (session is null)
+        {
+            StatusMessage = "Sign in to delete items.";
+            return;
+        }
+
+        var item = FindItem(itemId);
+        if (item is null)
+        {
+            StatusMessage = "Selected item is no longer available in this list.";
+            return;
+        }
+
+        IsBusy = true;
+
+        try
+        {
+            await itemService.DeleteAsync(session.UserId, itemId, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+
+        await RefreshAsync(cancellationToken).ConfigureAwait(false);
+        StatusMessage = $"Deleted {item.Title}.";
+    }
+
+    public AddItemNavigationRequest CreateAddNavigationRequest()
+    {
+        var request = new AddItemNavigationRequest
+        {
+            SourceTabKey = CurrentTab.ToString()
+        };
+
+        return CurrentTab switch
+        {
+            ListPageTab.MyDay => request with
+            {
+                SuggestedStartDate = CurrentReferenceDate
+            },
+            ListPageTab.Tasks => request with
+            {
+                SuggestedType = ItemType.Task
+            },
+            ListPageTab.Schedules => request with
+            {
+                SuggestedType = ItemType.Schedule
+            },
+            ListPageTab.Notes => request with
+            {
+                SuggestedType = ItemType.Note
+            },
+            ListPageTab.Important => request with
+            {
+                SuggestedIsImportant = true
+            },
+            _ => request
+        };
+    }
+
     private async Task LoadSnapshotAsync(
         ListPageQuery? query,
         CancellationToken cancellationToken)
@@ -301,6 +373,7 @@ public sealed class ListPageViewModel
 
             CurrentTab = snapshot.Tab;
             CurrentSortBy = snapshot.SortBy;
+            CurrentReferenceDate = snapshot.ReferenceDate;
             CurrentTheme = NormalizeTheme(snapshot.Theme);
             Tabs = BuildTabs(snapshot.Tab);
             SortOptions = BuildSortOptions(snapshot.SortBy);

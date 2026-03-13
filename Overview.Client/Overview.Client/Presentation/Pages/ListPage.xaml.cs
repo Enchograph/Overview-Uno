@@ -79,6 +79,11 @@ public sealed partial class ListPage : Page
         Frame?.Navigate(typeof(SettingsPage), SettingsPageViewModel.ListSectionKey);
     }
 
+    private void OnAddItemButtonClick(object sender, RoutedEventArgs e)
+    {
+        Frame?.Navigate(typeof(AddItemPage), ViewModel.CreateAddNavigationRequest());
+    }
+
     private async void OnCompletionButtonClick(object sender, RoutedEventArgs e)
     {
         if (!TryGetItemId(sender, out var itemId))
@@ -139,6 +144,31 @@ public sealed partial class ListPage : Page
         ApplyViewModelState();
     }
 
+    private void OnEditSwipeItemInvoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+    {
+        if (!TryGetSwipeItemId(sender, out var itemId))
+        {
+            return;
+        }
+
+        Frame?.Navigate(typeof(AddItemPage), new AddItemNavigationRequest
+        {
+            EditItemId = itemId,
+            SourceTabKey = ViewModel.CurrentTab.ToString()
+        });
+    }
+
+    private async void OnDeleteSwipeItemInvoked(SwipeItem sender, SwipeItemInvokedEventArgs args)
+    {
+        if (!TryGetSwipeItemId(sender, out var itemId))
+        {
+            return;
+        }
+
+        await ViewModel.DeleteItemAsync(itemId).ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
     private void ApplyViewModelState()
     {
         isApplyingViewModel = true;
@@ -166,6 +196,8 @@ public sealed partial class ListPage : Page
         var hasItems = ViewModel.ActiveItems.Count > 0 || ViewModel.CompletedItems.Count > 0;
         ContentPanel.Visibility = hasItems ? Visibility.Visible : Visibility.Collapsed;
         EmptyStateBorder.Visibility = hasItems ? Visibility.Collapsed : Visibility.Visible;
+        AddItemButton.IsEnabled = !ViewModel.IsBusy;
+        AddItemButton.Opacity = ViewModel.IsBusy ? 0.72 : 1;
         ApplyThemeResources(ViewModel.CurrentTheme);
 
         isApplyingViewModel = false;
@@ -182,6 +214,25 @@ public sealed partial class ListPage : Page
         }
 
         if (sender is FrameworkElement { Tag: string itemIdText } &&
+            Guid.TryParse(itemIdText, out itemId))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryGetSwipeItemId(SwipeItem sender, out Guid itemId)
+    {
+        itemId = default;
+
+        if (sender.CommandParameter is Guid typedId)
+        {
+            itemId = typedId;
+            return true;
+        }
+
+        if (sender.CommandParameter is string itemIdText &&
             Guid.TryParse(itemIdText, out itemId))
         {
             return true;

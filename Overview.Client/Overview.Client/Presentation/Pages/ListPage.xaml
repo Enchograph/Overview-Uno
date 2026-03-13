@@ -118,8 +118,9 @@
       </StackPanel>
     </Border>
 
-    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-      <Grid>
+    <Grid Grid.Row="2">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
         <StackPanel x:Name="ContentPanel" Spacing="16">
           <Border
             x:Name="ActiveSectionBorder"
@@ -133,67 +134,86 @@
               <ListView x:Name="ActiveItemsListView" MinHeight="120" SelectionMode="None">
                 <ListView.ItemTemplate>
                   <DataTemplate x:DataType="viewModels:ListPageItemEntryViewModel">
-                    <Border
-                      Tag="{Binding ItemId}"
-                      Margin="0,0,0,10"
-                      Padding="14"
-                      Background="{StaticResource ListPageItemBackgroundBrush}"
-                      CornerRadius="18"
-                      Tapped="OnItemContainerTapped">
-                      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
-                        <Button
-                          Width="36"
-                          Height="36"
-                          Click="OnCompletionButtonClick"
-                          Content="{Binding CompletionGlyph}"
-                          Tag="{Binding ItemId}" />
-
-                        <Border
-                          Grid.Column="1"
-                          Width="36"
-                          Height="36"
-                          Background="{StaticResource ListPageActiveBadgeBrush}"
-                          CornerRadius="18">
-                          <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontWeight="SemiBold"
-                            Text="{Binding TypeBadge}" />
-                        </Border>
-
-                        <StackPanel Grid.Column="2" Spacing="4">
-                          <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
-                          <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center">
-                          <Button
-                            HorizontalAlignment="Right"
-                            Click="OnImportanceButtonClick"
-                            Content="{Binding ImportanceGlyph}"
-                            Tag="{Binding ItemId}" />
-                          <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
-                          <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="4" Spacing="6" VerticalAlignment="Center">
+                    <SwipeControl Margin="0,0,0,10">
+                      <SwipeControl.LeftItems>
+                        <SwipeItems Mode="Reveal">
+                          <SwipeItem
+                            Text="Edit"
+                            Background="#FF4A8A67"
+                            CommandParameter="{Binding ItemId}"
+                            Invoked="OnEditSwipeItemInvoked" />
+                        </SwipeItems>
+                      </SwipeControl.LeftItems>
+                      <SwipeControl.RightItems>
+                        <SwipeItems Mode="Reveal">
+                          <SwipeItem
+                            Text="Delete"
+                            Background="#FFC65A4B"
+                            CommandParameter="{Binding ItemId}"
+                            Invoked="OnDeleteSwipeItemInvoked" />
+                        </SwipeItems>
+                      </SwipeControl.RightItems>
+                      <Border
+                        Tag="{Binding ItemId}"
+                        Padding="14"
+                        Background="{StaticResource ListPageItemBackgroundBrush}"
+                        CornerRadius="18"
+                        Tapped="OnItemContainerTapped">
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
                           <Button
                             Width="36"
-                            Height="32"
-                            Click="OnMoveUpButtonClick"
-                            Content="↑"
-                            IsEnabled="{Binding CanMoveUp}"
+                            Height="36"
+                            Click="OnCompletionButtonClick"
+                            Content="{Binding CompletionGlyph}"
                             Tag="{Binding ItemId}" />
-                          <Button
+
+                          <Border
+                            Grid.Column="1"
                             Width="36"
-                            Height="32"
-                            Click="OnMoveDownButtonClick"
-                            Content="↓"
-                            IsEnabled="{Binding CanMoveDown}"
-                            Tag="{Binding ItemId}" />
-                        </StackPanel>
-                      </Grid>
-                    </Border>
+                            Height="36"
+                            Background="{StaticResource ListPageActiveBadgeBrush}"
+                            CornerRadius="18">
+                            <TextBlock
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              FontWeight="SemiBold"
+                              Text="{Binding TypeBadge}" />
+                          </Border>
+
+                          <StackPanel Grid.Column="2" Spacing="4">
+                            <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
+                            <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
+                          </StackPanel>
+
+                          <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center">
+                            <Button
+                              HorizontalAlignment="Right"
+                              Click="OnImportanceButtonClick"
+                              Content="{Binding ImportanceGlyph}"
+                              Tag="{Binding ItemId}" />
+                            <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
+                            <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
+                          </StackPanel>
+
+                          <StackPanel Grid.Column="4" Spacing="6" VerticalAlignment="Center">
+                            <Button
+                              Width="36"
+                              Height="32"
+                              Click="OnMoveUpButtonClick"
+                              Content="↑"
+                              IsEnabled="{Binding CanMoveUp}"
+                              Tag="{Binding ItemId}" />
+                            <Button
+                              Width="36"
+                              Height="32"
+                              Click="OnMoveDownButtonClick"
+                              Content="↓"
+                              IsEnabled="{Binding CanMoveDown}"
+                              Tag="{Binding ItemId}" />
+                          </StackPanel>
+                        </Grid>
+                      </Border>
+                    </SwipeControl>
                   </DataTemplate>
                 </ListView.ItemTemplate>
               </ListView>
@@ -212,68 +232,87 @@
               <ListView x:Name="CompletedItemsListView" MinHeight="120" SelectionMode="None">
                 <ListView.ItemTemplate>
                   <DataTemplate x:DataType="viewModels:ListPageItemEntryViewModel">
-                    <Border
-                      Tag="{Binding ItemId}"
-                      Margin="0,0,0,10"
-                      Padding="14"
-                      Background="{StaticResource ListPageItemBackgroundBrush}"
-                      CornerRadius="18"
-                      Opacity="0.72"
-                      Tapped="OnItemContainerTapped">
-                      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
-                        <Button
-                          Width="36"
-                          Height="36"
-                          Click="OnCompletionButtonClick"
-                          Content="{Binding CompletionGlyph}"
-                          Tag="{Binding ItemId}" />
-
-                        <Border
-                          Grid.Column="1"
-                          Width="36"
-                          Height="36"
-                          Background="{StaticResource ListPageCompletedBadgeBrush}"
-                          CornerRadius="18">
-                          <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontWeight="SemiBold"
-                            Text="{Binding TypeBadge}" />
-                        </Border>
-
-                        <StackPanel Grid.Column="2" Spacing="4">
-                          <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
-                          <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center">
-                          <Button
-                            HorizontalAlignment="Right"
-                            Click="OnImportanceButtonClick"
-                            Content="{Binding ImportanceGlyph}"
-                            Tag="{Binding ItemId}" />
-                          <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
-                          <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="4" Spacing="6" VerticalAlignment="Center">
+                    <SwipeControl Margin="0,0,0,10">
+                      <SwipeControl.LeftItems>
+                        <SwipeItems Mode="Reveal">
+                          <SwipeItem
+                            Text="Edit"
+                            Background="#FF4A8A67"
+                            CommandParameter="{Binding ItemId}"
+                            Invoked="OnEditSwipeItemInvoked" />
+                        </SwipeItems>
+                      </SwipeControl.LeftItems>
+                      <SwipeControl.RightItems>
+                        <SwipeItems Mode="Reveal">
+                          <SwipeItem
+                            Text="Delete"
+                            Background="#FFC65A4B"
+                            CommandParameter="{Binding ItemId}"
+                            Invoked="OnDeleteSwipeItemInvoked" />
+                        </SwipeItems>
+                      </SwipeControl.RightItems>
+                      <Border
+                        Tag="{Binding ItemId}"
+                        Padding="14"
+                        Background="{StaticResource ListPageItemBackgroundBrush}"
+                        CornerRadius="18"
+                        Opacity="0.72"
+                        Tapped="OnItemContainerTapped">
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
                           <Button
                             Width="36"
-                            Height="32"
-                            Click="OnMoveUpButtonClick"
-                            Content="↑"
-                            IsEnabled="{Binding CanMoveUp}"
+                            Height="36"
+                            Click="OnCompletionButtonClick"
+                            Content="{Binding CompletionGlyph}"
                             Tag="{Binding ItemId}" />
-                          <Button
+
+                          <Border
+                            Grid.Column="1"
                             Width="36"
-                            Height="32"
-                            Click="OnMoveDownButtonClick"
-                            Content="↓"
-                            IsEnabled="{Binding CanMoveDown}"
-                            Tag="{Binding ItemId}" />
-                        </StackPanel>
-                      </Grid>
-                    </Border>
+                            Height="36"
+                            Background="{StaticResource ListPageCompletedBadgeBrush}"
+                            CornerRadius="18">
+                            <TextBlock
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              FontWeight="SemiBold"
+                              Text="{Binding TypeBadge}" />
+                          </Border>
+
+                          <StackPanel Grid.Column="2" Spacing="4">
+                            <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
+                            <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
+                          </StackPanel>
+
+                          <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center">
+                            <Button
+                              HorizontalAlignment="Right"
+                              Click="OnImportanceButtonClick"
+                              Content="{Binding ImportanceGlyph}"
+                              Tag="{Binding ItemId}" />
+                            <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
+                            <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
+                          </StackPanel>
+
+                          <StackPanel Grid.Column="4" Spacing="6" VerticalAlignment="Center">
+                            <Button
+                              Width="36"
+                              Height="32"
+                              Click="OnMoveUpButtonClick"
+                              Content="↑"
+                              IsEnabled="{Binding CanMoveUp}"
+                              Tag="{Binding ItemId}" />
+                            <Button
+                              Width="36"
+                              Height="32"
+                              Click="OnMoveDownButtonClick"
+                              Content="↓"
+                              IsEnabled="{Binding CanMoveDown}"
+                              Tag="{Binding ItemId}" />
+                          </StackPanel>
+                        </Grid>
+                      </Border>
+                    </SwipeControl>
                   </DataTemplate>
                 </ListView.ItemTemplate>
               </ListView>
@@ -298,7 +337,21 @@
               TextWrapping="WrapWholeWords" />
           </StackPanel>
         </Border>
-      </Grid>
-    </ScrollViewer>
+        </Grid>
+      </ScrollViewer>
+
+      <Button
+        x:Name="AddItemButton"
+        Width="64"
+        Height="64"
+        Margin="0,0,8,8"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Bottom"
+        Background="{StaticResource ListPageActiveBadgeBrush}"
+        Click="OnAddItemButtonClick"
+        Content="+"
+        FontSize="28"
+        FontWeight="SemiBold" />
+    </Grid>
   </Grid>
 </Page>

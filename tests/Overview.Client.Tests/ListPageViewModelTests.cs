@@ -90,6 +90,41 @@ public sealed class ListPageViewModelTests
         Assert.Equal("Forest", viewModel.ThemeOptions.Single(option => option.IsSelected).Label);
     }
 
+    [Fact]
+    public async Task DeleteItemAsync_RemovesItemFromVisibleSnapshot()
+    {
+        var itemService = new FakeItemService();
+        var listPageService = new FakeListPageService();
+        var viewModel = CreateViewModel(itemService, listPageService);
+
+        await viewModel.InitializeAsync();
+        await viewModel.DeleteItemAsync(TaskItemId);
+
+        Assert.DoesNotContain(viewModel.ActiveItems, item => item.ItemId == TaskItemId);
+        Assert.Contains("Deleted Alpha Task.", viewModel.StatusMessage, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CreateAddNavigationRequest_UsesCurrentTabDefaults()
+    {
+        var itemService = new FakeItemService();
+        var listPageService = new FakeListPageService();
+        var viewModel = CreateViewModel(itemService, listPageService);
+
+        await viewModel.InitializeAsync();
+        var myDayRequest = viewModel.CreateAddNavigationRequest();
+
+        await viewModel.SelectTabAsync(ListPageTab.Tasks);
+        var taskRequest = viewModel.CreateAddNavigationRequest();
+
+        await viewModel.SelectTabAsync(ListPageTab.Important);
+        var importantRequest = viewModel.CreateAddNavigationRequest();
+
+        Assert.Equal(new DateOnly(2026, 3, 13), myDayRequest.SuggestedStartDate);
+        Assert.Equal(ItemType.Task, taskRequest.SuggestedType);
+        Assert.True(importantRequest.SuggestedIsImportant);
+    }
+
     private static ListPageViewModel CreateViewModel(FakeItemService itemService, FakeListPageService listPageService)
     {
         itemService.ListPageService = listPageService;
@@ -209,6 +244,11 @@ public sealed class ListPageViewModelTests
             items[index] = items[index] with { IsImportant = isImportant };
         }
 
+        public void Delete(Guid itemId)
+        {
+            items.RemoveAll(item => item.ItemId == itemId);
+        }
+
         private static ListPageItem ToItem(FakeListItem item)
         {
             return new ListPageItem
@@ -285,7 +325,8 @@ public sealed class ListPageViewModelTests
 
         public Task DeleteAsync(Guid userId, Guid itemId, CancellationToken cancellationToken = default)
         {
-            throw new NotSupportedException();
+            ListPageService?.Delete(itemId);
+            return Task.CompletedTask;
         }
     }
 

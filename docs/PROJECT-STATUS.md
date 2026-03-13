@@ -2,14 +2,14 @@
 
 ## 当前阶段
 
-- 阶段编号：7
-- 阶段名称：Presentation 列表页
+- 阶段编号：8
+- 阶段名称：Presentation AI 页
 - 阶段状态：`active`
 
 ## 当前里程碑
 
-- 里程碑：A
-- 名称：MVP
+- 里程碑：B
+- 名称：AI 与实时同步
 - 里程碑状态：`active`
 
 ## 已完成任务 ID
@@ -47,6 +47,7 @@
 - `LIST-720`
 - `LIST-730`
 - `LIST-740`
+- `LIST-750`
 
 ## 正在进行任务 ID
 
@@ -54,7 +55,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `LIST-750`
+- `AI-800`
 
 ## 当前阻塞
 
@@ -62,6 +63,21 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，25/25 用例通过，0 failed
+- 已确认客户端列表页已新增滑动编辑、滑动删除和浮动添加按钮：
+  - `Presentation/Pages/ListPage.xaml`
+  - `Presentation/Pages/ListPage.xaml.cs`
+- 已确认客户端列表页状态 ViewModel 已接入：
+  - 删除事项入口
+  - 按当前标签生成添加页默认值
+  - `Presentation/ViewModels/ListPageViewModel.cs`
+- 已确认客户端添加页导航参数已支持列表页默认值预填：
+  - `Presentation/Pages/AddItemNavigationRequest.cs`
+  - `Presentation/ViewModels/AddItemPageViewModel.cs`
+- 已确认客户端新增列表页默认填充与删除测试：
+  - `tests/Overview.Client.Tests/ListPageViewModelTests.cs`
+  - `tests/Overview.Client.Tests/AddItemPageViewModelTests.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，21/21 用例通过，0 failed
 - 已确认客户端列表页已新增“更多设置”入口，并联通到设置页列表分页：

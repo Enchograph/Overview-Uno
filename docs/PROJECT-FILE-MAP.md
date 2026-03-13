@@ -67,13 +67,13 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
   - 客户端主页真实骨架，当前支持顶栏周期切换、窄屏周视图、宽屏月视图、时间块网格、标题展开时间选择组件和事项详情弹层
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
-  - 客户端列表页真实骨架，当前支持六个标签筛选、五种排序、完成/重要切换、手动重排、四种主题切换、“更多设置”跳转、未完成/已完成分组和空态展示
+  - 客户端列表页真实骨架，当前支持六个标签筛选、五种排序、完成/重要切换、手动重排、四种主题切换、“更多设置”跳转、左右滑动编辑删除、浮动添加按钮、未完成/已完成分组和空态展示
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
   - 当前 AI 页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
   - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口、详情卡片接入，以及来自主页长按的预填导航参数支持
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemNavigationRequest.cs`
-  - 客户端添加/编辑事项导航参数模型，承载主页长按空白预填和长按事项编辑请求
+  - 客户端添加/编辑事项导航参数模型，承载主页长按空白预填、列表页浮动添加默认值和长按事项编辑请求
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
   - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架和设置摘要展示
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml.cs`
@@ -103,7 +103,7 @@
 - `Overview.Client/Overview.Client/Presentation/ViewModels/TimeSelectionViewModel.cs`
   - 客户端时间选择组件 ViewModel，负责月份快照加载、日/周/月映射、前后月份切换和确认前状态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ListPageViewModel.cs`
-  - 客户端列表页 ViewModel，负责认证态校验、标签切换、排序切换、主题切换、完成/重要状态切换、列表快照加载和空态文案
+  - 客户端列表页 ViewModel，负责认证态校验、标签切换、排序切换、主题切换、完成/重要状态切换、删除、浮动添加默认值、列表快照加载和空态文案
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ListPageTabEntryViewModel.cs`
   - 客户端列表页标签展示模型，用于六个标签按钮的标题与选中态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ListPageItemEntryViewModel.cs`
@@ -114,6 +114,8 @@
   - 客户端列表页主题选项展示模型，用于顶部主题下拉框
 - `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
   - 客户端设置页 ViewModel 测试，当前覆盖按导航参数直达列表设置分页与刷新保持分区
+- `tests/Overview.Client.Tests/AddItemPageViewModelTests.cs`
+  - 客户端添加页 ViewModel 测试，当前覆盖列表页默认填充导航参数到表单的落地行为
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
   - 客户端设置页分区入口模型，用于设置主页卡片列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`

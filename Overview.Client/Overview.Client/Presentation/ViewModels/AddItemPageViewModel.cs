@@ -241,10 +241,22 @@ public sealed class AddItemPageViewModel
             return;
         }
 
+        if (navigationRequest?.SuggestedType is ItemType suggestedType)
+        {
+            Form.Type = suggestedType;
+        }
+
+        if (navigationRequest?.SuggestedIsImportant is bool isImportant)
+        {
+            Form.IsImportant = isImportant;
+        }
+
         if (navigationRequest?.SuggestedStartDate is DateOnly startDate)
         {
             Form.StartDate = startDate;
             Form.EndDate = startDate;
+            Form.DeadlineDate = startDate;
+            Form.TargetDate = startDate;
         }
 
         if (navigationRequest?.SuggestedStartTime is TimeOnly startTime)
