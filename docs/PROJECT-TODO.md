@@ -714,7 +714,7 @@
 - Title: 验证事项与设置的自动收敛
 - Phase: 阶段 9
 - Depends On: SYNC-900, SYNC-910
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 验证多设备在不手动触发时也能同步事项和设置
 - Implementation Notes: 这是“实时同步”的强制门禁

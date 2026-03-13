@@ -140,6 +140,8 @@
   - 客户端 AI 页 ViewModel 测试，当前覆盖初始化加载、日/周/月范围切换、发送后刷新当前范围和未登录提示
 - `tests/Overview.Client.Tests/SyncLifecycleCoordinatorTests.cs`
   - 客户端同步生命周期测试，当前覆盖壳层加载启动自动同步、窗口激活补同步和壳层卸载停止自动同步
+- `tests/Overview.Client.Tests/SyncOrchestrationServiceTests.cs`
+  - 客户端同步编排验证测试，当前覆盖双设备在仅启动自动同步时对事项和设置的自动收敛
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
   - 客户端设置页分区入口模型，用于设置主页卡片列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`
