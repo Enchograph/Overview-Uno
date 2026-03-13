@@ -23,7 +23,7 @@ public sealed class HomePageViewModel
     public string Title => "Home";
 
     public string Description =>
-        "Overview timeline grid for week and month planning. Item overlay rendering lands in the next homepage task.";
+        "Overview timeline grid for week and month planning with scheduled item overlays.";
 
     public bool IsBusy { get; private set; }
 
@@ -175,10 +175,10 @@ public sealed class HomePageViewModel
                 ? $"{snapshot.ViewMode} view active. Resize narrower to fall back to week mode."
                 : "Narrow layout active. Week view is enforced until the page is wide enough for month mode.";
             GridSummary =
-                $"{snapshot.Columns.Count} day columns · {snapshot.TimeBlocks.Count} time blocks · {snapshot.Items.Count} scheduled items ready for overlay";
+                $"{snapshot.Columns.Count} day columns · {snapshot.TimeBlocks.Count} time blocks · {snapshot.Items.Count} scheduled items rendered in the visible range";
             StatusMessage = snapshot.Items.Count == 0
                 ? "Timeline grid ready. No scheduled items in the visible range yet."
-                : "Timeline grid ready. Item overlay rendering lands in HOME-620.";
+                : "Timeline grid ready. Scheduled items now render with proportional height and overlap opacity.";
         }
         catch (Exception ex)
         {

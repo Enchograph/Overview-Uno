@@ -73,7 +73,7 @@
 - `Overview.Client/Overview.Client/Presentation/Components/TimeSelectionPicker.xaml`
   - 客户端可复用时间选择组件，当前支持日/周/月选择、月格/周格/日期格映射、前后月份切换和确认返回
 - `Overview.Client/Overview.Client/Presentation/Components/HomeTimelineGrid.xaml`
-  - 客户端主页时间块网格组件，当前负责渲染日期列、时间块行和左右滑动周期切换入口
+  - 客户端主页时间块网格组件，当前负责渲染日期列、时间块行、事项覆盖层和左右滑动周期切换入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/`
   - 当前五页壳层的 ViewModel 集合
 - `Overview.Client/Overview.Client/Presentation/ViewModels/HomePageViewModel.cs`

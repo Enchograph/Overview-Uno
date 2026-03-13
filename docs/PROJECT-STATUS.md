@@ -40,6 +40,7 @@
 - `UI-530`
 - `HOME-600`
 - `HOME-610`
+- `HOME-620`
 
 ## 正在进行任务 ID
 
@@ -47,7 +48,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `HOME-620`
+- `HOME-630`
 
 ## 当前阻塞
 
@@ -56,6 +57,14 @@
 ## 最近已验证结果
 
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端主页时间块网格已接入事项覆盖层渲染：
+  - `Presentation/Components/HomeTimelineGrid.xaml`
+  - `Presentation/Components/HomeTimelineGrid.xaml.cs`
+- 已确认客户端主页当前已新增覆盖：
+  - 任务与日程按真实时间比例跨格渲染
+  - 超出规划起止时间的可见区裁剪展示
+  - 基于最大重叠数的事项透明度映射
+  - 周/月网格上的事项覆盖层叠加显示
 - 已确认客户端 `HomePage` 已从时间选择宿主页切换为真实主页骨架：
   - `Presentation/Pages/HomePage.xaml`
   - `Presentation/Pages/HomePage.xaml.cs`

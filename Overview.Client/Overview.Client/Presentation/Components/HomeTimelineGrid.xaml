@@ -9,7 +9,7 @@
     ManipulationMode="TranslateX,System">
     <StackPanel Spacing="12">
       <Grid x:Name="HeaderGrid" ColumnSpacing="8" />
-      <StackPanel x:Name="RowsPanel" Spacing="8" />
+      <Grid x:Name="BodyHostGrid" />
     </StackPanel>
   </ScrollViewer>
 </UserControl>

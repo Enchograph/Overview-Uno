@@ -1,4 +1,5 @@
 using Overview.Client.Application.Home;
+using Overview.Client.Domain.Enums;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -10,6 +11,8 @@ namespace Overview.Client.Presentation.Components;
 public sealed partial class HomeTimelineGrid : UserControl
 {
     private const double LabelColumnWidth = 112d;
+    private const double ColumnSpacing = 8d;
+    private const double MinimumItemHeight = 44d;
     private HomeLayoutSnapshot? snapshot;
 
     public event EventHandler<HomeTimelineSwipeRequestedEventArgs>? SwipeRequested;
@@ -24,7 +27,7 @@ public sealed partial class HomeTimelineGrid : UserControl
         snapshot = newSnapshot;
         HeaderGrid.Children.Clear();
         HeaderGrid.ColumnDefinitions.Clear();
-        RowsPanel.Children.Clear();
+        BodyHostGrid.Children.Clear();
 
         if (snapshot is null)
         {
@@ -33,12 +36,10 @@ public sealed partial class HomeTimelineGrid : UserControl
 
         var dayColumnWidth = snapshot.ViewMode == Domain.Enums.HomeViewMode.Month ? 82d : 112d;
         var cellSize = dayColumnWidth;
+        var totalHeight = cellSize * snapshot.TimeBlocks.Count;
 
         RenderHeader(dayColumnWidth, cellSize);
-        foreach (var timeBlock in snapshot.TimeBlocks)
-        {
-            RenderRow(timeBlock.Label, snapshot.Columns.Count, dayColumnWidth, cellSize);
-        }
+        RenderBody(dayColumnWidth, cellSize, totalHeight);
     }
 
     private void RenderHeader(double dayColumnWidth, double headerHeight)
@@ -74,42 +75,88 @@ public sealed partial class HomeTimelineGrid : UserControl
         }
     }
 
-    private void RenderRow(string label, int columnCount, double dayColumnWidth, double cellSize)
+    private void RenderBody(double dayColumnWidth, double cellSize, double totalHeight)
     {
-        var rowGrid = new Grid
+        var bodyGrid = new Grid
         {
-            ColumnSpacing = 8
+            ColumnSpacing = ColumnSpacing,
+            Height = totalHeight,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top
         };
 
-        rowGrid.ColumnDefinitions.Add(new ColumnDefinition
+        bodyGrid.ColumnDefinitions.Add(new ColumnDefinition
         {
             Width = new GridLength(LabelColumnWidth)
         });
 
-        rowGrid.Children.Add(BuildLabelCell(label, "Block", LabelColumnWidth, cellSize));
-
-        for (var index = 0; index < columnCount; index++)
+        foreach (var _ in snapshot!.Columns)
         {
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition
+            bodyGrid.ColumnDefinitions.Add(new ColumnDefinition
             {
                 Width = new GridLength(dayColumnWidth)
             });
-
-            var cell = new Border
-            {
-                Width = dayColumnWidth,
-                Height = cellSize,
-                Background = ResolveBrush("LayerFillColorAltBrush", Colors.Transparent),
-                BorderBrush = ResolveBrush("CardStrokeColorDefaultBrush", Colors.LightGray),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(18)
-            };
-
-            Grid.SetColumn(cell, index + 1);
-            rowGrid.Children.Add(cell);
         }
 
-        RowsPanel.Children.Add(rowGrid);
+        for (var rowIndex = 0; rowIndex < snapshot!.TimeBlocks.Count; rowIndex++)
+        {
+            bodyGrid.RowDefinitions.Add(new RowDefinition
+            {
+                Height = new GridLength(cellSize)
+            });
+
+            var timeBlock = snapshot.TimeBlocks[rowIndex];
+            var labelCell = BuildLabelCell(timeBlock.Label, "Block", LabelColumnWidth, cellSize);
+            Grid.SetRow(labelCell, rowIndex);
+            bodyGrid.Children.Add(labelCell);
+
+            for (var columnIndex = 0; columnIndex < snapshot.Columns.Count; columnIndex++)
+            {
+                var cell = new Border
+                {
+                    Width = dayColumnWidth,
+                    Height = cellSize,
+                    Background = ResolveBrush("LayerFillColorAltBrush", Colors.Transparent),
+                    BorderBrush = ResolveBrush("CardStrokeColorDefaultBrush", Colors.LightGray),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(18)
+                };
+
+                Grid.SetRow(cell, rowIndex);
+                Grid.SetColumn(cell, columnIndex + 1);
+                bodyGrid.Children.Add(cell);
+            }
+        }
+
+        var dayAreaWidth = (snapshot.Columns.Count * dayColumnWidth) + ((snapshot.Columns.Count - 1) * ColumnSpacing);
+        var overlayCanvas = new Canvas
+        {
+            Width = dayAreaWidth,
+            Height = totalHeight,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(LabelColumnWidth + ColumnSpacing, 0, 0, 0),
+            IsHitTestVisible = false
+        };
+
+        foreach (var layoutItem in snapshot.Items)
+        {
+            var columnIndex = GetColumnIndex(layoutItem.ColumnDate);
+            if (columnIndex < 0)
+            {
+                continue;
+            }
+
+            var itemCard = BuildItemCard(layoutItem, dayColumnWidth, totalHeight);
+            Canvas.SetLeft(itemCard, columnIndex * (dayColumnWidth + ColumnSpacing));
+            Canvas.SetTop(itemCard, layoutItem.TopRatio * totalHeight);
+            overlayCanvas.Children.Add(itemCard);
+        }
+
+        BodyHostGrid.Children.Add(bodyGrid);
+        BodyHostGrid.Children.Add(overlayCanvas);
+        BodyHostGrid.Height = totalHeight;
+        BodyHostGrid.HorizontalAlignment = HorizontalAlignment.Left;
     }
 
     private static Border BuildLabelCell(
@@ -156,6 +203,86 @@ public sealed partial class HomeTimelineGrid : UserControl
 
         border.Child = stackPanel;
         return border;
+    }
+
+    private static Border BuildItemCard(HomeLayoutItem item, double dayColumnWidth, double totalHeight)
+    {
+        var itemHeight = Math.Max(MinimumItemHeight, item.HeightRatio * totalHeight);
+        var border = new Border
+        {
+            Width = dayColumnWidth,
+            Height = itemHeight,
+            Padding = new Thickness(10, 8, 10, 8),
+            Background = BuildItemBrush(item.Type),
+            BorderBrush = ResolveBrush("CardStrokeColorDefaultBrush", Colors.Transparent),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(18),
+            Opacity = item.Opacity
+        };
+
+        var stackPanel = new StackPanel
+        {
+            Spacing = 4
+        };
+
+        stackPanel.Children.Add(new TextBlock
+        {
+            Text = item.Title,
+            FontWeight = new FontWeight { Weight = 700 },
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            TextWrapping = TextWrapping.WrapWholeWords,
+            MaxLines = itemHeight >= 72d ? 2 : 1
+        });
+
+        stackPanel.Children.Add(new TextBlock
+        {
+            Text = BuildItemSubtitle(item),
+            Opacity = 0.78,
+            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["CaptionTextBlockStyle"],
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            TextWrapping = TextWrapping.WrapWholeWords,
+            MaxLines = itemHeight >= 84d ? 2 : 1
+        });
+
+        border.Child = stackPanel;
+        return border;
+    }
+
+    private static Brush BuildItemBrush(ItemType itemType)
+    {
+        var color = itemType switch
+        {
+            ItemType.Schedule => Color.FromArgb(0xE6, 0x57, 0x8F, 0xFF),
+            ItemType.Task => Color.FromArgb(0xE6, 0xFF, 0xB0, 0x20),
+            _ => Color.FromArgb(0xE6, 0x56, 0xB6, 0x7A)
+        };
+
+        return new SolidColorBrush(color);
+    }
+
+    private static string BuildItemSubtitle(HomeLayoutItem item)
+    {
+        var startPrefix = item.IsClippedAtStart ? "..." : string.Empty;
+        var endSuffix = item.IsClippedAtEnd ? " ..." : string.Empty;
+        return $"{startPrefix}{item.VisibleStartAt:HH:mm} - {item.VisibleEndAt:HH:mm}{endSuffix}";
+    }
+
+    private int GetColumnIndex(DateOnly columnDate)
+    {
+        if (snapshot is null)
+        {
+            return -1;
+        }
+
+        for (var index = 0; index < snapshot.Columns.Count; index++)
+        {
+            if (snapshot.Columns[index].Date == columnDate)
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     private void OnRootManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)

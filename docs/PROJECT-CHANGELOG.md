@@ -343,3 +343,12 @@
 - 在 `ClientServiceRegistry` 为主页接入 `IAuthenticationService` 与 `IHomeLayoutService`
 - 主页当前支持顶栏周期切换、标题展开时间选择组件、窄屏周视图、宽屏月视图、时间块网格和左右滑动换页
 - 验证客户端桌面目标可无警告构建
+
+### Round 33
+
+- 完成 `HOME-620`
+- 更新 `Presentation/Components/HomeTimelineGrid.xaml`，为主页网格预留事项覆盖层宿主
+- 更新 `Presentation/Components/HomeTimelineGrid.xaml.cs`，在周 / 月时间块网格上按 `TopRatio`、`HeightRatio` 与 `Opacity` 渲染事项块
+- 更新 `Presentation/ViewModels/HomePageViewModel.cs`，同步主页状态文案为已完成事项覆盖层渲染
+- 主页当前支持任务与日程按真实时间比例跨格显示、可见区裁剪和重叠透明度展示
+- 验证客户端桌面目标可无警告构建

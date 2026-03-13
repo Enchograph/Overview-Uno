@@ -469,12 +469,15 @@
 - Title: 实现事项跨格布局和重叠透明度
 - Phase: 阶段 6
 - Depends On: HOME-610, APP-420
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 按真实时间比例渲染任务与日程
-- Implementation Notes: 透明度规则必须对齐设计文档
+- Implementation Notes: 已在主页时间块网格中接入事项覆盖层渲染，复用 `HomeLayoutService` 输出的 `TopRatio`、`HeightRatio` 与 `Opacity`；透明度规则与设计文档保持一致
 - Done When: 跨格渲染和透明度逻辑完成
-- Verification: 可定位布局算法
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/Components/HomeTimelineGrid.xaml`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/Components/HomeTimelineGrid.xaml.cs`
 - Files Expected: 布局计算与渲染代码
 
 ### Task ID: HOME-630
