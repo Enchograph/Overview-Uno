@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using Overview.Client.Application.Auth;
+using Overview.Client.Application.Home;
 using Overview.Client.Application.Items;
 using Overview.Client.Application.Settings;
+using Overview.Client.Domain.Rules;
 using Overview.Client.Infrastructure.Api.Auth;
 using Overview.Client.Infrastructure.Api.Sync;
 using Overview.Client.Infrastructure.Diagnostics;
@@ -37,6 +39,8 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<IItemRepository>(() => new SqliteItemRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<IUserSettingsRepository>(() => new SqliteUserSettingsRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<ISyncChangeRepository>(() => new SqliteSyncChangeRepository(registry.Resolve<ISqliteConnectionFactory>()));
+        registry.RegisterSingleton<ITimeRuleService>(() => new TimeRuleService());
+        registry.RegisterSingleton<IHomeInteractionRuleService>(() => new HomeInteractionRuleService());
         registry.RegisterSingleton<IAuthSessionStore>(() => new FileAuthSessionStore());
         registry.RegisterSingleton<IDeviceIdStore>(() => new FileDeviceIdStore());
         registry.RegisterSingleton<IAuthRemoteClient>(() => new AuthRemoteClient(registry.Resolve<HttpClient>()));
@@ -53,6 +57,14 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IUserSettingsRepository>(),
             registry.Resolve<ISyncChangeRepository>(),
             registry.Resolve<IDeviceIdStore>()));
+        registry.RegisterSingleton<IHomeLayoutService>(() => new HomeLayoutService(
+            registry.Resolve<IItemService>(),
+            registry.Resolve<IUserSettingsService>(),
+            registry.Resolve<ITimeRuleService>(),
+            registry.Resolve<IHomeInteractionRuleService>()));
+        registry.RegisterSingleton<ITimeSelectionService>(() => new TimeSelectionService(
+            registry.Resolve<IUserSettingsService>(),
+            registry.Resolve<ITimeRuleService>()));
         return registry;
     }
 

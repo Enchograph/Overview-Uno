@@ -309,7 +309,7 @@
 - Title: 实现主页布局计算与时间选择应用服务
 - Phase: 阶段 4
 - Depends On: DOMAIN-210, DOMAIN-230, APP-410
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 封装主页跨格布局、重叠透明度、时间选择映射
 - Implementation Notes: 不在 UI 层直接写算法

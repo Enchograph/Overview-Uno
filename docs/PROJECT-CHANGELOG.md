@@ -212,3 +212,15 @@
 - 事项与设置写入统一接入 `ISyncChangeRepository`，登记本地待同步变更
 - 在客户端轻量注册中心接入 SQLite 仓储、设备标识存储以及事项/设置应用服务
 - 验证客户端桌面目标可无警告构建
+
+### Round 25
+
+- 完成 `APP-420`
+- 在客户端新增主页应用层目录 `Application/Home`
+- 新增 `IHomeLayoutService`、`HomeLayoutService`
+- 新增 `ITimeSelectionService`、`TimeSelectionService`
+- 新增主页/时间选择输出模型：`HomeLayoutSnapshot`、`HomeDateColumn`、`HomeLayoutItem`、`TimeSelectionSnapshot`、`TimeSelectionWeekRow`、`TimeSelectionDateCell`
+- 主页布局应用层支持周/月时间段解析、时间块快照、跨格分段、可见区裁剪和重叠透明度映射
+- 时间选择应用层支持月份网格构建、日/周/月映射和前后周期导航解析
+- 在客户端轻量注册中心接入 `ITimeRuleService`、`IHomeInteractionRuleService`、`IHomeLayoutService`、`ITimeSelectionService`
+- 验证客户端桌面目标可无警告构建

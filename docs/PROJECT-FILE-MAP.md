@@ -42,6 +42,8 @@
   - 客户端轻量注册中心，作为后续服务注册的基础落点
 - `Overview.Client/Overview.Client/Application/Auth/`
   - 客户端认证应用层目录，包含登录、注册、登出、登录态恢复和刷新用例
+- `Overview.Client/Overview.Client/Application/Home/`
+  - 客户端主页应用层目录，包含主页布局快照、跨格分段计算和时间选择映射服务
 - `Overview.Client/Overview.Client/Application/Items/`
   - 客户端事项应用层目录，包含 CRUD、完成状态切换和查询输入模型
 - `Overview.Client/Overview.Client/Application/Settings/`
