@@ -130,7 +130,7 @@
 
 ## 阶段 8：Presentation AI 页
 
-- 状态：`active`
+- 状态：`complete`
 - 入口条件：
   - 阶段 5 完成
   - Application 层 AI 编排完成
@@ -145,7 +145,7 @@
 
 ## 阶段 9：实时同步与状态一致性
 
-- 状态：`not_started`
+- 状态：`active`
 - 入口条件：
   - 阶段 5 完成
 - 必须产出：

@@ -117,6 +117,8 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IDeviceIdStore>(),
             registry.Resolve<IOverviewLoggerFactory>(),
             registry.Resolve<TimeProvider>()));
+        registry.RegisterSingleton<ISyncLifecycleCoordinator>(() => new SyncLifecycleCoordinator(
+            registry.Resolve<ISyncOrchestrationService>()));
         return registry;
     }
 

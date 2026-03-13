@@ -682,12 +682,18 @@
 - Title: 接入自动后台同步
 - Phase: 阶段 9
 - Depends On: APP-450, UI-530
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 在不手动触发的情况下自动同步事项与设置
 - Implementation Notes: 满足“全端实时同步”目标
 - Done When: 自动同步接入页面生命周期和后台调度
-- Verification: 可定位自动同步触发点
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位 `Overview.Client/Overview.Client/Application/Sync/ISyncLifecycleCoordinator.cs`
+  - 可定位 `Overview.Client/Overview.Client/Application/Sync/SyncLifecycleCoordinator.cs`
+  - 可定位 `Overview.Client/Overview.Client/App.xaml.cs`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml.cs`
 - Files Expected: 自动同步接入代码
 
 ### Task ID: SYNC-910

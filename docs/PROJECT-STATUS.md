@@ -52,6 +52,7 @@
 - `AI-810`
 - `AI-820`
 - `AI-830`
+- `SYNC-900`
 
 ## 正在进行任务 ID
 
@@ -59,7 +60,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `SYNC-900`
+- `SYNC-910`
 
 ## 当前阻塞
 
@@ -67,6 +68,19 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，45/45 用例通过，0 failed
+- 已确认客户端自动同步已接入页面生命周期与后台调度：
+  - `Overview.Client/Overview.Client/Application/Sync/ISyncLifecycleCoordinator.cs`
+  - `Overview.Client/Overview.Client/Application/Sync/SyncLifecycleCoordinator.cs`
+  - `Overview.Client/Overview.Client/App.xaml.cs`
+  - `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml.cs`
+- 已确认客户端当前会在以下时机自动触发同步：
+  - 进入 `ShellPage` 后启动自动同步并立即执行首轮同步
+  - 应用窗口重新激活时，若自动同步未启动则自动启动，否则立即执行一次前台同步
+  - `ShellPage` 卸载或窗口关闭时停止自动同步循环
+- 已确认客户端新增同步生命周期测试：
+  - `tests/Overview.Client.Tests/SyncLifecycleCoordinatorTests.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，41/41 用例通过，0 failed
 - 已确认客户端 AI 聊天应用层已完成 AI-830 意图闭环：

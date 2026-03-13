@@ -2,12 +2,15 @@ using System;
 using Microsoft.Extensions.Logging;
 using Uno.Resizetizer;
 using Overview.Client.Application.DependencyInjection;
+using Overview.Client.Application.Sync;
 using Overview.Client.Presentation.Pages;
 
 namespace Overview.Client;
 
 public partial class App : Microsoft.UI.Xaml.Application
 {
+    private ISyncLifecycleCoordinator? syncLifecycleCoordinator;
+
     /// <summary>
     /// Initializes the singleton application object. This is the first line of authored code
     /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -16,6 +19,7 @@ public partial class App : Microsoft.UI.Xaml.Application
     {
         this.InitializeComponent();
         Services = ClientServiceRegistry.CreateDefault();
+        syncLifecycleCoordinator = Services.Resolve<ISyncLifecycleCoordinator>();
     }
 
     protected Window? MainWindow { get; private set; }
@@ -42,6 +46,11 @@ public partial class App : Microsoft.UI.Xaml.Application
             rootFrame.NavigationFailed += OnNavigationFailed;
         }
 
+        MainWindow.Activated -= OnMainWindowActivated;
+        MainWindow.Activated += OnMainWindowActivated;
+        MainWindow.Closed -= OnMainWindowClosed;
+        MainWindow.Closed += OnMainWindowClosed;
+
         if (rootFrame.Content == null)
         {
             // When the navigation stack isn't restored navigate to the first page,
@@ -53,6 +62,27 @@ public partial class App : Microsoft.UI.Xaml.Application
         MainWindow.SetWindowIcon();
         // Ensure the current window is active
         MainWindow.Activate();
+    }
+
+    private async void OnMainWindowActivated(object sender, WindowActivatedEventArgs e)
+    {
+        if (e.WindowActivationState == Windows.UI.Core.CoreWindowActivationState.Deactivated ||
+            syncLifecycleCoordinator is null)
+        {
+            return;
+        }
+
+        await syncLifecycleCoordinator.HandleWindowActivatedAsync().ConfigureAwait(true);
+    }
+
+    private async void OnMainWindowClosed(object sender, WindowEventArgs args)
+    {
+        if (syncLifecycleCoordinator is null)
+        {
+            return;
+        }
+
+        await syncLifecycleCoordinator.HandleShellUnloadedAsync().ConfigureAwait(false);
     }
 
     /// <summary>

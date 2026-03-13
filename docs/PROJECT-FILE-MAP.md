@@ -62,6 +62,10 @@
   - 客户端 AI 聊天范围快照模型，承载选中日/周/月范围与消息列表
 - `Overview.Client/Overview.Client/Application/Sync/`
   - 客户端同步应用层目录，包含自动/手动同步编排、同步状态模型和冲突收敛逻辑
+- `Overview.Client/Overview.Client/Application/Sync/ISyncLifecycleCoordinator.cs`
+  - 客户端同步生命周期协调接口，负责把自动同步接到壳层和应用窗口事件
+- `Overview.Client/Overview.Client/Application/Sync/SyncLifecycleCoordinator.cs`
+  - 客户端同步生命周期协调实现，当前负责壳层进入启动自动同步、窗口激活触发前台同步、壳层退出停止自动同步
 - `Overview.Client/Overview.Client/Application/Items/`
   - 客户端事项应用层目录，包含 CRUD、完成状态切换和查询输入模型
 - `Overview.Client/Overview.Client/Application/Settings/`
@@ -134,6 +138,8 @@
   - 客户端 AI 编排解析测试，当前覆盖结构化 JSON 扩展字段解析、删除意图关键字段校验和 query itemIds 解析
 - `tests/Overview.Client.Tests/AiPageViewModelTests.cs`
   - 客户端 AI 页 ViewModel 测试，当前覆盖初始化加载、日/周/月范围切换、发送后刷新当前范围和未登录提示
+- `tests/Overview.Client.Tests/SyncLifecycleCoordinatorTests.cs`
+  - 客户端同步生命周期测试，当前覆盖壳层加载启动自动同步、窗口激活补同步和壳层卸载停止自动同步
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
   - 客户端设置页分区入口模型，用于设置主页卡片列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`

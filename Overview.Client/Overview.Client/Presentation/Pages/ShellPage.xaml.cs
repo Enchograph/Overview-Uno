@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Overview.Client.Application.Sync;
 using Overview.Client.Presentation.ViewModels;
 
 namespace Overview.Client.Presentation.Pages;
 
 public sealed partial class ShellPage : Page
 {
+    private readonly ISyncLifecycleCoordinator syncLifecycleCoordinator;
     private readonly Dictionary<string, Type> pageMap = new()
     {
         ["Home"] = typeof(HomePage),
@@ -21,12 +23,22 @@ public sealed partial class ShellPage : Page
     {
         this.InitializeComponent();
         DataContext = App.Services.Resolve<ShellViewModel>();
+        syncLifecycleCoordinator = App.Services.Resolve<ISyncLifecycleCoordinator>();
         Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
+    private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        await syncLifecycleCoordinator.HandleShellLoadedAsync().ConfigureAwait(true);
         NavigateTo("Home");
+    }
+
+    private async void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        Loaded -= OnLoaded;
+        Unloaded -= OnUnloaded;
+        await syncLifecycleCoordinator.HandleShellUnloadedAsync().ConfigureAwait(true);
     }
 
     private void OnNavigationButtonClick(object sender, RoutedEventArgs e)
