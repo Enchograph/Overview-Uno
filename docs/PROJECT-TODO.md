@@ -98,14 +98,15 @@
 - Title: 实现 5 页应用壳层、底部导航和默认主页启动
 - Phase: 阶段 1
 - Depends On: SHELL-110
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 建立主页、列表页、AI 页、添加页、设置页的壳层与导航
-- Implementation Notes: 默认首页必须是主页；先做占位页和导航结构
+- Implementation Notes: 已新增 `ShellPage` 作为客户端入口页，使用底部导航切换五个占位页面；默认进入 `HomePage`
 - Done When:
   - 应用启动默认进入主页
   - 5 页可通过导航切换
 - Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
   - 可定位导航壳层和默认路由
 - Files Expected:
   - Shell 页面

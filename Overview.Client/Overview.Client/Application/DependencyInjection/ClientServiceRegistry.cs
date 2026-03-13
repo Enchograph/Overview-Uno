@@ -11,7 +11,12 @@ internal sealed class ClientServiceRegistry
     public static ClientServiceRegistry CreateDefault()
     {
         var registry = new ClientServiceRegistry();
-        registry.RegisterSingleton(() => new MainViewModel());
+        registry.RegisterSingleton(() => new ShellViewModel());
+        registry.RegisterSingleton(() => new HomePageViewModel());
+        registry.RegisterSingleton(() => new ListPageViewModel());
+        registry.RegisterSingleton(() => new AiPageViewModel());
+        registry.RegisterSingleton(() => new AddItemPageViewModel());
+        registry.RegisterSingleton(() => new SettingsPageViewModel());
         return registry;
     }
 

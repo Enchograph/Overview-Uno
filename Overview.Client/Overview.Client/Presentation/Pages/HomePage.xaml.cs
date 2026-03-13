@@ -2,11 +2,11 @@ using Overview.Client.Presentation.ViewModels;
 
 namespace Overview.Client.Presentation.Pages;
 
-public sealed partial class MainPage : Page
+public sealed partial class HomePage : Page
 {
-    public MainPage()
+    public HomePage()
     {
         this.InitializeComponent();
-        DataContext = App.Services.Resolve<MainViewModel>();
+        DataContext = App.Services.Resolve<HomePageViewModel>();
     }
 }

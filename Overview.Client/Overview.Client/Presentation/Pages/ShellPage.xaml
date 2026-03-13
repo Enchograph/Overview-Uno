@@ -1,0 +1,25 @@
+<Page x:Class="Overview.Client.Presentation.Pages.ShellPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  <Grid RowDefinitions="*,Auto">
+    <Frame x:Name="ContentFrame" />
+
+    <Border
+      Grid.Row="1"
+      Padding="12"
+      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+      BorderThickness="0,1,0,0">
+      <Grid ColumnDefinitions="*,*,*,*,*">
+        <Button Grid.Column="0" Click="OnNavigationButtonClick" Content="Home" Tag="Home" />
+        <Button Grid.Column="1" Click="OnNavigationButtonClick" Content="List" Tag="List" />
+        <Button Grid.Column="2" Click="OnNavigationButtonClick" Content="AI" Tag="Ai" />
+        <Button Grid.Column="3" Click="OnNavigationButtonClick" Content="Add" Tag="Add" />
+        <Button Grid.Column="4" Click="OnNavigationButtonClick" Content="Settings" Tag="Settings" />
+      </Grid>
+    </Border>
+  </Grid>
+</Page>

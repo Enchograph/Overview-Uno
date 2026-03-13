@@ -38,10 +38,20 @@
   - Uno Platform 客户端主项目
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
   - 客户端轻量注册中心，作为后续服务注册的基础落点
-- `Overview.Client/Overview.Client/Presentation/Pages/MainPage.xaml`
-  - 当前客户端占位首页
-- `Overview.Client/Overview.Client/Presentation/ViewModels/MainViewModel.cs`
-  - 当前客户端占位首页 ViewModel
+- `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml`
+  - 客户端应用壳层和底部导航入口
+- `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
+  - 当前主页壳层占位页
+- `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
+  - 当前列表页壳层占位页
+- `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
+  - 当前 AI 页壳层占位页
+- `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
+  - 当前添加页壳层占位页
+- `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
+  - 当前设置页壳层占位页
+- `Overview.Client/Overview.Client/Presentation/ViewModels/`
+  - 当前五页壳层的 ViewModel 集合
 - `Overview.Client/Overview.Client/Domain/DomainAssemblyMarker.cs`
   - 客户端 Domain 层目录落点
 - `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
