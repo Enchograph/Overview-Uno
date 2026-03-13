@@ -1,0 +1,15 @@
+<UserControl x:Class="Overview.Client.Presentation.Components.HomeTimelineGrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ScrollViewer
+    x:Name="RootScrollViewer"
+    HorizontalScrollBarVisibility="Auto"
+    VerticalScrollBarVisibility="Auto"
+    ManipulationCompleted="OnRootManipulationCompleted"
+    ManipulationMode="TranslateX,System">
+    <StackPanel Spacing="12">
+      <Grid x:Name="HeaderGrid" ColumnSpacing="8" />
+      <StackPanel x:Name="RowsPanel" Spacing="8" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

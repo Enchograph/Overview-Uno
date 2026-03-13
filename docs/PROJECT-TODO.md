@@ -452,12 +452,16 @@
 - Title: 实现主页时间块网格与顶栏切换
 - Phase: 阶段 6
 - Depends On: HOME-600, UI-510
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 实现周/月视图、列日、行时间块和滑动切换
-- Implementation Notes: 窄屏周视图、宽屏支持月视图
+- Implementation Notes: 已将 `HomePage` 从时间选择宿主页推进为真实主页骨架；当前接入 `HomePageViewModel`、`HomeTimelineGrid` 与 `HomeLayoutService`，覆盖顶栏切换、周/月模式、时间块网格、点击标题展开时间选择组件，以及表格区域左右滑动切换周期；事项跨格渲染仍留给 `HOME-620`
 - Done When: 主页网格可显示
-- Verification: 可定位主页页面和时间块生成逻辑
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 `Presentation/Pages/HomePage.xaml`
+  - 可定位 `Presentation/Components/HomeTimelineGrid.xaml`
+  - 可定位 `Presentation/ViewModels/HomePageViewModel.cs`
 - Files Expected: 主页页面、网格组件
 
 ### Task ID: HOME-620

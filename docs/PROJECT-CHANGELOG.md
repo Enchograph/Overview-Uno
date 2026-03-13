@@ -332,3 +332,14 @@
 - 登录页支持登录态恢复、登录/注册切换、验证码发送和成功后导航到 `ShellPage`
 - 在客户端轻量注册中心接入 `LoginPageViewModel`
 - 验证客户端桌面目标可无警告构建
+
+### Round 32
+
+- 完成 `HOME-610`
+- 新增主页时间块网格组件 `Presentation/Components/HomeTimelineGrid.xaml`
+- 新增主页网格代码后置与左右滑动导航事件参数
+- 重写 `Presentation/ViewModels/HomePageViewModel.cs`，接入认证态、主页布局快照和宽度驱动的周 / 月视图切换
+- 重写 `Presentation/Pages/HomePage.xaml` 与 `Presentation/Pages/HomePage.xaml.cs`
+- 在 `ClientServiceRegistry` 为主页接入 `IAuthenticationService` 与 `IHomeLayoutService`
+- 主页当前支持顶栏周期切换、标题展开时间选择组件、窄屏周视图、宽屏月视图、时间块网格和左右滑动换页
+- 验证客户端桌面目标可无警告构建

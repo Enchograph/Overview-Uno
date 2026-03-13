@@ -14,12 +14,12 @@ public sealed partial class HomePage : Page
         DataContext = App.Services.Resolve<HomePageViewModel>();
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        SizeChanged += OnSizeChanged;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        SetSelectionModeComboBox(ViewModel.CurrentSelectionMode);
-        await TimeSelectionPicker.InitializeAsync(ViewModel.CurrentSelectionMode).ConfigureAwait(true);
+        await ViewModel.InitializeAsync(ActualWidth).ConfigureAwait(true);
         ApplyViewModelState();
     }
 
@@ -27,31 +27,69 @@ public sealed partial class HomePage : Page
     {
         Loaded -= OnLoaded;
         Unloaded -= OnUnloaded;
+        SizeChanged -= OnSizeChanged;
     }
 
-    private async void OnSelectionModeChanged(object sender, SelectionChangedEventArgs e)
+    private async void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (SelectionModeComboBox.SelectedItem is not ComboBoxItem { Tag: string tag })
+        await ViewModel.UpdateViewportAsync(e.NewSize.Width).ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private async void OnPreviousPeriodButtonClick(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.NavigatePreviousAsync().ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private async void OnNextPeriodButtonClick(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.NavigateNextAsync().ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private async void OnWeekViewButtonClick(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.SetViewModeAsync(HomeViewMode.Week).ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private async void OnMonthViewButtonClick(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.SetViewModeAsync(HomeViewMode.Month).ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private async void OnPeriodTitleButtonClick(object sender, RoutedEventArgs e)
+    {
+        ViewModel.TogglePicker();
+        if (ViewModel.IsPickerOpen)
         {
-            return;
+            await TimeSelectionPicker.InitializeAsync(
+                ViewModel.CurrentSelectionMode,
+                ViewModel.CurrentReferenceDate).ConfigureAwait(true);
         }
 
-        var mode = tag switch
-        {
-            "Day" => TimeSelectionMode.Day,
-            "Week" => TimeSelectionMode.Week,
-            "Month" => TimeSelectionMode.Month,
-            _ => ViewModel.CurrentSelectionMode
-        };
-
-        ViewModel.SetSelectionMode(mode);
         ApplyViewModelState();
-        await TimeSelectionPicker.ChangeSelectionModeAsync(mode).ConfigureAwait(true);
     }
 
-    private void OnTimeSelectionConfirmed(object sender, TimeSelectionConfirmedEventArgs e)
+    private async void OnTimeSelectionConfirmed(object sender, TimeSelectionConfirmedEventArgs e)
     {
-        ViewModel.ApplyConfirmedPeriod(e.SelectedPeriod);
+        await ViewModel.ApplyConfirmedPeriodAsync(e.SelectedPeriod).ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private async void OnTimelineGridSwipeRequested(object sender, HomeTimelineSwipeRequestedEventArgs e)
+    {
+        if (e.IsPrevious)
+        {
+            await ViewModel.NavigatePreviousAsync().ConfigureAwait(true);
+        }
+        else
+        {
+            await ViewModel.NavigateNextAsync().ConfigureAwait(true);
+        }
+
         ApplyViewModelState();
     }
 
@@ -59,21 +97,32 @@ public sealed partial class HomePage : Page
     {
         PageTitleTextBlock.Text = ViewModel.Title;
         PageDescriptionTextBlock.Text = ViewModel.Description;
+        PeriodTitleTextBlock.Text = ViewModel.PeriodTitle;
+        VisibleRangeTextBlock.Text = ViewModel.VisibleRangeSummary;
+        ViewModeSummaryTextBlock.Text = ViewModel.ViewModeSummary;
+        GridSummaryTextBlock.Text = ViewModel.GridSummary;
         StatusTextBlock.Text = ViewModel.StatusMessage;
-        ConfirmedSelectionTextBlock.Text = ViewModel.ConfirmedSelectionText;
-    }
+        BusyIndicator.IsActive = ViewModel.IsBusy;
 
-    private void SetSelectionModeComboBox(TimeSelectionMode selectionMode)
-    {
-        foreach (var item in SelectionModeComboBox.Items)
+        WeekViewButton.IsEnabled = !ViewModel.IsBusy && ViewModel.CurrentViewMode != HomeViewMode.Week;
+        MonthViewButton.IsEnabled = !ViewModel.IsBusy && ViewModel.SupportsMonthView && ViewModel.CurrentViewMode != HomeViewMode.Month;
+        MonthViewButton.Visibility = ViewModel.SupportsMonthView ? Visibility.Visible : Visibility.Collapsed;
+        PreviousPeriodButton.IsEnabled = !ViewModel.IsBusy && ViewModel.IsAuthenticated;
+        NextPeriodButton.IsEnabled = !ViewModel.IsBusy && ViewModel.IsAuthenticated;
+        PeriodTitleButton.IsEnabled = !ViewModel.IsBusy && ViewModel.IsAuthenticated;
+        TimePickerHost.Visibility = ViewModel.IsPickerOpen ? Visibility.Visible : Visibility.Collapsed;
+
+        if (ViewModel.IsAuthenticated && ViewModel.Snapshot is not null)
         {
-            if (item is ComboBoxItem comboBoxItem &&
-                comboBoxItem.Tag is string tag &&
-                string.Equals(tag, selectionMode.ToString(), StringComparison.Ordinal))
-            {
-                SelectionModeComboBox.SelectedItem = comboBoxItem;
-                break;
-            }
+            LoggedOutStateBorder.Visibility = Visibility.Collapsed;
+            TimelineGrid.Visibility = Visibility.Visible;
+            TimelineGrid.Render(ViewModel.Snapshot);
+        }
+        else
+        {
+            TimelineGrid.Visibility = Visibility.Collapsed;
+            TimelineGrid.Render(null);
+            LoggedOutStateBorder.Visibility = Visibility.Visible;
         }
     }
 }

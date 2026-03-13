@@ -30,7 +30,9 @@ internal sealed class ClientServiceRegistry
         var registry = new ClientServiceRegistry();
         registry.RegisterSingleton(() => new ShellViewModel());
         registry.RegisterSingleton(() => new LoginPageViewModel(registry.Resolve<IAuthenticationService>()));
-        registry.RegisterSingleton(() => new HomePageViewModel());
+        registry.RegisterSingleton(() => new HomePageViewModel(
+            registry.Resolve<IAuthenticationService>(),
+            registry.Resolve<IHomeLayoutService>()));
         registry.RegisterSingleton(() => new TimeSelectionViewModel(
             registry.Resolve<IAuthenticationService>(),
             registry.Resolve<ITimeSelectionService>()));

@@ -59,7 +59,7 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/LoginPage.xaml`
   - 客户端登录/注册入口页，负责启动时会话恢复和进入壳层前的认证流程
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
-  - 客户端主页当前作为时间选择组件宿主页，已支持日/周/月模式切换和确认结果展示
+  - 客户端主页真实骨架，当前支持顶栏周期切换、窄屏周视图、宽屏月视图、时间块网格和标题展开时间选择组件
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
   - 当前列表页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
@@ -72,10 +72,12 @@
   - 客户端统一事项详情组件，当前展示标题、类型、时间、地点、详情、提醒、重复、状态和编辑入口
 - `Overview.Client/Overview.Client/Presentation/Components/TimeSelectionPicker.xaml`
   - 客户端可复用时间选择组件，当前支持日/周/月选择、月格/周格/日期格映射、前后月份切换和确认返回
+- `Overview.Client/Overview.Client/Presentation/Components/HomeTimelineGrid.xaml`
+  - 客户端主页时间块网格组件，当前负责渲染日期列、时间块行和左右滑动周期切换入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/`
   - 当前五页壳层的 ViewModel 集合
 - `Overview.Client/Overview.Client/Presentation/ViewModels/HomePageViewModel.cs`
-  - 客户端主页宿主页 ViewModel，负责时间选择模式切换提示和确认结果展示
+  - 客户端主页 ViewModel，负责认证态校验、主页布局快照加载、周/月视图切换和周期导航状态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/LoginPageViewModel.cs`
   - 客户端登录页 ViewModel，封装登录、注册、验证码发送和会话恢复入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AddItemPageViewModel.cs`

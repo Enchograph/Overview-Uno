@@ -39,6 +39,7 @@
 - `UI-520`
 - `UI-530`
 - `HOME-600`
+- `HOME-610`
 
 ## 正在进行任务 ID
 
@@ -46,7 +47,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `HOME-610`
+- `HOME-620`
 
 ## 当前阻塞
 
@@ -54,6 +55,23 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端 `HomePage` 已从时间选择宿主页切换为真实主页骨架：
+  - `Presentation/Pages/HomePage.xaml`
+  - `Presentation/Pages/HomePage.xaml.cs`
+- 已确认客户端新增主页时间块网格组件：
+  - `Presentation/Components/HomeTimelineGrid.xaml`
+  - `Presentation/Components/HomeTimelineGrid.xaml.cs`
+  - `Presentation/Components/HomeTimelineSwipeRequestedEventArgs.cs`
+- 已确认客户端主页状态 ViewModel 已接入认证与主页布局应用服务：
+  - `Presentation/ViewModels/HomePageViewModel.cs`
+- 已确认客户端主页当前已覆盖：
+  - 顶栏上一周期 / 下一周期切换
+  - 点击周期标题展开时间选择组件
+  - 窄屏默认周视图
+  - 宽屏月视图切换
+  - 周 / 月时间块网格渲染
+  - 表格区域左右滑动切换前后周期
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - 已确认客户端新增可复用时间选择组件：
   - `Presentation/Components/TimeSelectionPicker.xaml`

@@ -3,55 +3,138 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:components="using:Overview.Client.Presentation.Components"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <Grid Padding="24">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-      <StackPanel MaxWidth="860" HorizontalAlignment="Center" Spacing="18">
-        <StackPanel Spacing="8">
-          <TextBlock x:Name="PageTitleTextBlock" FontSize="32" FontWeight="SemiBold" />
+  <Grid Padding="24" RowDefinitions="Auto,Auto,*">
+    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+      <Button
+        x:Name="PreviousPeriodButton"
+        Click="OnPreviousPeriodButtonClick"
+        Content="&lt;"
+        HorizontalAlignment="Left" />
+
+      <Button
+        x:Name="PeriodTitleButton"
+        Grid.Column="1"
+        Click="OnPeriodTitleButtonClick"
+        HorizontalAlignment="Center"
+        HorizontalContentAlignment="Center">
+        <StackPanel Spacing="4">
           <TextBlock
-            x:Name="PageDescriptionTextBlock"
+            x:Name="PeriodTitleTextBlock"
+            FontSize="28"
+            FontWeight="SemiBold"
+            TextAlignment="Center" />
+          <TextBlock
+            x:Name="VisibleRangeTextBlock"
             Opacity="0.72"
-            Style="{ThemeResource BodyStrongTextBlockStyle}"
+            Style="{ThemeResource BodyTextBlockStyle}"
+            TextAlignment="Center"
             TextWrapping="WrapWholeWords" />
         </StackPanel>
+      </Button>
 
-        <Border
-          Padding="20"
-          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-          BorderThickness="1"
-          CornerRadius="24">
-          <StackPanel Spacing="14">
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-              <ComboBox x:Name="SelectionModeComboBox" Header="Selection Mode" SelectionChanged="OnSelectionModeChanged">
-                <ComboBoxItem Content="Day" Tag="Day" />
-                <ComboBoxItem Content="Week" Tag="Week" />
-                <ComboBoxItem Content="Month" Tag="Month" />
-              </ComboBox>
+      <Button
+        x:Name="NextPeriodButton"
+        Grid.Column="2"
+        Click="OnNextPeriodButtonClick"
+        Content="&gt;"
+        HorizontalAlignment="Right" />
+    </Grid>
 
+    <StackPanel Grid.Row="1" Margin="0,18,0,18" Spacing="16">
+      <Border
+        Padding="18"
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="24">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+            <StackPanel Spacing="4">
               <TextBlock
-                x:Name="StatusTextBlock"
-                Grid.Column="1"
-                VerticalAlignment="Bottom"
+                x:Name="PageTitleTextBlock"
+                FontSize="22"
+                FontWeight="SemiBold" />
+              <TextBlock
+                x:Name="PageDescriptionTextBlock"
+                Opacity="0.72"
+                Style="{ThemeResource BodyTextBlockStyle}"
                 TextWrapping="WrapWholeWords" />
-            </Grid>
+            </StackPanel>
 
-            <components:TimeSelectionPicker x:Name="TimeSelectionPicker" SelectionConfirmed="OnTimeSelectionConfirmed" />
-          </StackPanel>
-        </Border>
+            <Button
+              x:Name="WeekViewButton"
+              Grid.Column="1"
+              Click="OnWeekViewButtonClick"
+              Content="Week" />
 
-        <Border
-          Padding="20"
-          Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-          BorderThickness="1"
-          CornerRadius="24">
-          <StackPanel Spacing="8">
-            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Last Confirmed Result" />
-            <TextBlock x:Name="ConfirmedSelectionTextBlock" TextWrapping="WrapWholeWords" />
-          </StackPanel>
-        </Border>
-      </StackPanel>
-    </ScrollViewer>
+            <Button
+              x:Name="MonthViewButton"
+              Grid.Column="2"
+              Click="OnMonthViewButtonClick"
+              Content="Month" />
+          </Grid>
+
+          <TextBlock
+            x:Name="ViewModeSummaryTextBlock"
+            Opacity="0.82"
+            Style="{ThemeResource BodyStrongTextBlockStyle}"
+            TextWrapping="WrapWholeWords" />
+
+          <TextBlock
+            x:Name="GridSummaryTextBlock"
+            Opacity="0.72"
+            Style="{ThemeResource CaptionTextBlockStyle}"
+            TextWrapping="WrapWholeWords" />
+
+          <TextBlock
+            x:Name="StatusTextBlock"
+            Foreground="{ThemeResource SystemFillColorCautionBrush}"
+            TextWrapping="WrapWholeWords" />
+
+          <ProgressRing
+            x:Name="BusyIndicator"
+            Height="24"
+            HorizontalAlignment="Left"
+            IsActive="False"
+            Width="24" />
+        </StackPanel>
+      </Border>
+
+      <Border
+        x:Name="TimePickerHost"
+        Padding="0"
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="24"
+        Visibility="Collapsed">
+        <components:TimeSelectionPicker
+          x:Name="TimeSelectionPicker"
+          SelectionConfirmed="OnTimeSelectionConfirmed" />
+      </Border>
+    </StackPanel>
+
+    <Grid Grid.Row="2">
+      <Border
+        x:Name="LoggedOutStateBorder"
+        Padding="24"
+        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="24"
+        Visibility="Collapsed">
+        <StackPanel Spacing="8">
+          <TextBlock FontSize="22" FontWeight="SemiBold" Text="Sign in required" />
+          <TextBlock
+            Text="The homepage timeline loads after authentication. Finish login on the Login page, then return here."
+            TextWrapping="WrapWholeWords" />
+        </StackPanel>
+      </Border>
+
+      <components:HomeTimelineGrid
+        x:Name="TimelineGrid"
+        SwipeRequested="OnTimelineGridSwipeRequested"
+        Visibility="Collapsed" />
+    </Grid>
   </Grid>
 </Page>
