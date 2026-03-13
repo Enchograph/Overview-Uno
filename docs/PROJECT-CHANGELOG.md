@@ -186,3 +186,17 @@
 - 在服务端新增 `MicrosoftOverviewLoggerFactory` 以桥接 `Microsoft.Extensions.Logging`
 - 将 `VerificationCodeService` 切换到统一日志抽象
 - 验证服务端与客户端项目均可无警告构建
+
+### Round 23
+
+- 完成 `APP-400`
+- 在客户端新增认证应用层目录 `Application/Auth`
+- 新增 `AuthSession`、`VerificationCodeDispatchResult`
+- 新增 `IAuthenticationService` 与 `AuthenticationService`
+- 认证应用层覆盖发送验证码、注册、登录、登录态恢复、令牌刷新和登出
+- 在客户端新增认证远程访问目录 `Infrastructure/Api/Auth`
+- 新增 `IAuthRemoteClient`、`AuthRemoteClient` 及认证请求/响应 DTO
+- 在客户端新增登录态持久化目录 `Infrastructure/Settings`
+- 新增 `IAuthSessionStore` 与基于 JSON 文件的 `FileAuthSessionStore`
+- 在客户端轻量注册中心接入认证远程访问、登录态存储和认证应用服务
+- 验证客户端桌面目标可无警告构建

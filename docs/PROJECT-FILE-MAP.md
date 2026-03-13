@@ -40,6 +40,8 @@
   - Uno Platform 客户端主项目
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
   - 客户端轻量注册中心，作为后续服务注册的基础落点
+- `Overview.Client/Overview.Client/Application/Auth/`
+  - 客户端认证应用层目录，包含登录、注册、登出、登录态恢复和刷新用例
 - `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml`
   - 客户端应用壳层和底部导航入口
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
@@ -68,12 +70,16 @@
   - 客户端 Infrastructure 层目录落点
 - `Overview.Client/Overview.Client/Infrastructure/Api/Sync/`
   - 客户端远程同步访问层，包含 `pull/push` 契约、接口与 HTTP 客户端实现
+- `Overview.Client/Overview.Client/Infrastructure/Api/Auth/`
+  - 客户端认证远程访问层，包含认证契约、接口与 HTTP 客户端实现
 - `Overview.Client/Overview.Client/Infrastructure/Diagnostics/`
   - 客户端日志抽象目录，包含统一日志接口与默认空实现工厂
 - `Overview.Client/Overview.Client/Infrastructure/Notifications/`
   - 客户端通知抽象目录，包含统一通知调度接口与默认空实现
 - `Overview.Client/Overview.Client/Infrastructure/Persistence/`
   - 客户端 SQLite 数据层，包含数据库选项、表记录、仓储接口与实现、连接工厂
+- `Overview.Client/Overview.Client/Infrastructure/Settings/`
+  - 客户端本地设置与登录态存储目录，当前包含基于 JSON 文件的认证会话存储
 - `Overview.Client/Overview.Client/Infrastructure/Widgets/`
   - 客户端小组件快照抽象目录，包含快照模型与默认内存存储
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`

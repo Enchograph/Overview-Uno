@@ -280,12 +280,15 @@
 - Title: 实现认证用例与登录态管理
 - Phase: 阶段 4
 - Depends On: INFRA-320
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 封装登录、登出、登录态恢复
 - Implementation Notes: 供登录页调用
 - Done When: 认证用例完成
-- Verification: 可定位应用服务
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 `Overview.Client/Overview.Client/Application/Auth/IAuthenticationService.cs`
+  - 可定位 `Overview.Client/Overview.Client/Application/Auth/AuthenticationService.cs`
 - Files Expected: 认证服务
 
 ### Task ID: APP-410

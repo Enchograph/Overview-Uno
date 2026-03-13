@@ -2,29 +2,34 @@
 
 ## 本轮目标
 
-- 完成 `INFRA-340`，建立通知、小组件、日志基础设施抽象
+- 完成 `APP-400`，实现认证用例与登录态管理
 
 ## 本轮完成
 
-- 在客户端新增日志抽象目录 `Infrastructure/Diagnostics`
-- 在客户端新增通知抽象目录 `Infrastructure/Notifications`
-- 在客户端新增小组件快照抽象目录 `Infrastructure/Widgets`
-- 新增客户端日志接口 `IOverviewLogger`、`IOverviewLoggerFactory`
-- 新增客户端通知接口 `INotificationScheduler` 与默认空实现 `NoOpNotificationScheduler`
-- 新增客户端小组件快照接口 `IWidgetSnapshotStore` 与默认内存实现 `InMemoryWidgetSnapshotStore`
-- 在客户端 `ClientServiceRegistry` 注册日志工厂、通知调度和小组件快照存储
-- 在服务端新增日志抽象目录 `Infrastructure/Diagnostics`
-- 新增服务端日志接口 `IOverviewLogger`、`IOverviewLoggerFactory`
-- 新增服务端 `MicrosoftOverviewLoggerFactory`，用于桥接 `Microsoft.Extensions.Logging`
-- 在服务端基础设施注册中接入 `IOverviewLoggerFactory`
-- 将 `VerificationCodeService` 从直接依赖 `ILogger<T>` 切换为统一日志抽象
+- 在客户端新增认证应用层目录 `Application/Auth`
+- 新增认证会话模型 `AuthSession`
+- 新增认证应用服务接口 `IAuthenticationService`
+- 新增认证应用服务实现 `AuthenticationService`
+- 认证应用服务已覆盖：
+  - 发送验证码
+  - 注册并保存登录态
+  - 登录并保存登录态
+  - 本地登录态恢复
+  - 访问令牌刷新
+  - 登出清理
+- 在客户端新增认证远程访问目录 `Infrastructure/Api/Auth`
+- 新增认证远程访问接口 `IAuthRemoteClient` 与实现 `AuthRemoteClient`
+- 新增客户端认证请求/响应契约 DTO
+- 在客户端新增本地登录态存储目录 `Infrastructure/Settings`
+- 新增 `IAuthSessionStore` 与基于 JSON 文件的 `FileAuthSessionStore`
+- 在客户端 `ClientServiceRegistry` 注册认证远程访问、登录态存储和认证应用服务
 - 验证结果：
-  - `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
   - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 
 ## 本轮未完成
 
-- Application 层用例
+- `APP-410` 及后续 Application 层用例
+- 登录页与设置页 Presentation 接入
 - 真实邮件发送提供程序接入
 - 通知平台映射
 - 小组件平台映射
@@ -35,13 +40,10 @@
 
 ## 已更新文件
 
-- `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
-- `Overview.Server/Infrastructure/Diagnostics/`
-- `Overview.Server/Infrastructure/Identity/VerificationCodeService.cs`
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
-- `Overview.Client/Overview.Client/Infrastructure/Diagnostics/`
-- `Overview.Client/Overview.Client/Infrastructure/Notifications/`
-- `Overview.Client/Overview.Client/Infrastructure/Widgets/`
+- `Overview.Client/Overview.Client/Application/Auth/`
+- `Overview.Client/Overview.Client/Infrastructure/Api/Auth/`
+- `Overview.Client/Overview.Client/Infrastructure/Settings/`
 - `docs/PROJECT-STATUS.md`
 - `docs/PROJECT-TODO.md`
 - `docs/PROJECT-HANDOFF.md`
@@ -51,7 +53,7 @@
 
 ## 下一步唯一推荐动作
 
-- 执行 `APP-400`：实现认证用例与登录态管理
+- 执行 `APP-410`：实现事项 CRUD 与设置读写用例
 
 ## 接手 AI 注意事项
 
@@ -61,7 +63,7 @@
 - 若从仓库根目录执行 `dotnet restore/build`，必须保留根级 `global.json`，否则 `Uno.Sdk` 无法解析
 - Uno 模板还生成了 `Overview.Client/Overview.Client.sln`，当前以仓库根解决方案为主
 - `DOMAIN-200`、`DOMAIN-210`、`DOMAIN-220`、`DOMAIN-230`、`INFRA-300`、`INFRA-310` 已完成；后续基础设施实现应继续复用既有领域规则，而不是重写算法
-- `INFRA-320`、`INFRA-330`、`INFRA-340` 已完成；当前服务端已具备认证与同步 API 基础设施，客户端已具备远程同步访问封装以及通知/小组件/日志抽象
+- `INFRA-320`、`INFRA-330`、`INFRA-340`、`APP-400` 已完成；当前服务端已具备认证与同步 API 基础设施，客户端已具备认证应用层、远程同步访问封装以及通知/小组件/日志抽象
 - 当前时间标题只做了基础格式化规则，真正的多语言资源化应放在后续 Presentation/i18n 阶段，不要在 Domain 层引入资源依赖
 - 当前提醒规则服务已提供 `NormalizeReminderConfig`、`ExpandOccurrences`、`BuildReminderSchedule` 三个入口；后续应用层和基础设施层应复用，而不是各自再写一套时间展开
 - 当前主页交互规则服务已提供 `CalculateOverlapStates`、`ResolveHit` 两个入口；后续 Presentation 主页应只负责把坐标映射成时间点和可见事项集合
@@ -70,10 +72,11 @@
 - 服务端当前使用 EF Core 10 + Npgsql，值对象和快照字段以 `jsonb` 存储；后续若要把某些字段拆成列，先确认是否属于当前最小任务边界
 - 当前 `SyncController` 直接使用 `OverviewDbContext` 完成基础设施级 pull/push；自动后台同步、手动同步入口、同步状态机和本地冲突收敛还没有开始
 - 当前 `send-verification-code` 端点会生成 6 位验证码、持久化哈希，并把明文验证码写入服务端日志；这是为了完成当前最小基础设施任务，真实邮件发送链路仍需后续补齐
+- 当前客户端登录态以 `LocalApplicationData/Overview.Client/auth-session.json` 持久化，用于支持首版恢复与刷新；尚未做平台安全存储适配
 - 当前密码哈希采用 PBKDF2-SHA256，自定义格式为 `PBKDF2.{saltHex}.{hashHex}`
 - 当前刷新令牌按单条记录持久化，`refresh` 端点会吊销旧令牌并写入替换后的哈希
 - 当前已进入 Application 阶段，不应跳去做 Presentation 或 Platform 细节
-- 下一步不要回头扩写页面壳层或平台映射，先完成 `APP-400`
+- 下一步不要回头扩写登录页 UI 或平台映射，先完成 `APP-410`
 - 运行 EF CLI 前先执行 `dotnet tool restore`
 - 本地没有可连接的 PostgreSQL 实例；如果下轮需要验证 `database update` 或真实读写，请先启动数据库或调整连接串
 - 不要跳过 Shell/Domain/Application 直接做页面细节
