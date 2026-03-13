@@ -42,6 +42,7 @@
 - `HOME-610`
 - `HOME-620`
 - `HOME-630`
+- `LIST-700`
 
 ## 正在进行任务 ID
 
@@ -49,7 +50,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `LIST-700`
+- `LIST-710`
 
 ## 当前阻塞
 
@@ -57,6 +58,22 @@
 
 ## 最近已验证结果
 
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，10/10 用例通过，0 failed
+- 已确认客户端列表页已从占位实现切换为真实列表筛选页：
+  - `Presentation/Pages/ListPage.xaml`
+  - `Presentation/Pages/ListPage.xaml.cs`
+- 已确认客户端新增列表页状态 ViewModel 与展示模型：
+  - `Presentation/ViewModels/ListPageViewModel.cs`
+  - `Presentation/ViewModels/ListPageTabEntryViewModel.cs`
+  - `Presentation/ViewModels/ListPageItemEntryViewModel.cs`
+- 已确认客户端列表页当前已覆盖：
+  - 我的一天、全部、任务、日程、备忘、重要事项六个标签
+  - 标签切换驱动的真实数据筛选
+  - 未完成 / 已完成分组展示
+  - 未登录空态与无匹配结果空态
+- 已确认客户端新增列表筛选测试：
+  - `tests/Overview.Client.Tests/ListPageServiceTests.cs`
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，4/4 用例通过，0 failed
 - 已确认客户端新增主页交互解析与测试：
   - `Application/Home/IHomeTimelineInteractionService.cs`

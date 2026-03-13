@@ -38,7 +38,9 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton(() => new TimeSelectionViewModel(
             registry.Resolve<IAuthenticationService>(),
             registry.Resolve<ITimeSelectionService>()));
-        registry.RegisterSingleton(() => new ListPageViewModel());
+        registry.RegisterSingleton(() => new ListPageViewModel(
+            registry.Resolve<IAuthenticationService>(),
+            registry.Resolve<IListPageService>()));
         registry.RegisterSingleton(() => new AiPageViewModel());
         registry.RegisterSingleton(() => new AddItemPageViewModel(
             registry.Resolve<IAuthenticationService>(),

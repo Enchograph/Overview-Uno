@@ -1,11 +1,188 @@
 <Page x:Class="Overview.Client.Presentation.Pages.ListPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:viewModels="using:Overview.Client.Presentation.ViewModels"
+      mc:Ignorable="d"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <Grid Padding="24">
-    <StackPanel Spacing="12" VerticalAlignment="Center">
-      <TextBlock FontSize="28" FontWeight="SemiBold" Text="{Binding Title}" />
-      <TextBlock Opacity="0.72" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{Binding Description}" TextWrapping="WrapWholeWords" />
+  <Grid Padding="24" RowDefinitions="Auto,Auto,*">
+    <StackPanel Spacing="6">
+      <TextBlock x:Name="PageTitleTextBlock" FontSize="30" FontWeight="SemiBold" Text="List" />
+      <TextBlock
+        x:Name="PageSubtitleTextBlock"
+        Opacity="0.72"
+        Style="{ThemeResource BodyStrongTextBlockStyle}"
+        TextWrapping="WrapWholeWords" />
     </StackPanel>
+
+    <Border
+      Grid.Row="1"
+      Margin="0,20,0,16"
+      Padding="20"
+      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+      BorderThickness="1"
+      CornerRadius="24">
+      <StackPanel Spacing="14">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
+          <ItemsControl x:Name="TabItemsControl">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="10" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:ListPageTabEntryViewModel">
+                <Button
+                  MinWidth="110"
+                  Click="OnTabButtonClick"
+                  Content="{Binding Label}"
+                  Tag="{Binding Key}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="12">
+          <TextBlock
+            x:Name="ActiveSummaryTextBlock"
+            Style="{ThemeResource BodyStrongTextBlockStyle}" />
+          <TextBlock
+            x:Name="CompletedSummaryTextBlock"
+            Grid.Column="1"
+            Style="{ThemeResource BodyStrongTextBlockStyle}" />
+          <ProgressRing
+            x:Name="BusyIndicator"
+            Grid.Column="2"
+            Width="24"
+            Height="24"
+            IsActive="False"
+            VerticalAlignment="Center" />
+        </Grid>
+
+        <TextBlock
+          x:Name="StatusTextBlock"
+          Foreground="{ThemeResource SystemFillColorCautionBrush}"
+          TextWrapping="WrapWholeWords" />
+      </StackPanel>
+    </Border>
+
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+      <Grid>
+        <StackPanel x:Name="ContentPanel" Spacing="16">
+          <Border
+            Padding="20"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="24">
+            <StackPanel Spacing="12">
+              <TextBlock FontSize="22" FontWeight="SemiBold" Text="Active Items" />
+              <ListView x:Name="ActiveItemsListView" MinHeight="120" SelectionMode="None">
+                <ListView.ItemTemplate>
+                  <DataTemplate x:DataType="viewModels:ListPageItemEntryViewModel">
+                    <Border
+                      Margin="0,0,0,10"
+                      Padding="14"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      CornerRadius="18">
+                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border
+                          Width="36"
+                          Height="36"
+                          Background="{ThemeResource AccentFillColorSecondaryBrush}"
+                          CornerRadius="18">
+                          <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{Binding TypeBadge}" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Spacing="4">
+                          <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
+                          <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center">
+                          <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
+                          <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ListView.ItemTemplate>
+              </ListView>
+            </StackPanel>
+          </Border>
+
+          <Border
+            Padding="20"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="24">
+            <StackPanel Spacing="12">
+              <TextBlock FontSize="22" FontWeight="SemiBold" Text="Completed Items" />
+              <ListView x:Name="CompletedItemsListView" MinHeight="120" SelectionMode="None">
+                <ListView.ItemTemplate>
+                  <DataTemplate x:DataType="viewModels:ListPageItemEntryViewModel">
+                    <Border
+                      Margin="0,0,0,10"
+                      Padding="14"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      CornerRadius="18"
+                      Opacity="0.72">
+                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border
+                          Width="36"
+                          Height="36"
+                          Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                          CornerRadius="18">
+                          <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{Binding TypeBadge}" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Spacing="4">
+                          <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextWrapping="WrapWholeWords" />
+                          <TextBlock Opacity="0.72" Text="{Binding Subtitle}" TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center">
+                          <TextBlock HorizontalAlignment="Right" Text="{Binding CompletionBadge}" />
+                          <TextBlock HorizontalAlignment="Right" Text="{Binding ImportanceBadge}" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ListView.ItemTemplate>
+              </ListView>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <Border
+          x:Name="EmptyStateBorder"
+          Padding="28"
+          Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="24"
+          Visibility="Collapsed">
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="EmptyStateTitleTextBlock" FontSize="24" FontWeight="SemiBold" />
+            <TextBlock
+              x:Name="EmptyStateDescriptionTextBlock"
+              Opacity="0.72"
+              Style="{ThemeResource BodyStrongTextBlockStyle}"
+              TextWrapping="WrapWholeWords" />
+          </StackPanel>
+        </Border>
+      </Grid>
+    </ScrollViewer>
   </Grid>
 </Page>

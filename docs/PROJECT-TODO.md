@@ -507,7 +507,7 @@
 - Title: 实现列表页标签和数据筛选
 - Phase: 阶段 7
 - Depends On: APP-430, UI-510
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 实现我的一天、全部、任务、日程、备忘、重要事项标签
 - Implementation Notes: 先保证筛选正确

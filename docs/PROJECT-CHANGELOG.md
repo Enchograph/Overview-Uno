@@ -368,3 +368,16 @@
 - 新增主页交互测试工程 `tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
 - 新增主页交互测试 `tests/Overview.Client.Tests/HomeTimelineInteractionServiceTests.cs`
 - 验证客户端桌面目标可无警告构建，且主页交互测试 4/4 通过
+
+### Round 35
+
+- 完成 `LIST-700`
+- 将 `Presentation/Pages/ListPage.xaml` 从占位页改为真实列表筛选页
+- 更新 `Presentation/Pages/ListPage.xaml.cs`，接入初始化、标签切换和空态刷新
+- 重写 `Presentation/ViewModels/ListPageViewModel.cs`
+- 新增 `Presentation/ViewModels/ListPageTabEntryViewModel.cs`
+- 新增 `Presentation/ViewModels/ListPageItemEntryViewModel.cs`
+- 在 `ClientServiceRegistry` 为列表页接入认证与列表应用服务
+- 列表页当前支持我的一天、全部、任务、日程、备忘、重要事项六个标签和未完成 / 已完成分组展示
+- 新增列表筛选测试 `tests/Overview.Client.Tests/ListPageServiceTests.cs`
+- 验证客户端桌面目标可无警告构建，且测试项目 10/10 通过
