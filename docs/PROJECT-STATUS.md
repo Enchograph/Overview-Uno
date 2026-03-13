@@ -2,8 +2,8 @@
 
 ## 当前阶段
 
-- 阶段编号：6
-- 阶段名称：Presentation 主页
+- 阶段编号：7
+- 阶段名称：Presentation 列表页
 - 阶段状态：`active`
 
 ## 当前里程碑
@@ -41,6 +41,7 @@
 - `HOME-600`
 - `HOME-610`
 - `HOME-620`
+- `HOME-630`
 
 ## 正在进行任务 ID
 
@@ -48,7 +49,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `HOME-630`
+- `LIST-700`
 
 ## 当前阻塞
 
@@ -56,6 +57,21 @@
 
 ## 最近已验证结果
 
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，4/4 用例通过，0 failed
+- 已确认客户端新增主页交互解析与测试：
+  - `Application/Home/IHomeTimelineInteractionService.cs`
+  - `Application/Home/HomeTimelineInteractionService.cs`
+  - `Application/Home/HomeTimelineInteractionResult.cs`
+  - `tests/Overview.Client.Tests/HomeTimelineInteractionServiceTests.cs`
+- 已确认客户端主页当前已新增覆盖：
+  - 点击事项按需求文档命中规则打开详情卡片
+  - 长按空白单元格跳转添加页并预填起始日期、时间块起始时间
+  - 长按事项跳转编辑页
+  - 详情卡片内可直接跳转到编辑态
+- 已确认客户端添加页已支持导航参数预填：
+  - `Presentation/Pages/AddItemNavigationRequest.cs`
+  - `Presentation/Pages/AddItemPage.xaml.cs`
+  - `Presentation/ViewModels/AddItemPageViewModel.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - 已确认客户端主页时间块网格已接入事项覆盖层渲染：
   - `Presentation/Components/HomeTimelineGrid.xaml`

@@ -485,12 +485,17 @@
 - Title: 实现主页点击命中、长按和详情交互
 - Phase: 阶段 6
 - Depends On: HOME-620, UI-520
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持命中规则、长按空白创建、长按事项编辑、点击事项详情
-- Implementation Notes: 命中算法必须可单元测试
+- Implementation Notes: 已新增独立 `HomeTimelineInteractionService` 解析主页列坐标与时间坐标，复用领域层 `HomeInteractionRuleService` 完成命中裁决；主页当前已接入点击事项详情、长按空白创建、长按事项编辑，以及添加页导航参数预填；命中规则已有独立单元测试覆盖
 - Done When: 主页交互完成
-- Verification: 存在命中算法和相关测试
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位 `Overview.Client/Overview.Client/Application/Home/HomeTimelineInteractionService.cs`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/Components/HomeTimelineGrid.xaml.cs`
+  - 可定位 `tests/Overview.Client.Tests/HomeTimelineInteractionServiceTests.cs`
 - Files Expected: 命中逻辑、测试、交互代码
 
 ---

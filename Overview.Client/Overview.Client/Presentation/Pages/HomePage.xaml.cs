@@ -1,6 +1,7 @@
 using Overview.Client.Presentation.ViewModels;
 using Overview.Client.Domain.Enums;
 using Overview.Client.Presentation.Components;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace Overview.Client.Presentation.Pages;
 
@@ -93,6 +94,67 @@ public sealed partial class HomePage : Page
         ApplyViewModelState();
     }
 
+    private async void OnTimelineGridInteractionRequested(object sender, HomeTimelineInteractionRequestedEventArgs e)
+    {
+        if (!e.Interaction.IsWithinGrid)
+        {
+            return;
+        }
+
+        if (e.IsHold)
+        {
+            if (e.Interaction.HitItemId is Guid itemId)
+            {
+                Frame?.Navigate(typeof(AddItemPage), new AddItemNavigationRequest
+                {
+                    EditItemId = itemId
+                });
+            }
+            else
+            {
+                Frame?.Navigate(typeof(AddItemPage), new AddItemNavigationRequest
+                {
+                    SuggestedStartDate = e.Interaction.ColumnDate,
+                    SuggestedStartTime = e.Interaction.CellStartTime
+                });
+            }
+
+            return;
+        }
+
+        if (e.Interaction.HitItemId is Guid detailItemId)
+        {
+            await ViewModel.ShowDetailAsync(detailItemId).ConfigureAwait(true);
+            ApplyViewModelState();
+        }
+    }
+
+    private void OnCloseDetailButtonClick(object sender, RoutedEventArgs e)
+    {
+        ViewModel.CloseDetail();
+        ApplyViewModelState();
+    }
+
+    private void OnDetailEditRequested(object sender, Guid itemId)
+    {
+        ViewModel.CloseDetail();
+        ApplyViewModelState();
+        Frame?.Navigate(typeof(AddItemPage), new AddItemNavigationRequest
+        {
+            EditItemId = itemId
+        });
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        if (e.Parameter is AddItemNavigationRequest)
+        {
+            ViewModel.CloseDetail();
+        }
+    }
+
     private void ApplyViewModelState()
     {
         PageTitleTextBlock.Text = ViewModel.Title;
@@ -103,6 +165,7 @@ public sealed partial class HomePage : Page
         GridSummaryTextBlock.Text = ViewModel.GridSummary;
         StatusTextBlock.Text = ViewModel.StatusMessage;
         BusyIndicator.IsActive = ViewModel.IsBusy;
+        ItemDetailCard.DataContext = ViewModel.Detail;
 
         WeekViewButton.IsEnabled = !ViewModel.IsBusy && ViewModel.CurrentViewMode != HomeViewMode.Week;
         MonthViewButton.IsEnabled = !ViewModel.IsBusy && ViewModel.SupportsMonthView && ViewModel.CurrentViewMode != HomeViewMode.Month;
@@ -111,6 +174,7 @@ public sealed partial class HomePage : Page
         NextPeriodButton.IsEnabled = !ViewModel.IsBusy && ViewModel.IsAuthenticated;
         PeriodTitleButton.IsEnabled = !ViewModel.IsBusy && ViewModel.IsAuthenticated;
         TimePickerHost.Visibility = ViewModel.IsPickerOpen ? Visibility.Visible : Visibility.Collapsed;
+        DetailOverlay.Visibility = ViewModel.IsDetailOpen ? Visibility.Visible : Visibility.Collapsed;
 
         if (ViewModel.IsAuthenticated && ViewModel.Snapshot is not null)
         {

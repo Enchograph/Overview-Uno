@@ -38,12 +38,18 @@
   - 接力变更记录
 - `Overview.Client/Overview.Client/Overview.Client.csproj`
   - Uno Platform 客户端主项目
+- `tests/Overview.Client.Tests/`
+  - 客户端主页交互测试项目，当前覆盖主页命中规则、被包裹事项优先和空白单元格起始时间映射
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
   - 客户端轻量注册中心，作为后续服务注册的基础落点
 - `Overview.Client/Overview.Client/Application/Auth/`
   - 客户端认证应用层目录，包含登录、注册、登出、登录态恢复和刷新用例
 - `Overview.Client/Overview.Client/Application/Home/`
   - 客户端主页应用层目录，包含主页布局快照、跨格分段计算和时间选择映射服务
+- `Overview.Client/Overview.Client/Application/Home/HomeTimelineInteractionService.cs`
+  - 客户端主页交互解析服务，负责把主页列坐标与时间坐标映射为命中事项或空白单元格
+- `Overview.Client/Overview.Client/Application/Home/HomeTimelineInteractionResult.cs`
+  - 客户端主页交互解析结果模型，承载列日期、命中时间、单元格起始时间和命中事项 ID
 - `Overview.Client/Overview.Client/Application/Lists/`
   - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
 - `Overview.Client/Overview.Client/Application/Ai/`
@@ -59,13 +65,15 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/LoginPage.xaml`
   - 客户端登录/注册入口页，负责启动时会话恢复和进入壳层前的认证流程
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
-  - 客户端主页真实骨架，当前支持顶栏周期切换、窄屏周视图、宽屏月视图、时间块网格和标题展开时间选择组件
+  - 客户端主页真实骨架，当前支持顶栏周期切换、窄屏周视图、宽屏月视图、时间块网格、标题展开时间选择组件和事项详情弹层
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
   - 当前列表页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
   - 当前 AI 页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
-  - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口和详情卡片接入
+  - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口、详情卡片接入，以及来自主页长按的预填导航参数支持
+- `Overview.Client/Overview.Client/Presentation/Pages/AddItemNavigationRequest.cs`
+  - 客户端添加/编辑事项导航参数模型，承载主页长按空白预填和长按事项编辑请求
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
   - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架和设置摘要展示
 - `Overview.Client/Overview.Client/Presentation/Components/ItemDetailCard.xaml`
@@ -73,11 +81,11 @@
 - `Overview.Client/Overview.Client/Presentation/Components/TimeSelectionPicker.xaml`
   - 客户端可复用时间选择组件，当前支持日/周/月选择、月格/周格/日期格映射、前后月份切换和确认返回
 - `Overview.Client/Overview.Client/Presentation/Components/HomeTimelineGrid.xaml`
-  - 客户端主页时间块网格组件，当前负责渲染日期列、时间块行、事项覆盖层和左右滑动周期切换入口
+  - 客户端主页时间块网格组件，当前负责渲染日期列、时间块行、事项覆盖层、统一命中层，以及点击/长按/左右滑动交互入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/`
   - 当前五页壳层的 ViewModel 集合
 - `Overview.Client/Overview.Client/Presentation/ViewModels/HomePageViewModel.cs`
-  - 客户端主页 ViewModel，负责认证态校验、主页布局快照加载、周/月视图切换和周期导航状态
+  - 客户端主页 ViewModel，负责认证态校验、主页布局快照加载、周/月视图切换、周期导航状态和事项详情加载
 - `Overview.Client/Overview.Client/Presentation/ViewModels/LoginPageViewModel.cs`
   - 客户端登录页 ViewModel，封装登录、注册、验证码发送和会话恢复入口
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AddItemPageViewModel.cs`
@@ -199,8 +207,6 @@
   - 服务端 Domain 分层目录
 - `Overview.Server/Infrastructure/`
   - 服务端 Infrastructure 分层目录
-- `tests/` 或等价测试项目目录
-  - 自动化测试
 
 ## 维护规则
 

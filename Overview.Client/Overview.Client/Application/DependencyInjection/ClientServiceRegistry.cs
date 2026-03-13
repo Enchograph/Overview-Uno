@@ -32,7 +32,9 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton(() => new LoginPageViewModel(registry.Resolve<IAuthenticationService>()));
         registry.RegisterSingleton(() => new HomePageViewModel(
             registry.Resolve<IAuthenticationService>(),
-            registry.Resolve<IHomeLayoutService>()));
+            registry.Resolve<IHomeLayoutService>(),
+            registry.Resolve<IHomeTimelineInteractionService>(),
+            registry.Resolve<IItemService>()));
         registry.RegisterSingleton(() => new TimeSelectionViewModel(
             registry.Resolve<IAuthenticationService>(),
             registry.Resolve<ITimeSelectionService>()));
@@ -77,6 +79,8 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IItemService>(),
             registry.Resolve<IUserSettingsService>(),
             registry.Resolve<ITimeRuleService>(),
+            registry.Resolve<IHomeInteractionRuleService>()));
+        registry.RegisterSingleton<IHomeTimelineInteractionService>(() => new HomeTimelineInteractionService(
             registry.Resolve<IHomeInteractionRuleService>()));
         registry.RegisterSingleton<IListPageService>(() => new ListPageService(
             registry.Resolve<IItemService>(),

@@ -133,8 +133,41 @@
 
       <components:HomeTimelineGrid
         x:Name="TimelineGrid"
+        InteractionRequested="OnTimelineGridInteractionRequested"
         SwipeRequested="OnTimelineGridSwipeRequested"
         Visibility="Collapsed" />
+
+      <Border
+        x:Name="DetailOverlay"
+        Padding="16"
+        Background="#66000000"
+        CornerRadius="24"
+        Visibility="Collapsed">
+        <Border
+          MaxWidth="520"
+          Padding="18"
+          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="24"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Bottom">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock FontSize="22" FontWeight="SemiBold" Text="Item Detail" />
+              <Button
+                x:Name="CloseDetailButton"
+                Grid.Column="1"
+                Click="OnCloseDetailButtonClick"
+                Content="Close" />
+            </Grid>
+
+            <components:ItemDetailCard
+              x:Name="ItemDetailCard"
+              EditRequested="OnDetailEditRequested" />
+          </StackPanel>
+        </Border>
+      </Border>
     </Grid>
   </Grid>
 </Page>

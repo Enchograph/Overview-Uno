@@ -3,6 +3,8 @@ using Overview.Client.Domain.Enums;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Windows.Foundation;
+using Windows.UI.Input;
 using Windows.UI;
 using Windows.UI.Text;
 
@@ -13,13 +15,20 @@ public sealed partial class HomeTimelineGrid : UserControl
     private const double LabelColumnWidth = 112d;
     private const double ColumnSpacing = 8d;
     private const double MinimumItemHeight = 44d;
+    private readonly IHomeTimelineInteractionService homeTimelineInteractionService;
     private HomeLayoutSnapshot? snapshot;
+    private double currentDayColumnWidth;
+    private double currentTotalHeight;
+    private bool suppressNextTap;
 
     public event EventHandler<HomeTimelineSwipeRequestedEventArgs>? SwipeRequested;
+
+    public event EventHandler<HomeTimelineInteractionRequestedEventArgs>? InteractionRequested;
 
     public HomeTimelineGrid()
     {
         this.InitializeComponent();
+        homeTimelineInteractionService = App.Services.Resolve<IHomeTimelineInteractionService>();
     }
 
     public void Render(HomeLayoutSnapshot? newSnapshot)
@@ -37,6 +46,8 @@ public sealed partial class HomeTimelineGrid : UserControl
         var dayColumnWidth = snapshot.ViewMode == Domain.Enums.HomeViewMode.Month ? 82d : 112d;
         var cellSize = dayColumnWidth;
         var totalHeight = cellSize * snapshot.TimeBlocks.Count;
+        currentDayColumnWidth = dayColumnWidth;
+        currentTotalHeight = totalHeight;
 
         RenderHeader(dayColumnWidth, cellSize);
         RenderBody(dayColumnWidth, cellSize, totalHeight);
@@ -153,8 +164,23 @@ public sealed partial class HomeTimelineGrid : UserControl
             overlayCanvas.Children.Add(itemCard);
         }
 
+        var interactionBorder = new Border
+        {
+            Width = dayAreaWidth,
+            Height = totalHeight,
+            Background = new SolidColorBrush(Colors.Transparent),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(LabelColumnWidth + ColumnSpacing, 0, 0, 0),
+            ManipulationMode = ManipulationModes.TranslateX | ManipulationModes.System
+        };
+        interactionBorder.Tapped += OnInteractionBorderTapped;
+        interactionBorder.Holding += OnInteractionBorderHolding;
+        interactionBorder.ManipulationCompleted += OnRootManipulationCompleted;
+
         BodyHostGrid.Children.Add(bodyGrid);
         BodyHostGrid.Children.Add(overlayCanvas);
+        BodyHostGrid.Children.Add(interactionBorder);
         BodyHostGrid.Height = totalHeight;
         BodyHostGrid.HorizontalAlignment = HorizontalAlignment.Left;
     }
@@ -297,6 +323,82 @@ public sealed partial class HomeTimelineGrid : UserControl
         {
             SwipeRequested?.Invoke(this, new HomeTimelineSwipeRequestedEventArgs(isPrevious: false));
         }
+    }
+
+    private void OnInteractionBorderTapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (suppressNextTap)
+        {
+            suppressNextTap = false;
+            return;
+        }
+
+        if (sender is not FrameworkElement element)
+        {
+            return;
+        }
+
+        if (!TryResolveInteraction(e.GetPosition(element), out var interaction))
+        {
+            return;
+        }
+
+        InteractionRequested?.Invoke(this, new HomeTimelineInteractionRequestedEventArgs(interaction, isHold: false));
+    }
+
+    private void OnInteractionBorderHolding(object sender, HoldingRoutedEventArgs e)
+    {
+        if (!e.HoldingState.Equals(HoldingState.Started))
+        {
+            return;
+        }
+
+        suppressNextTap = true;
+
+        if (sender is not FrameworkElement element)
+        {
+            return;
+        }
+
+        if (!TryResolveInteraction(e.GetPosition(element), out var interaction))
+        {
+            return;
+        }
+
+        InteractionRequested?.Invoke(this, new HomeTimelineInteractionRequestedEventArgs(interaction, isHold: true));
+    }
+
+    private bool TryResolveInteraction(Point position, out HomeTimelineInteractionResult interaction)
+    {
+        interaction = HomeTimelineInteractionResult.OutsideGrid;
+        if (snapshot is null || currentDayColumnWidth <= 0d || currentTotalHeight <= 0d)
+        {
+            return false;
+        }
+
+        if (position.X < 0d || position.Y < 0d || position.Y > currentTotalHeight)
+        {
+            return false;
+        }
+
+        var combinedColumnWidth = currentDayColumnWidth + ColumnSpacing;
+        var columnIndex = (int)Math.Floor(position.X / combinedColumnWidth);
+        if (columnIndex < 0 || columnIndex >= snapshot.Columns.Count)
+        {
+            return false;
+        }
+
+        var columnOffset = position.X - (columnIndex * combinedColumnWidth);
+        if (columnOffset > currentDayColumnWidth)
+        {
+            return false;
+        }
+
+        var verticalRatio = currentTotalHeight <= 0d
+            ? 0d
+            : position.Y / currentTotalHeight;
+        interaction = homeTimelineInteractionService.ResolveInteraction(snapshot, columnIndex, verticalRatio);
+        return interaction.IsWithinGrid;
     }
 
     private static Brush ResolveBrush(string resourceKey, Color fallbackColor)

@@ -1,11 +1,14 @@
 using System;
 using Overview.Client.Presentation.ViewModels;
 using Overview.Client.Domain.Enums;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace Overview.Client.Presentation.Pages;
 
 public sealed partial class AddItemPage : Page
 {
+    private AddItemNavigationRequest? navigationRequest;
+
     private AddItemPageViewModel ViewModel => (AddItemPageViewModel)DataContext;
 
     public AddItemPage()
@@ -18,8 +21,14 @@ public sealed partial class AddItemPage : Page
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        await ViewModel.InitializeAsync().ConfigureAwait(true);
+        await ViewModel.InitializeAsync(navigationRequest).ConfigureAwait(true);
         ApplyViewModelState();
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        navigationRequest = e.Parameter as AddItemNavigationRequest;
     }
 
     private void OnUnloaded(object sender, RoutedEventArgs e)

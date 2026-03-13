@@ -97,7 +97,7 @@
 
 ## 阶段 6：Presentation 主页
 
-- 状态：`active`
+- 状态：`complete`
 - 入口条件：
   - 阶段 5 完成
 - 必须产出：
@@ -113,7 +113,7 @@
 
 ## 阶段 7：Presentation 列表页
 
-- 状态：`not_started`
+- 状态：`active`
 - 入口条件：
   - 阶段 5 完成
 - 必须产出：

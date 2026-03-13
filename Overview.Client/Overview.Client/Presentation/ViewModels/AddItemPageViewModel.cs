@@ -4,6 +4,7 @@ using Overview.Client.Application.Settings;
 using Overview.Client.Domain.Entities;
 using Overview.Client.Domain.Enums;
 using Overview.Client.Domain.ValueObjects;
+using Overview.Client.Presentation.Pages;
 
 namespace Overview.Client.Presentation.ViewModels;
 
@@ -43,7 +44,9 @@ public sealed class AddItemPageViewModel
 
     public Guid? EditingItemId { get; private set; }
 
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    public async Task InitializeAsync(
+        AddItemNavigationRequest? navigationRequest = null,
+        CancellationToken cancellationToken = default)
     {
         await ExecuteBusyActionAsync(
             async () =>
@@ -59,9 +62,30 @@ public sealed class AddItemPageViewModel
                 EditingItemId = null;
                 Detail = ItemDetailViewModel.Empty;
                 await LoadExistingItemsAsync(userId, cancellationToken).ConfigureAwait(false);
+                ApplyNavigationPreset(navigationRequest);
                 StatusMessage = ExistingItems.Count == 0
                     ? "No items yet. Fill the form to create your first item."
                     : "Select an existing item to edit it, or create a new one.";
+
+                if (navigationRequest?.EditItemId is Guid editItemId)
+                {
+                    var item = await itemService.GetAsync(userId, editItemId, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    if (item is null)
+                    {
+                        StatusMessage = "The selected item was not found.";
+                        return false;
+                    }
+
+                    Form = AddItemFormModel.FromItem(item);
+                    EditingItemId = item.Id;
+                    Detail = ItemDetailViewModel.FromItem(item);
+                    StatusMessage = "Edit mode ready.";
+                }
+                else if (navigationRequest?.SuggestedStartDate is not null || navigationRequest?.SuggestedStartTime is not null)
+                {
+                    StatusMessage = "Create mode ready with the selected start time.";
+                }
+
                 return true;
             }).ConfigureAwait(false);
     }
@@ -208,6 +232,32 @@ public sealed class AddItemPageViewModel
         ExistingItems = Array.Empty<AddItemListEntry>();
         Detail = ItemDetailViewModel.Empty;
         StatusMessage = "Sign in first to create or edit items.";
+    }
+
+    private void ApplyNavigationPreset(AddItemNavigationRequest? navigationRequest)
+    {
+        if (navigationRequest?.EditItemId is not null)
+        {
+            return;
+        }
+
+        if (navigationRequest?.SuggestedStartDate is DateOnly startDate)
+        {
+            Form.StartDate = startDate;
+            Form.EndDate = startDate;
+        }
+
+        if (navigationRequest?.SuggestedStartTime is TimeOnly startTime)
+        {
+            Form.StartTime = startTime;
+            var adjustedEndTime = startTime.AddHours(1);
+            if (adjustedEndTime < startTime)
+            {
+                Form.EndDate = Form.StartDate.AddDays(1);
+            }
+
+            Form.EndTime = adjustedEndTime;
+        }
     }
 
     private async Task<bool> ExecuteBusyActionAsync(Func<Task<bool>> action)

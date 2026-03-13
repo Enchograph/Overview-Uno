@@ -1,5 +1,6 @@
 using Overview.Client.Application.Auth;
 using Overview.Client.Application.Home;
+using Overview.Client.Application.Items;
 using Overview.Client.Domain.Enums;
 using Overview.Client.Domain.ValueObjects;
 
@@ -11,13 +12,19 @@ public sealed class HomePageViewModel
 
     private readonly IAuthenticationService authenticationService;
     private readonly IHomeLayoutService homeLayoutService;
+    private readonly IHomeTimelineInteractionService homeTimelineInteractionService;
+    private readonly IItemService itemService;
 
     public HomePageViewModel(
         IAuthenticationService authenticationService,
-        IHomeLayoutService homeLayoutService)
+        IHomeLayoutService homeLayoutService,
+        IHomeTimelineInteractionService homeTimelineInteractionService,
+        IItemService itemService)
     {
         this.authenticationService = authenticationService;
         this.homeLayoutService = homeLayoutService;
+        this.homeTimelineInteractionService = homeTimelineInteractionService;
+        this.itemService = itemService;
     }
 
     public string Title => "Home";
@@ -46,6 +53,10 @@ public sealed class HomePageViewModel
     public string VisibleRangeSummary { get; private set; } = string.Empty;
 
     public string GridSummary { get; private set; } = string.Empty;
+
+    public bool IsDetailOpen { get; private set; }
+
+    public ItemDetailViewModel Detail { get; private set; } = ItemDetailViewModel.Empty;
 
     public HomeLayoutSnapshot? Snapshot { get; private set; }
 
@@ -132,6 +143,45 @@ public sealed class HomePageViewModel
         await LoadSnapshotAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public HomeTimelineInteractionResult ResolveInteraction(int columnIndex, double verticalPositionRatio)
+    {
+        if (Snapshot is null)
+        {
+            return HomeTimelineInteractionResult.OutsideGrid;
+        }
+
+        return homeTimelineInteractionService.ResolveInteraction(Snapshot, columnIndex, verticalPositionRatio);
+    }
+
+    public async Task ShowDetailAsync(Guid itemId, CancellationToken cancellationToken = default)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            Detail = ItemDetailViewModel.Empty;
+            IsDetailOpen = false;
+            StatusMessage = "Home timeline requires an authenticated account.";
+            return;
+        }
+
+        var item = await itemService.GetAsync(userId, itemId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (item is null)
+        {
+            Detail = ItemDetailViewModel.Empty;
+            IsDetailOpen = false;
+            StatusMessage = "The selected item was not found.";
+            return;
+        }
+
+        Detail = ItemDetailViewModel.FromItem(item);
+        IsDetailOpen = true;
+        StatusMessage = "Item detail ready.";
+    }
+
+    public void CloseDetail()
+    {
+        IsDetailOpen = false;
+    }
+
     private async Task LoadSnapshotAsync(CancellationToken cancellationToken)
     {
         if (IsBusy)
@@ -152,6 +202,8 @@ public sealed class HomePageViewModel
                 GridSummary = string.Empty;
                 ViewModeSummary = "Sign in to load your planning timeline.";
                 StatusMessage = "Home timeline requires an authenticated account.";
+                Detail = ItemDetailViewModel.Empty;
+                IsDetailOpen = false;
                 return;
             }
 
@@ -179,6 +231,21 @@ public sealed class HomePageViewModel
             StatusMessage = snapshot.Items.Count == 0
                 ? "Timeline grid ready. No scheduled items in the visible range yet."
                 : "Timeline grid ready. Scheduled items now render with proportional height and overlap opacity.";
+
+            if (IsDetailOpen && Detail.ItemId is Guid detailItemId)
+            {
+                var detailItem = await itemService.GetAsync(session.UserId, detailItemId, cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+                if (detailItem is null)
+                {
+                    Detail = ItemDetailViewModel.Empty;
+                    IsDetailOpen = false;
+                }
+                else
+                {
+                    Detail = ItemDetailViewModel.FromItem(detailItem);
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -188,10 +255,25 @@ public sealed class HomePageViewModel
             GridSummary = string.Empty;
             ViewModeSummary = SupportsMonthView ? "Week or month view available." : "Week view ready.";
             StatusMessage = ex.Message;
+            Detail = ItemDetailViewModel.Empty;
+            IsDetailOpen = false;
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    private bool TryGetUserId(out Guid userId)
+    {
+        var session = authenticationService.CurrentSession;
+        if (session is null)
+        {
+            userId = Guid.Empty;
+            return false;
+        }
+
+        userId = session.UserId;
+        return true;
     }
 }

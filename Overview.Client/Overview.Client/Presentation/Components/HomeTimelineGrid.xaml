@@ -5,7 +5,6 @@
     x:Name="RootScrollViewer"
     HorizontalScrollBarVisibility="Auto"
     VerticalScrollBarVisibility="Auto"
-    ManipulationCompleted="OnRootManipulationCompleted"
     ManipulationMode="TranslateX,System">
     <StackPanel Spacing="12">
       <Grid x:Name="HeaderGrid" ColumnSpacing="8" />

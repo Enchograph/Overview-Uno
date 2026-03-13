@@ -352,3 +352,19 @@
 - 更新 `Presentation/ViewModels/HomePageViewModel.cs`，同步主页状态文案为已完成事项覆盖层渲染
 - 主页当前支持任务与日程按真实时间比例跨格显示、可见区裁剪和重叠透明度展示
 - 验证客户端桌面目标可无警告构建
+
+### Round 34
+
+- 完成 `HOME-630`
+- 新增主页交互解析服务 `Application/Home/IHomeTimelineInteractionService.cs`
+- 新增主页交互解析实现 `Application/Home/HomeTimelineInteractionService.cs`
+- 新增主页交互解析结果模型 `Application/Home/HomeTimelineInteractionResult.cs`
+- 更新 `Presentation/Components/HomeTimelineGrid.xaml` 与 `Presentation/Components/HomeTimelineGrid.xaml.cs`，接入统一点击/长按命中层
+- 新增 `Presentation/Components/HomeTimelineInteractionRequestedEventArgs.cs`
+- 更新 `Presentation/Pages/HomePage.xaml` 与 `Presentation/Pages/HomePage.xaml.cs`，接入详情弹层、长按创建和长按编辑导航
+- 更新 `Presentation/ViewModels/HomePageViewModel.cs`，接入详情加载与主页交互解析服务
+- 新增 `Presentation/Pages/AddItemNavigationRequest.cs`
+- 更新 `Presentation/Pages/AddItemPage.xaml.cs` 与 `Presentation/ViewModels/AddItemPageViewModel.cs`，支持编辑态和预填起始时间导航参数
+- 新增主页交互测试工程 `tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+- 新增主页交互测试 `tests/Overview.Client.Tests/HomeTimelineInteractionServiceTests.cs`
+- 验证客户端桌面目标可无警告构建，且主页交互测试 4/4 通过
