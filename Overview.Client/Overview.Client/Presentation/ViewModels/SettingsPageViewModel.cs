@@ -6,6 +6,7 @@ namespace Overview.Client.Presentation.ViewModels;
 
 public sealed class SettingsPageViewModel
 {
+    public const string AiSectionKey = "ai";
     public const string ListSectionKey = "list";
 
     private readonly IAuthenticationService authenticationService;
@@ -24,6 +25,7 @@ public sealed class SettingsPageViewModel
         PageSubtitle = "Choose a section to manage Overview preferences and integrations.";
         RootIntro = "Sign in to configure sync, AI, and planning preferences.";
         SessionSummary = "Account status unavailable.";
+        AiSettingsForm = new AiSettingsFormModel();
     }
 
     public IReadOnlyList<SettingsSectionEntry> Sections { get; private set; }
@@ -49,9 +51,15 @@ public sealed class SettingsPageViewModel
     public string DetailFootnote { get; private set; } =
         "This section currently provides the navigation shell and summary. Editable controls will be added in later tasks.";
 
+    public AiSettingsFormModel AiSettingsForm { get; }
+
     public bool IsAuthenticated => authenticationService.CurrentSession is not null;
 
     public bool IsRootView => ActiveSection is null;
+
+    public bool IsAiEditorVisible => string.Equals(ActiveSection?.Key, AiSectionKey, StringComparison.Ordinal);
+
+    public bool CanSaveAiSettings => IsAuthenticated && !IsBusy;
 
     public async Task InitializeAsync(
         string? initialSectionKey = null,
@@ -92,6 +100,7 @@ public sealed class SettingsPageViewModel
         DetailLead = section.Subtitle;
         ActiveFields = BuildActiveFields(section.Key, currentSettings, authenticationService.CurrentSession);
         DetailFootnote = BuildDetailFootnote(section.Key);
+        ResetSectionDraft(section.Key);
         StatusMessage = $"{section.Title} section ready.";
     }
 
@@ -104,6 +113,46 @@ public sealed class SettingsPageViewModel
         DetailLead = string.Empty;
         DetailFootnote =
             "This section currently provides the navigation shell and summary. Editable controls will be added in later tasks.";
+    }
+
+    public void UpdateAiDraft(string? baseUrl, string? apiKey, string? model)
+    {
+        AiSettingsForm.BaseUrl = baseUrl ?? string.Empty;
+        AiSettingsForm.ApiKey = apiKey ?? string.Empty;
+        AiSettingsForm.Model = model ?? string.Empty;
+    }
+
+    public async Task SaveAiSettingsAsync(CancellationToken cancellationToken = default)
+    {
+        if (authenticationService.CurrentSession is not { } session)
+        {
+            StatusMessage = "Sign in before saving AI settings.";
+            return;
+        }
+
+        await ExecuteBusyActionAsync(
+            async () =>
+            {
+                var baseline = currentSettings
+                    ?? await userSettingsService.GetAsync(session.UserId, cancellationToken).ConfigureAwait(false);
+                currentSettings = await userSettingsService.SaveAsync(
+                    session.UserId,
+                    ToUpdateRequest(
+                        baseline,
+                        AiSettingsForm.BaseUrl,
+                        AiSettingsForm.ApiKey,
+                        AiSettingsForm.Model),
+                    cancellationToken).ConfigureAwait(false);
+
+                Sections = BuildSections(currentSettings, session);
+                ActiveFields = BuildActiveFields(AiSectionKey, currentSettings, session);
+                ResetSectionDraft(AiSectionKey);
+                DetailFootnote = BuildDetailFootnote(AiSectionKey);
+                SessionSummary =
+                    $"Signed in as {session.Email}. Sync endpoint: {DisplayOrFallback(currentSettings.SyncServerBaseUrl, "not configured")}.";
+                StatusMessage = "AI settings saved.";
+                return true;
+            }).ConfigureAwait(false);
     }
 
     private void ApplySectionState(string? sectionKey)
@@ -281,7 +330,7 @@ public sealed class SettingsPageViewModel
     {
         return sectionKey switch
         {
-            "ai" => "AI editing controls and chat page wiring will land in the dedicated AI presentation tasks.",
+            "ai" => "AI settings now persist to synchronized user settings. Chat delivery will land in the next AI tasks.",
             "sync" => "Manual sync actions and status widgets will be added in the real-time sync presentation phase.",
             "about" => "This page is a stable shell for later version, license, and support details.",
             _ => "This secondary page skeleton is complete. Editable controls will be layered in later focused tasks."
@@ -323,6 +372,50 @@ public sealed class SettingsPageViewModel
     private static string DisplayOrFallback(string? value, string fallback)
     {
         return string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+    }
+
+    private void ResetSectionDraft(string sectionKey)
+    {
+        if (!string.Equals(sectionKey, AiSectionKey, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        UpdateAiDraft(
+            currentSettings?.AiBaseUrl,
+            currentSettings?.AiApiKey,
+            currentSettings?.AiModel);
+    }
+
+    private static UserSettingsUpdateRequest ToUpdateRequest(
+        UserSettings settings,
+        string? aiBaseUrl,
+        string? aiApiKey,
+        string? aiModel)
+    {
+        return new UserSettingsUpdateRequest
+        {
+            Language = settings.Language,
+            ThemeMode = settings.ThemeMode,
+            ThemePreset = settings.ThemePreset,
+            WeekStartDay = settings.WeekStartDay,
+            HomeViewMode = settings.HomeViewMode,
+            DayPlanStartTime = settings.DayPlanStartTime,
+            TimeBlockDurationMinutes = settings.TimeBlockDurationMinutes,
+            TimeBlockGapMinutes = settings.TimeBlockGapMinutes,
+            TimeBlockCount = settings.TimeBlockCount,
+            ListPageDefaultTab = settings.ListPageDefaultTab,
+            ListPageSortBy = settings.ListPageSortBy,
+            ListPageTheme = settings.ListPageTheme,
+            ListManualOrder = settings.ListManualOrder,
+            AiBaseUrl = aiBaseUrl ?? string.Empty,
+            AiApiKey = aiApiKey ?? string.Empty,
+            AiModel = aiModel ?? string.Empty,
+            SyncServerBaseUrl = settings.SyncServerBaseUrl,
+            NotificationEnabled = settings.NotificationEnabled,
+            WidgetPreferences = settings.WidgetPreferences,
+            TimeZoneId = settings.TimeZoneId
+        };
     }
 
     private static string? NormalizeSectionKey(string? sectionKey)

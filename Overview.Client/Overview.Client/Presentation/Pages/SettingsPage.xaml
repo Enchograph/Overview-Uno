@@ -163,6 +163,53 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
+
+          <Border
+            x:Name="AiEditorCard"
+            Padding="20"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="24"
+            Visibility="Collapsed">
+            <StackPanel Spacing="12">
+              <TextBlock
+                FontSize="18"
+                FontWeight="SemiBold"
+                Text="AI Connection" />
+              <TextBlock
+                Opacity="0.72"
+                Style="{ThemeResource BodyTextBlockStyle}"
+                Text="Configure the direct OpenAI-compatible endpoint used by this client. These values are stored in synchronized user settings."
+                TextWrapping="WrapWholeWords" />
+              <TextBox
+                x:Name="AiBaseUrlTextBox"
+                Header="Base URL"
+                PlaceholderText="https://api.example.com/v1"
+                TextChanged="OnAiBaseUrlTextChanged" />
+              <PasswordBox
+                x:Name="AiApiKeyPasswordBox"
+                Header="API Key"
+                PasswordChanged="OnAiApiKeyPasswordChanged" />
+              <TextBox
+                x:Name="AiModelTextBox"
+                Header="Model"
+                PlaceholderText="gpt-4.1-mini"
+                TextChanged="OnAiModelTextChanged" />
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button
+                  x:Name="SaveAiSettingsButton"
+                  Click="OnSaveAiSettingsButtonClick"
+                  Content="Save AI Settings" />
+                <TextBlock
+                  VerticalAlignment="Center"
+                  Opacity="0.72"
+                  Style="{ThemeResource CaptionTextBlockStyle}"
+                  Text="Sync server configuration stays separate on the Sync page."
+                  TextWrapping="WrapWholeWords" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
         </StackPanel>
       </Grid>
     </ScrollViewer>

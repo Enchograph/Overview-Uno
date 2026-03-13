@@ -37,6 +37,42 @@ public sealed class SettingsPageViewModelTests
         Assert.Equal("List section ready.", viewModel.StatusMessage);
     }
 
+    [Fact]
+    public async Task OpenSection_WithAiSection_SeedsEditableDraftFromStoredSettings()
+    {
+        var viewModel = CreateViewModel();
+
+        await viewModel.InitializeAsync(SettingsPageViewModel.AiSectionKey);
+
+        Assert.False(viewModel.IsRootView);
+        Assert.True(viewModel.IsAiEditorVisible);
+        Assert.Equal("https://ai.example.com/v1", viewModel.AiSettingsForm.BaseUrl);
+        Assert.Equal("secret-key", viewModel.AiSettingsForm.ApiKey);
+        Assert.Equal("gpt-4.1-mini", viewModel.AiSettingsForm.Model);
+    }
+
+    [Fact]
+    public async Task SaveAiSettingsAsync_PersistsSettingsAndRefreshesSummary()
+    {
+        var settingsService = new FakeUserSettingsService();
+        var viewModel = new SettingsPageViewModel(
+            new FakeAuthenticationService(),
+            settingsService);
+
+        await viewModel.InitializeAsync(SettingsPageViewModel.AiSectionKey);
+
+        viewModel.UpdateAiDraft(" https://proxy.example.com/v1 ", " next-secret ", " gpt-4.1 ");
+        await viewModel.SaveAiSettingsAsync();
+
+        Assert.NotNull(settingsService.LastSavedRequest);
+        Assert.Equal("https://proxy.example.com/v1", settingsService.LastSavedRequest!.AiBaseUrl);
+        Assert.Equal("next-secret", settingsService.LastSavedRequest.AiApiKey);
+        Assert.Equal("gpt-4.1", settingsService.LastSavedRequest.AiModel);
+        Assert.Equal("AI settings saved.", viewModel.StatusMessage);
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Base URL" && field.Value == "https://proxy.example.com/v1");
+        Assert.Contains(viewModel.Sections, section => section.Key == SettingsPageViewModel.AiSectionKey && section.Summary.Contains("https://proxy.example.com/v1", StringComparison.Ordinal));
+    }
+
     private static SettingsPageViewModel CreateViewModel()
     {
         return new SettingsPageViewModel(
@@ -91,21 +127,61 @@ public sealed class SettingsPageViewModelTests
 
     private sealed class FakeUserSettingsService : IUserSettingsService
     {
+        private UserSettings settings = new()
+        {
+            UserId = UserId,
+            ListPageDefaultTab = ListPageTab.Important,
+            ListPageSortBy = ListSortBy.CreatedAt,
+            ListPageTheme = "forest",
+            AiBaseUrl = "https://ai.example.com/v1",
+            AiApiKey = "secret-key",
+            AiModel = "gpt-4.1-mini",
+            SourceDeviceId = "test-device"
+        };
+
+        public UserSettingsUpdateRequest? LastSavedRequest { get; private set; }
+
         public Task<UserSettings> GetAsync(Guid userId, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new UserSettings
-            {
-                UserId = userId,
-                ListPageDefaultTab = ListPageTab.Important,
-                ListPageSortBy = ListSortBy.CreatedAt,
-                ListPageTheme = "forest",
-                SourceDeviceId = "test-device"
-            });
+            return Task.FromResult(settings);
         }
 
         public Task<UserSettings> SaveAsync(Guid userId, UserSettingsUpdateRequest request, CancellationToken cancellationToken = default)
         {
-            throw new NotSupportedException();
+            LastSavedRequest = request with
+            {
+                AiBaseUrl = request.AiBaseUrl.Trim(),
+                AiApiKey = request.AiApiKey.Trim(),
+                AiModel = request.AiModel.Trim()
+            };
+            settings = new UserSettings
+            {
+                Id = settings.Id,
+                UserId = userId,
+                Language = LastSavedRequest.Language,
+                ThemeMode = LastSavedRequest.ThemeMode,
+                ThemePreset = LastSavedRequest.ThemePreset,
+                WeekStartDay = LastSavedRequest.WeekStartDay,
+                HomeViewMode = LastSavedRequest.HomeViewMode,
+                DayPlanStartTime = LastSavedRequest.DayPlanStartTime,
+                TimeBlockDurationMinutes = LastSavedRequest.TimeBlockDurationMinutes,
+                TimeBlockGapMinutes = LastSavedRequest.TimeBlockGapMinutes,
+                TimeBlockCount = LastSavedRequest.TimeBlockCount,
+                ListPageDefaultTab = LastSavedRequest.ListPageDefaultTab,
+                ListPageSortBy = LastSavedRequest.ListPageSortBy,
+                ListPageTheme = LastSavedRequest.ListPageTheme,
+                ListManualOrder = LastSavedRequest.ListManualOrder,
+                AiBaseUrl = LastSavedRequest.AiBaseUrl,
+                AiApiKey = LastSavedRequest.AiApiKey,
+                AiModel = LastSavedRequest.AiModel,
+                SyncServerBaseUrl = LastSavedRequest.SyncServerBaseUrl,
+                NotificationEnabled = LastSavedRequest.NotificationEnabled,
+                WidgetPreferences = LastSavedRequest.WidgetPreferences,
+                TimeZoneId = LastSavedRequest.TimeZoneId ?? "UTC",
+                SourceDeviceId = settings.SourceDeviceId
+            };
+
+            return Task.FromResult(settings);
         }
     }
 }

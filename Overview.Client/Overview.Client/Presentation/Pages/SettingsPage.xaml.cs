@@ -56,6 +56,37 @@ public sealed partial class SettingsPage : Page
         }
     }
 
+    private void OnAiBaseUrlTextChanged(object sender, TextChangedEventArgs e)
+    {
+        ViewModel.UpdateAiDraft(
+            AiBaseUrlTextBox.Text,
+            AiApiKeyPasswordBox.Password,
+            AiModelTextBox.Text);
+    }
+
+    private void OnAiApiKeyPasswordChanged(object sender, RoutedEventArgs e)
+    {
+        ViewModel.UpdateAiDraft(
+            AiBaseUrlTextBox.Text,
+            AiApiKeyPasswordBox.Password,
+            AiModelTextBox.Text);
+    }
+
+    private void OnAiModelTextChanged(object sender, TextChangedEventArgs e)
+    {
+        ViewModel.UpdateAiDraft(
+            AiBaseUrlTextBox.Text,
+            AiApiKeyPasswordBox.Password,
+            AiModelTextBox.Text);
+    }
+
+    private async void OnSaveAiSettingsButtonClick(object sender, RoutedEventArgs e)
+    {
+        ApplyViewModelState();
+        await ViewModel.SaveAiSettingsAsync().ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
     private void ApplyViewModelState()
     {
         PageTitleTextBlock.Text = ViewModel.PageTitle;
@@ -73,5 +104,22 @@ public sealed partial class SettingsPage : Page
         DetailPanel.Visibility = ViewModel.IsRootView ? Visibility.Collapsed : Visibility.Visible;
         BusyIndicator.IsActive = ViewModel.IsBusy;
         RefreshButton.IsEnabled = !ViewModel.IsBusy;
+        AiEditorCard.Visibility = ViewModel.IsAiEditorVisible ? Visibility.Visible : Visibility.Collapsed;
+        SaveAiSettingsButton.IsEnabled = ViewModel.CanSaveAiSettings;
+
+        if (AiBaseUrlTextBox.Text != ViewModel.AiSettingsForm.BaseUrl)
+        {
+            AiBaseUrlTextBox.Text = ViewModel.AiSettingsForm.BaseUrl;
+        }
+
+        if (AiApiKeyPasswordBox.Password != ViewModel.AiSettingsForm.ApiKey)
+        {
+            AiApiKeyPasswordBox.Password = ViewModel.AiSettingsForm.ApiKey;
+        }
+
+        if (AiModelTextBox.Text != ViewModel.AiSettingsForm.Model)
+        {
+            AiModelTextBox.Text = ViewModel.AiSettingsForm.Model;
+        }
     }
 }

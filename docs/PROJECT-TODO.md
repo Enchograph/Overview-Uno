@@ -606,12 +606,16 @@
 - Title: 实现 AI 设置页和配置同步接入
 - Phase: 阶段 8
 - Depends On: UI-530, APP-450
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持 Base URL、API Key、Model 配置及同步
-- Implementation Notes: 同步服务器地址与 AI 地址必须分开
+- Implementation Notes: 已在设置页 AI 分区新增 Base URL、API Key、Model 编辑表单；保存沿用 `UserSettingsService`，同步服务器地址仍保留在 Sync 分区单独维护
 - Done When: AI 设置存在且接入设置存储
-- Verification: 可定位 AI 设置入口和持久化逻辑
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
+  - 可定位 `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
 - Files Expected: AI 设置页、配置模型
 
 ### Task ID: AI-810

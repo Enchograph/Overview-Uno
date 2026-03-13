@@ -48,6 +48,7 @@
 - `LIST-730`
 - `LIST-740`
 - `LIST-750`
+- `AI-800`
 
 ## 正在进行任务 ID
 
@@ -55,7 +56,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `AI-800`
+- `AI-810`
 
 ## 当前阻塞
 
@@ -583,3 +584,18 @@
 - 当前客户端根解决方案依赖仓库根目录 `global.json` 提供 `Uno.Sdk` 版本钉住；不要删除
 - 迁移工具通过仓库根目录 `dotnet-tools.json` 固定；后续执行 EF CLI 前先运行 `dotnet tool restore`
 - 只有在尝试补齐环境后仍无法继续时，才允许在 `PROJECT-HANDOFF.md` 标记阻塞
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，27/27 用例通过，0 failed
+- 已确认客户端设置页 AI 分区已从只读摘要升级为可编辑配置页：
+  - `Presentation/Pages/SettingsPage.xaml`
+  - `Presentation/Pages/SettingsPage.xaml.cs`
+- 已确认客户端设置页状态 ViewModel 已接入：
+  - AI Base URL / API Key / Model 草稿状态
+  - AI 配置保存
+  - 保存后摘要即时刷新
+  - `Presentation/ViewModels/SettingsPageViewModel.cs`
+  - `Presentation/ViewModels/AiSettingsFormModel.cs`
+- 已确认 AI 配置保存沿用用户设置持久化与同步变更链路：
+  - `Application/Settings/UserSettingsService.cs`
+- 已确认客户端新增 AI 设置页状态测试：
+  - `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`

@@ -2,6 +2,15 @@
 
 ## 2026-03-13
 
+### Round 41
+
+- 完成 `AI-800`
+- 将设置页 `AI` 分区从只读摘要升级为可编辑配置表单
+- 新增 AI Base URL、API Key、Model 输入与保存按钮
+- AI 配置保存已复用 `UserSettingsService` 和同步变更链路
+- 新增 `AiSettingsFormModel` 与设置页 AI 配置测试
+- 验证客户端桌面构建通过，客户端测试 27/27 通过
+
 ### Round 40
 
 - 完成 `LIST-750`
