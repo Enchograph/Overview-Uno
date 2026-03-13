@@ -1,0 +1,85 @@
+<Page x:Class="Overview.Client.Presentation.Pages.LoginPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  <Grid Padding="24">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <Grid MinWidth="320" MaxWidth="480" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border
+          Padding="24"
+          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="24">
+          <StackPanel x:Name="FormPanel" Spacing="16">
+            <StackPanel Spacing="8">
+              <TextBlock FontSize="34" FontWeight="SemiBold" Text="Overview" />
+              <TextBlock
+                x:Name="SubtitleTextBlock"
+                Opacity="0.72"
+                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                Text="Sign in to sync your plans across devices."
+                TextWrapping="WrapWholeWords" />
+            </StackPanel>
+
+            <TextBox
+              x:Name="BaseUrlTextBox"
+              Header="Sync Server URL"
+              PlaceholderText="https://your-server.example.com" />
+
+            <TextBox
+              x:Name="EmailTextBox"
+              Header="Email"
+              InputScope="EmailSmtpAddress"
+              PlaceholderText="name@example.com" />
+
+            <PasswordBox
+              x:Name="PasswordBox"
+              Header="Password" />
+
+            <TextBox
+              x:Name="VerificationCodeTextBox"
+              Header="Verification Code"
+              PlaceholderText="6-digit code"
+              Visibility="Collapsed" />
+
+            <Button
+              x:Name="SendCodeButton"
+              Click="OnSendCodeButtonClick"
+              Content="Send Verification Code"
+              HorizontalAlignment="Left"
+              Visibility="Collapsed" />
+
+            <TextBlock
+              x:Name="StatusTextBlock"
+              Foreground="{ThemeResource SystemFillColorCautionBrush}"
+              TextWrapping="WrapWholeWords" />
+
+            <ProgressRing
+              x:Name="BusyIndicator"
+              Height="28"
+              IsActive="False"
+              Width="28" />
+
+            <Button
+              x:Name="SubmitButton"
+              Click="OnSubmitButtonClick"
+              Content="Login"
+              HorizontalAlignment="Stretch"
+              Style="{StaticResource AccentButtonStyle}" />
+
+            <Button
+              x:Name="ToggleModeButton"
+              Click="OnToggleModeButtonClick"
+              Content="Need an account? Register"
+              HorizontalAlignment="Left"
+              Style="{StaticResource DefaultButtonStyle}" />
+          </StackPanel>
+        </Border>
+      </Grid>
+    </ScrollViewer>
+  </Grid>
+</Page>

@@ -34,6 +34,7 @@
 - `APP-430`
 - `APP-440`
 - `APP-450`
+- `UI-500`
 
 ## 正在进行任务 ID
 
@@ -41,7 +42,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `UI-500`
+- `UI-510`
 
 ## 当前阻塞
 
@@ -49,6 +50,17 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端新增登录 Presentation 页面：
+  - `Presentation/Pages/LoginPage.xaml`
+- 已确认客户端新增登录 Presentation ViewModel：
+  - `Presentation/ViewModels/LoginPageViewModel.cs`
+- 已确认客户端登录页已覆盖：
+  - 启动时登录态恢复尝试
+  - 登录/注册模式切换
+  - 邮箱验证码发送入口
+  - 登录成功后进入应用壳层
+  - 已恢复会话自动跳过登录页
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - 已确认客户端新增同步应用层目录：
   - `Application/Sync`

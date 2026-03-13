@@ -367,12 +367,14 @@
 - Title: 实现登录页与登录态恢复
 - Phase: 阶段 5
 - Depends On: APP-400, SHELL-130
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 提供可用登录页和启动时会话恢复
 - Implementation Notes: 与应用壳层协同工作
 - Done When: 登录页完成
-- Verification: 可定位登录页和 ViewModel
+- Verification:
+  - 可定位登录页和 ViewModel
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
 - Files Expected: 登录页、ViewModel
 
 ### Task ID: UI-510

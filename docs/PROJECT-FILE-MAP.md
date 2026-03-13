@@ -56,6 +56,8 @@
   - 客户端设置应用层目录，包含默认设置读取、设置保存和更新输入模型
 - `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml`
   - 客户端应用壳层和底部导航入口
+- `Overview.Client/Overview.Client/Presentation/Pages/LoginPage.xaml`
+  - 客户端登录/注册入口页，负责启动时会话恢复和进入壳层前的认证流程
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
   - 当前主页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
@@ -68,6 +70,8 @@
   - 当前设置页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/ViewModels/`
   - 当前五页壳层的 ViewModel 集合
+- `Overview.Client/Overview.Client/Presentation/ViewModels/LoginPageViewModel.cs`
+  - 客户端登录页 ViewModel，封装登录、注册、验证码发送和会话恢复入口
 - `Overview.Client/Overview.Client/Domain/DomainAssemblyMarker.cs`
   - 客户端 Domain 层目录落点
 - `Overview.Client/Overview.Client/Domain/Entities/`

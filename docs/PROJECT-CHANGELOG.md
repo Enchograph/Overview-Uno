@@ -260,3 +260,13 @@
 - 同步应用层支持自动后台轮询、手动同步、状态事件、访问令牌刷新重试和 `LastModifiedAt` 冲突收敛
 - 在客户端轻量注册中心接入 `ISyncOrchestrationService`、`ISyncStateStore` 与 `TimeProvider`
 - 验证客户端桌面目标可无警告构建
+
+### Round 29
+
+- 完成 `UI-500`
+- 在客户端新增登录页 `Presentation/Pages/LoginPage.xaml`
+- 新增登录页代码后置和 `LoginPageViewModel`
+- 应用启动入口改为 `LoginPage`
+- 登录页支持登录态恢复、登录/注册切换、验证码发送和成功后导航到 `ShellPage`
+- 在客户端轻量注册中心接入 `LoginPageViewModel`
+- 验证客户端桌面目标可无警告构建
