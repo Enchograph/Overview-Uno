@@ -41,7 +41,7 @@
 - `tests/Overview.Client.Tests/`
   - 客户端测试项目，当前覆盖主页命中规则、列表页状态、设置页分页联动以及 AI 聊天页/服务
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
-  - 客户端轻量注册中心，作为后续服务注册的基础落点
+  - 客户端轻量注册中心，作为后续服务注册的基础落点；当前已为 WebAssembly 切换到内存仓储 / 状态存储分支
 - `Overview.Client/Overview.Client/Application/Auth/`
   - 客户端认证应用层目录，包含登录、注册、登出、登录态恢复和刷新用例
 - `Overview.Client/Overview.Client/Application/Navigation/AppNavigationRequest.cs`
@@ -119,7 +119,7 @@
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ItemDetailViewModel.cs`
   - 客户端事项详情展示 ViewModel，负责把统一领域事项格式化为可复用的详情卡片字段
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
-  - 客户端设置页 ViewModel，负责设置主页分区、二级页状态、登录态/设置摘要加载、指定分区初始化、AI 配置草稿与保存，以及 Sync 分区状态聚合和手动同步触发
+  - 客户端设置页 ViewModel，负责设置主页分区、二级页状态、登录态/设置摘要加载、指定分区初始化、AI 配置草稿与保存、Sync 分区状态聚合和手动同步触发，以及 About 分区的平台能力 / 降级说明展示
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AiSettingsFormModel.cs`
   - 客户端 AI 设置表单模型，承载 Base URL、API Key、Model 的页面草稿状态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AiPageViewModel.cs`
@@ -180,6 +180,8 @@
   - 客户端认证远程访问层，包含认证契约、接口与 HTTP 客户端实现
 - `Overview.Client/Overview.Client/Infrastructure/Diagnostics/`
   - 客户端日志抽象目录，包含统一日志接口与默认空实现工厂
+- `Overview.Client/Overview.Client/Infrastructure/Platform/IPlatformCapabilities.cs`
+  - 客户端平台能力描述模型，当前用于统一声明 Android、Windows/Desktop、Web 的主流程状态、本地数据、通知和小组件能力边界
 - `Overview.Client/Overview.Client/Infrastructure/Notifications/`
   - 客户端通知基础设施目录，当前包含统一通知调度接口、平台调度入口、通知状态存储和默认空实现
 - `Overview.Client/Overview.Client/Infrastructure/Notifications/INotificationStateStore.cs`
@@ -188,8 +190,12 @@
   - 客户端平台通知调度入口，当前在 Android 上转到真实调度器，在 Desktop / Web 上降级为空实现
 - `Overview.Client/Overview.Client/Infrastructure/Persistence/`
   - 客户端 SQLite 数据层，包含数据库选项、表记录、仓储接口与实现、连接工厂
+- `Overview.Client/Overview.Client/Infrastructure/Persistence/Repositories/InMemoryRepositories.cs`
+  - 客户端浏览器降级仓储实现，当前为 WebAssembly 提供事项、设置、AI 聊天和同步变更的内存持久化替代
 - `Overview.Client/Overview.Client/Infrastructure/Settings/`
   - 客户端本地设置与登录态存储目录，当前包含认证会话存储、同步游标状态存储和设备标识存储
+- `Overview.Client/Overview.Client/Infrastructure/Settings/InMemoryStores.cs`
+  - 客户端浏览器降级状态存储实现，当前为 WebAssembly 提供会话、同步游标和设备 ID 的内存替代
 - `Overview.Client/Overview.Client/Infrastructure/Widgets/`
   - 客户端小组件基础设施目录，当前包含快照模型、文件 / 内存快照存储、平台渲染接口与默认空实现
 - `Overview.Client/Overview.Client/Infrastructure/Widgets/IWidgetRenderer.cs`

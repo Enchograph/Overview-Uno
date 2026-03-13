@@ -2,6 +2,15 @@
 
 ## 2026-03-13
 
+### Round 51
+
+- 完成 `PLATFORM-1030`
+- 新增 `IPlatformCapabilities`，统一描述 Android、Windows/Desktop、Web 的主流程状态与平台能力边界
+- 为 WebAssembly 新增内存仓储和内存状态存储，避免浏览器主流程依赖 SQLite / 文件路径
+- 将设置页 `About` 分区升级为平台能力说明入口，显式展示通知、小组件和本地数据降级策略
+- 扩展设置页测试，新增平台降级说明覆盖
+- 验证客户端桌面构建通过、客户端 WebAssembly 构建通过、客户端测试 59/59 通过
+
 ### Round 50
 
 - 完成 `PLATFORM-1020`

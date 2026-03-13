@@ -2,6 +2,7 @@ using Overview.Client.Application.Auth;
 using Overview.Client.Application.Settings;
 using Overview.Client.Application.Sync;
 using Overview.Client.Domain.Entities;
+using Overview.Client.Infrastructure.Platform;
 
 namespace Overview.Client.Presentation.ViewModels;
 
@@ -14,17 +15,20 @@ public sealed class SettingsPageViewModel
     private readonly IAuthenticationService authenticationService;
     private readonly IUserSettingsService userSettingsService;
     private readonly ISyncOrchestrationService syncOrchestrationService;
+    private readonly IPlatformCapabilities platformCapabilities;
     private UserSettings? currentSettings;
     private SyncStatusSnapshot currentSyncStatus;
 
     public SettingsPageViewModel(
         IAuthenticationService authenticationService,
         IUserSettingsService userSettingsService,
-        ISyncOrchestrationService syncOrchestrationService)
+        ISyncOrchestrationService syncOrchestrationService,
+        IPlatformCapabilities platformCapabilities)
     {
         this.authenticationService = authenticationService;
         this.userSettingsService = userSettingsService;
         this.syncOrchestrationService = syncOrchestrationService;
+        this.platformCapabilities = platformCapabilities;
         Sections = Array.Empty<SettingsSectionEntry>();
         ActiveFields = Array.Empty<SettingsSectionField>();
         PageTitle = "Settings";
@@ -112,7 +116,12 @@ public sealed class SettingsPageViewModel
         PageTitle = section.Title;
         PageSubtitle = section.Description;
         DetailLead = section.Subtitle;
-        ActiveFields = BuildActiveFields(section.Key, currentSettings, authenticationService.CurrentSession, currentSyncStatus);
+        ActiveFields = BuildActiveFields(
+            section.Key,
+            currentSettings,
+            authenticationService.CurrentSession,
+            currentSyncStatus,
+            platformCapabilities);
         DetailFootnote = BuildDetailFootnote(section.Key);
         ResetSectionDraft(section.Key);
         StatusMessage = $"{section.Title} section ready.";
@@ -159,7 +168,12 @@ public sealed class SettingsPageViewModel
                     cancellationToken).ConfigureAwait(false);
 
                 Sections = BuildSections(currentSettings, session);
-                ActiveFields = BuildActiveFields(AiSectionKey, currentSettings, session, currentSyncStatus);
+                ActiveFields = BuildActiveFields(
+                    AiSectionKey,
+                    currentSettings,
+                    session,
+                    currentSyncStatus,
+                    platformCapabilities);
                 ResetSectionDraft(AiSectionKey);
                 DetailFootnote = BuildDetailFootnote(AiSectionKey);
                 SessionSummary =
@@ -299,7 +313,8 @@ public sealed class SettingsPageViewModel
         string sectionKey,
         UserSettings? settings,
         AuthSession? session,
-        SyncStatusSnapshot? syncStatus)
+        SyncStatusSnapshot? syncStatus,
+        IPlatformCapabilities platformCapabilities)
     {
         return sectionKey switch
         {
@@ -369,7 +384,15 @@ public sealed class SettingsPageViewModel
                 CreateField("Product", "Overview / 一览"),
                 CreateField("Client Stack", "Uno Platform + MVVM"),
                 CreateField("Server Stack", "ASP.NET Core + PostgreSQL"),
-                CreateField("Current Milestone", "Milestone A - MVP")
+                CreateField("Current Milestone", "Milestone C - Platform Closure"),
+                CreateField("Current Platform", platformCapabilities.PlatformName),
+                CreateField("Platform Family", platformCapabilities.PlatformFamily),
+                CreateField("Main Flow Status", platformCapabilities.MainFlowStatus),
+                CreateField("Local Data", platformCapabilities.SupportsPersistentLocalStorage ? "Persistent local storage" : "Session-only local state"),
+                CreateField("Notifications", platformCapabilities.SupportsLocalNotifications ? "Supported" : "Downgraded / unavailable"),
+                CreateField("Widgets", platformCapabilities.SupportsHomeWidgets ? "Supported" : "Downgraded / unavailable"),
+                CreateField("Capability Summary", platformCapabilities.CapabilitySummary),
+                CreateField("Degradation Policy", platformCapabilities.DegradationSummary)
             ],
             _ => Array.Empty<SettingsSectionField>()
         };
@@ -381,7 +404,7 @@ public sealed class SettingsPageViewModel
         {
             "ai" => "AI settings now persist to synchronized user settings. Chat delivery will land in the next AI tasks.",
             "sync" => "Manual sync is a fallback control. Background sync remains the primary path for cross-device convergence.",
-            "about" => "This page is a stable shell for later version, license, and support details.",
+            "about" => "This page now records the active platform profile, supported capabilities, and explicit downgrade policy.",
             _ => "This secondary page skeleton is complete. Editable controls will be layered in later focused tasks."
         };
     }
@@ -485,7 +508,12 @@ public sealed class SettingsPageViewModel
         currentSyncStatus = snapshot;
         if (ActiveSection is not null)
         {
-            ActiveFields = BuildActiveFields(ActiveSection.Key, currentSettings, authenticationService.CurrentSession, currentSyncStatus);
+            ActiveFields = BuildActiveFields(
+                ActiveSection.Key,
+                currentSettings,
+                authenticationService.CurrentSession,
+                currentSyncStatus,
+                platformCapabilities);
         }
     }
 

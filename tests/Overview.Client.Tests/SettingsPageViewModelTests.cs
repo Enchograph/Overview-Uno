@@ -3,6 +3,7 @@ using Overview.Client.Application.Settings;
 using Overview.Client.Application.Sync;
 using Overview.Client.Domain.Entities;
 using Overview.Client.Domain.Enums;
+using Overview.Client.Infrastructure.Platform;
 using Overview.Client.Presentation.ViewModels;
 
 namespace Overview.Client.Tests;
@@ -59,7 +60,8 @@ public sealed class SettingsPageViewModelTests
         var viewModel = new SettingsPageViewModel(
             new FakeAuthenticationService(),
             settingsService,
-            new FakeSyncOrchestrationService());
+            new FakeSyncOrchestrationService(),
+            new FakePlatformCapabilities());
 
         await viewModel.InitializeAsync(SettingsPageViewModel.AiSectionKey);
 
@@ -96,7 +98,8 @@ public sealed class SettingsPageViewModelTests
         var viewModel = new SettingsPageViewModel(
             new FakeAuthenticationService(),
             new FakeUserSettingsService(),
-            syncService);
+            syncService,
+            new FakePlatformCapabilities());
 
         await viewModel.InitializeAsync(SettingsPageViewModel.SyncSectionKey);
 
@@ -126,7 +129,8 @@ public sealed class SettingsPageViewModelTests
         var viewModel = new SettingsPageViewModel(
             new FakeAuthenticationService(),
             new FakeUserSettingsService(),
-            syncService);
+            syncService,
+            new FakePlatformCapabilities());
 
         await viewModel.InitializeAsync(SettingsPageViewModel.SyncSectionKey);
         await viewModel.RunManualSyncAsync();
@@ -142,7 +146,32 @@ public sealed class SettingsPageViewModelTests
         return new SettingsPageViewModel(
             new FakeAuthenticationService(),
             new FakeUserSettingsService(),
-            new FakeSyncOrchestrationService());
+            new FakeSyncOrchestrationService(),
+            new FakePlatformCapabilities());
+    }
+
+    [Fact]
+    public async Task InitializeAsync_WithAboutSection_ShowsPlatformCapabilityAndDowngradeSummary()
+    {
+        var viewModel = new SettingsPageViewModel(
+            new FakeAuthenticationService(),
+            new FakeUserSettingsService(),
+            new FakeSyncOrchestrationService(),
+            new FakePlatformCapabilities(
+                platformName: "Web",
+                platformFamily: "Browser",
+                supportsPersistentLocalStorage: false,
+                supportsLocalNotifications: false,
+                supportsHomeWidgets: false,
+                mainFlowStatus: "Main flows run in the browser.",
+                capabilitySummary: "Primary pages are available.",
+                degradationSummary: "Widgets and notifications are intentionally unavailable."));
+
+        await viewModel.InitializeAsync("about");
+
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Current Platform" && field.Value == "Web");
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Local Data" && field.Value == "Session-only local state");
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Degradation Policy" && field.Value.Contains("intentionally unavailable", StringComparison.Ordinal));
     }
 
     private sealed class FakeAuthenticationService : IAuthenticationService
@@ -289,5 +318,44 @@ public sealed class SettingsPageViewModelTests
         {
             throw new NotSupportedException();
         }
+    }
+
+    private sealed class FakePlatformCapabilities : IPlatformCapabilities
+    {
+        public FakePlatformCapabilities(
+            string platformName = "Windows/Desktop",
+            string platformFamily = "Desktop",
+            bool supportsPersistentLocalStorage = true,
+            bool supportsLocalNotifications = false,
+            bool supportsHomeWidgets = false,
+            string mainFlowStatus = "Desktop main flows run.",
+            string capabilitySummary = "Main flows are supported.",
+            string degradationSummary = "Notifications and widgets are downgraded.")
+        {
+            PlatformName = platformName;
+            PlatformFamily = platformFamily;
+            SupportsPersistentLocalStorage = supportsPersistentLocalStorage;
+            SupportsLocalNotifications = supportsLocalNotifications;
+            SupportsHomeWidgets = supportsHomeWidgets;
+            MainFlowStatus = mainFlowStatus;
+            CapabilitySummary = capabilitySummary;
+            DegradationSummary = degradationSummary;
+        }
+
+        public string PlatformName { get; }
+
+        public string PlatformFamily { get; }
+
+        public bool SupportsPersistentLocalStorage { get; }
+
+        public bool SupportsLocalNotifications { get; }
+
+        public bool SupportsHomeWidgets { get; }
+
+        public string MainFlowStatus { get; }
+
+        public string CapabilitySummary { get; }
+
+        public string DegradationSummary { get; }
     }
 }

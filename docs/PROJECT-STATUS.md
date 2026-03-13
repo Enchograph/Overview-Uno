@@ -2,14 +2,14 @@
 
 ## 当前阶段
 
-- 阶段编号：10
-- 阶段名称：平台集成
+- 阶段编号：11
+- 阶段名称：QA、验收、发布收尾
 - 阶段状态：`active`
 
 ## 当前里程碑
 
-- 里程碑：C
-- 名称：平台闭环
+- 里程碑：D
+- 名称：发布就绪
 - 里程碑状态：`active`
 
 ## 已完成任务 ID
@@ -58,6 +58,7 @@
 - `PLATFORM-1000`
 - `PLATFORM-1010`
 - `PLATFORM-1020`
+- `PLATFORM-1030`
 
 ## 正在进行任务 ID
 
@@ -65,7 +66,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `PLATFORM-1030`
+- `QA-1100`
 
 ## 当前阻塞
 
@@ -73,6 +74,20 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-browserwasm -v q` 通过，0 error；当前仍存在既有 Wasm trimming / SQLite provider warning，但 Web 主流程已切换为内存仓储与会话级本地状态，不再依赖 SQLite / 文件路径
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，59/59 用例通过，0 failed
+- 已确认客户端当前新增平台能力分支：
+  - WebAssembly 切换到内存事项仓储、设置仓储、AI 聊天仓储、同步变更仓储
+  - WebAssembly 切换到内存登录态、同步状态和设备 ID 存储
+  - 设置页 `About` 分区新增当前平台、主流程状态、通知 / 小组件 / 本地数据能力和明确降级说明
+  - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
+  - `Overview.Client/Overview.Client/Infrastructure/Persistence/Repositories/InMemoryRepositories.cs`
+  - `Overview.Client/Overview.Client/Infrastructure/Settings/InMemoryStores.cs`
+  - `Overview.Client/Overview.Client/Infrastructure/Platform/IPlatformCapabilities.cs`
+  - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
+- 已确认客户端新增平台降级说明测试：
+  - `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，58/58 用例通过，0 failed
 - 已确认客户端已新增统一平板断点与横竖屏自适应布局：

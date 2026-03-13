@@ -18,6 +18,7 @@ using Overview.Client.Infrastructure.Diagnostics;
 using Overview.Client.Infrastructure.Notifications;
 using Overview.Client.Infrastructure.Persistence.Repositories;
 using Overview.Client.Infrastructure.Persistence.Services;
+using Overview.Client.Infrastructure.Platform;
 using Overview.Client.Infrastructure.Settings;
 using Overview.Client.Infrastructure.Widgets;
 using Overview.Client.Presentation.ViewModels;
@@ -56,24 +57,39 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton(() => new SettingsPageViewModel(
             registry.Resolve<IAuthenticationService>(),
             registry.Resolve<IUserSettingsService>(),
-            registry.Resolve<ISyncOrchestrationService>()));
+            registry.Resolve<ISyncOrchestrationService>(),
+            registry.Resolve<IPlatformCapabilities>()));
         registry.RegisterSingleton(() => new HttpClient());
         registry.RegisterSingleton<IOverviewLoggerFactory>(() => NullOverviewLoggerFactory.Instance);
+        registry.RegisterSingleton<IPlatformCapabilities>(() => PlatformCapabilities.Current);
         registry.RegisterSingleton<INotificationScheduler>(() => new PlatformNotificationScheduler());
+#if __WASM__
+        registry.RegisterSingleton<INotificationStateStore>(() => new InMemoryNotificationStateStore());
+        registry.RegisterSingleton<IWidgetSnapshotStore>(() => new InMemoryWidgetSnapshotStore());
+        registry.RegisterSingleton<ISqliteConnectionFactory>(() => new SqliteConnectionFactory());
+        registry.RegisterSingleton<IItemRepository>(() => new InMemoryItemRepository());
+        registry.RegisterSingleton<IUserSettingsRepository>(() => new InMemoryUserSettingsRepository());
+        registry.RegisterSingleton<IAiChatMessageRepository>(() => new InMemoryAiChatMessageRepository());
+        registry.RegisterSingleton<ISyncChangeRepository>(() => new InMemorySyncChangeRepository());
+        registry.RegisterSingleton<IAuthSessionStore>(() => new InMemoryAuthSessionStore());
+        registry.RegisterSingleton<ISyncStateStore>(() => new InMemorySyncStateStore());
+        registry.RegisterSingleton<IDeviceIdStore>(() => new InMemoryDeviceIdStore());
+#else
         registry.RegisterSingleton<INotificationStateStore>(() => new FileNotificationStateStore());
         registry.RegisterSingleton<IWidgetSnapshotStore>(() => new FileWidgetSnapshotStore());
-        registry.RegisterSingleton<IWidgetRenderer>(() => new PlatformWidgetRenderer());
         registry.RegisterSingleton<ISqliteConnectionFactory>(() => new SqliteConnectionFactory());
         registry.RegisterSingleton<IItemRepository>(() => new SqliteItemRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<IUserSettingsRepository>(() => new SqliteUserSettingsRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<IAiChatMessageRepository>(() => new SqliteAiChatMessageRepository(registry.Resolve<ISqliteConnectionFactory>()));
         registry.RegisterSingleton<ISyncChangeRepository>(() => new SqliteSyncChangeRepository(registry.Resolve<ISqliteConnectionFactory>()));
-        registry.RegisterSingleton<ITimeRuleService>(() => new TimeRuleService());
-        registry.RegisterSingleton<IHomeInteractionRuleService>(() => new HomeInteractionRuleService());
-        registry.RegisterSingleton<IReminderRuleService>(() => new ReminderRuleService());
         registry.RegisterSingleton<IAuthSessionStore>(() => new FileAuthSessionStore());
         registry.RegisterSingleton<ISyncStateStore>(() => new FileSyncStateStore());
         registry.RegisterSingleton<IDeviceIdStore>(() => new FileDeviceIdStore());
+#endif
+        registry.RegisterSingleton<IWidgetRenderer>(() => new PlatformWidgetRenderer());
+        registry.RegisterSingleton<ITimeRuleService>(() => new TimeRuleService());
+        registry.RegisterSingleton<IHomeInteractionRuleService>(() => new HomeInteractionRuleService());
+        registry.RegisterSingleton<IReminderRuleService>(() => new ReminderRuleService());
         registry.RegisterSingleton(() => TimeProvider.System);
         registry.RegisterSingleton<IAuthRemoteClient>(() => new AuthRemoteClient(registry.Resolve<HttpClient>()));
         registry.RegisterSingleton<IAiRemoteClient>(() => new AiRemoteClient(registry.Resolve<HttpClient>()));

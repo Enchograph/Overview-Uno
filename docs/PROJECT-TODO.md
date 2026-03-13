@@ -778,7 +778,7 @@
 - Title: 完成 Windows 与 Web 主流程适配和能力降级
 - Phase: 阶段 10
 - Depends On: PLATFORM-1020, PLATFORM-1000, PLATFORM-1010
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 完成 Windows 和 Web 主流程适配与降级处理
 - Implementation Notes: 不得伪造不可用平台能力

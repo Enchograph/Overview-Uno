@@ -2,34 +2,35 @@
 
 ## 本轮目标
 
-- 完成 `PLATFORM-1020`，完成平板横竖屏适配
+- 完成 `PLATFORM-1030`，完成 Windows 与 Web 主流程适配和能力降级
 
 ## 本轮完成
 
-- 新增统一平板断点工具：
-  - `Overview.Client/Overview.Client/Presentation/Layout/AdaptiveLayout.cs`
-- 已将以下页面接入 `Loaded/SizeChanged` 自适应布局切换：
-  - `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml(.cs)`
-  - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml(.cs)`
-  - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml(.cs)`
-  - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml(.cs)`
-  - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml(.cs)`
-  - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml(.cs)`
-- 当前平板布局行为：
-  - 壳层宽屏时把底部导航切换为左侧导航栏
-  - 主页宽屏时把周期控制区与时间轴拆成双栏
-  - 列表页宽屏时把未完成 / 已完成分组拆成双栏，并重排工具栏
-  - AI 页宽屏时把时间范围控制区与聊天区拆成双栏
-  - 添加页宽屏时把表单区与已有事项 / 详情区拆成双栏
-  - 设置页在平板宽度下扩大边距，维持主流程可读性
+- 新增平台能力描述模型：
+  - `Overview.Client/Overview.Client/Infrastructure/Platform/IPlatformCapabilities.cs`
+- 已在客户端注册中心增加平台分支：
+  - WebAssembly 当前切换到内存事项仓储、设置仓储、AI 聊天仓储、同步变更仓储
+  - WebAssembly 当前切换到内存登录态、同步状态和设备 ID 存储
+  - Desktop / Android 继续保留原有 SQLite 与文件存储链路
+  - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
+  - `Overview.Client/Overview.Client/Infrastructure/Persistence/Repositories/InMemoryRepositories.cs`
+  - `Overview.Client/Overview.Client/Infrastructure/Settings/InMemoryStores.cs`
+- 已将设置页 `About` 分区升级为平台能力说明入口：
+  - 展示当前平台、平台家族、主流程状态
+  - 展示本地数据能力、通知能力、小组件能力
+  - 展示明确降级策略，避免伪造 Windows / Web 不具备的平台能力
+  - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
+- 已补充平台降级说明测试：
+  - `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
 - 验证结果：
   - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
-  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，58/58 用例通过
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-browserwasm -v q` 通过，0 error；仍有既有 Wasm trimming / SQLite provider warning
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，59/59 用例通过
 
 ## 本轮未完成
 
 - 真实邮件发送提供程序接入
-- Windows / Web 主流程适配与通知降级说明收尾
+- 阶段 11 的测试补齐、需求映射验收与性能验证
 
 ## 当前阻塞
 
@@ -37,19 +38,12 @@
 
 ## 已更新文件
 
-- `Overview.Client/Overview.Client/Presentation/Layout/AdaptiveLayout.cs`
-- `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml.cs`
-- `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml`
-- `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
-- `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml.cs`
-- `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
-- `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml.cs`
-- `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
-- `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml.cs`
-- `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
-- `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml.cs`
-- `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
-- `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml.cs`
+- `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
+- `Overview.Client/Overview.Client/Infrastructure/Persistence/Repositories/InMemoryRepositories.cs`
+- `Overview.Client/Overview.Client/Infrastructure/Settings/InMemoryStores.cs`
+- `Overview.Client/Overview.Client/Infrastructure/Platform/IPlatformCapabilities.cs`
+- `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
+- `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
 - `docs/PROJECT-STATUS.md`
 - `docs/PROJECT-TODO.md`
 - `docs/PROJECT-ACCEPTANCE.md`
@@ -59,7 +53,7 @@
 
 ## 下一步唯一推荐动作
 
-- 执行 `PLATFORM-1030`：完成 Windows 与 Web 主流程适配和能力降级
+- 执行 `QA-1100`：补齐自动化测试与原始需求映射验收
 
 ## 接手 AI 注意事项
 
@@ -67,21 +61,14 @@
 - 开始任何实现前，先检查 git 仓库状态
 - 根解决方案入口是 `Overview.Uno.slnx`，不是 `.sln`
 - 若从仓库根目录执行 `dotnet restore/build`，必须保留根级 `global.json`，否则 `Uno.Sdk` 无法解析
-- 当前列表页已完成标签筛选、排序、完成切换、重要切换、手动重排、主题切换、“更多设置”联动、滑动编辑删除和浮动添加；当前已推进到 AI 任务
-- 当前阶段 10 已开始；`PLATFORM-1020` 已完成，下一轮应切换到 `PLATFORM-1030`
 - 新增的客户端测试项目当前通过直接引用桌面构建产物 `Overview.Client.dll` 运行；执行 `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 前，先确保客户端桌面目标已经构建过
-- 当前列表页采用“ViewModel 聚合状态 + 页面手动 Apply”模式；后续列表页任务应延续该模式，避免额外引入状态库
-- 当前设置页 AI 分区也沿用“ViewModel 聚合状态 + 页面手动 Apply”模式；后续 AI 页若需要新增表单或状态，优先复用这一模式
-- 当前 AI 页同样沿用“ViewModel 聚合状态 + 页面手动 Apply”模式；`AiPage.xaml.cs` 负责把 ViewModel 状态回填到页面、同步时间选择器模式，并在发送后滚动到最后一条消息
-- 当前自动同步触发点只集中在 `SyncLifecycleCoordinator`、`App.xaml.cs` 与 `ShellPage.xaml.cs`；后续不要把同步启动/停止逻辑散到 `HomePage`、`ListPage`、`AiPage` 等业务页面
-- 当前应用窗口激活会执行一次前台同步；若后续需要更细粒度退避、网络感知或平台后台任务，优先在协调层扩展，不要修改各业务 ViewModel
-- 当前手动同步入口只在设置页 `sync` 分区；状态展示依赖 `ISyncOrchestrationService.StatusChanged` 驱动刷新，不要在页面里直接拼接同步逻辑
-- 当前 `SyncOrchestrationServiceTests` 使用共享内存远端验证双设备自动收敛；后续若修改同步协议，应先保持这些验证通过
-- 当前本地提醒重建统一收敛在 `NotificationRefreshService`；后续不要把平台通知调度逻辑散到页面或 ViewModel
-- 当前 Desktop / Web 的小组件仍未映射真实平台能力；后续做 `PLATFORM-1030` 时要补明确降级说明
-- 当前平板适配主要收敛在 Presentation 层布局切换，不要把断点判断散到 ViewModel 或应用层
-- 当前 Android 构建在本环境里会长时间停留在收尾阶段，但已产出 `bin/Debug/net10.0-android/Overview.Client.dll`；若下轮继续做 Android 平台能力，建议优先复查构建脚本或增加显式超时
-- 当前外部导航协议统一走 `overview://...`，如需新增平台入口或小组件动作，优先扩展 `AppNavigationRequest`，不要在 `MainActivity` 或页面代码里散落字符串
+- 当前列表页、AI 页、设置页仍沿用“ViewModel 聚合状态 + 页面手动 Apply”模式；后续新增状态时优先延续该模式
+- 当前自动同步触发点只集中在 `SyncLifecycleCoordinator`、`App.xaml.cs` 与 `ShellPage.xaml.cs`；不要把同步启动/停止逻辑散到业务页面
+- 当前本地提醒重建统一收敛在 `NotificationRefreshService`；不要把平台通知调度逻辑散到页面或 ViewModel
+- 当前 Desktop / Web 的通知与小组件已经补入明确降级说明；后续 QA 轮次里不要把 no-op 降级误记为“已实现真实平台能力”
+- 当前 WebAssembly 已切到内存仓储和会话级状态存储，主流程不再依赖 SQLite / 文件路径；但 `browserwasm build` 仍有既有 SQLite provider 警告，后续若要彻底消除需进一步拆分包引用或裁剪共享文件
+- 当前 Android 构建在本环境里会长时间停留在收尾阶段，但已产出 `bin/Debug/net10.0-android/Overview.Client.dll`
+- 当前外部导航协议统一走 `overview://...`，如需新增平台入口或小组件动作，优先扩展 `AppNavigationRequest`
 - 运行 EF CLI 前先执行 `dotnet tool restore`
 - 本地没有可连接的 PostgreSQL 实例；如果下轮需要验证 `database update` 或真实读写，请先启动数据库或调整连接串
 - 每完成一个最小任务项后，要先更新状态文件，再立即创建一次包含任务 ID 的 git commit
