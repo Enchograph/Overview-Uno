@@ -191,12 +191,15 @@
 - Title: 建立客户端 SQLite 数据层
 - Phase: 阶段 3
 - Depends On: DOMAIN-200
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 建立本地数据库、仓储接口和基础持久化
-- Implementation Notes: 覆盖事项、设置、聊天记录、同步变更
+- Implementation Notes: 已新增 SQLite 连接工厂、初始化器、表记录和四类仓储接口/实现；当前采用 JSON 载荷 + 索引列的轻量持久化方式，覆盖事项、设置、聊天记录、同步变更
 - Done When: 本地数据库结构和仓储存在
-- Verification: 可定位数据库上下文和仓储
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 SQLite 连接工厂与初始化逻辑
+  - 可定位事项、设置、聊天记录、同步变更仓储
 - Files Expected: 数据库与仓储文件
 
 ### Task ID: INFRA-310

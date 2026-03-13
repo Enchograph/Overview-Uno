@@ -64,6 +64,8 @@
   - 客户端领域规则：时间块生成、时间范围计算、周期标题格式化、提醒调度、重复展开、主页命中与重叠计算
 - `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
   - 客户端 Infrastructure 层目录落点
+- `Overview.Client/Overview.Client/Infrastructure/Persistence/`
+  - 客户端 SQLite 数据层，包含数据库选项、表记录、仓储接口与实现、连接工厂
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
   - 客户端桌面入口
 - `Overview.Client/Overview.Client/Platforms/WebAssembly/Program.cs`

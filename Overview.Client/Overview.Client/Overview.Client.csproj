@@ -26,4 +26,8 @@
     </UnoFeatures>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl" />
+  </ItemGroup>
+
 </Project>
