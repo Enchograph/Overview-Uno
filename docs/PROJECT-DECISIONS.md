@@ -127,3 +127,10 @@
 - Topic: 提交粒度
 - Decision: 每完成 `PROJECT-TODO.md` 中的一个最小任务项，都必须创建一次 git commit
 - Reason: 这样可以让代码变更、状态文档和任务边界保持一致，降低接力开发时的回溯成本
+
+## DEC-018
+
+- Status: `confirmed`
+- Topic: 开始前的 git 检查
+- Decision: 每轮工作开始前，AI 都必须先检查 git 仓库状态，包括仓库是否初始化、工作区改动、当前分支和远端配置
+- Reason: 这样可以避免在未知工作区状态下提交或覆盖用户已有改动
