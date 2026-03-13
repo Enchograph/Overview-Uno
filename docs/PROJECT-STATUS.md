@@ -31,6 +31,7 @@
 - `APP-400`
 - `APP-410`
 - `APP-420`
+- `APP-430`
 
 ## 正在进行任务 ID
 
@@ -38,7 +39,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `APP-430`
+- `APP-440`
 
 ## 当前阻塞
 
@@ -46,6 +47,33 @@
 
 ## 最近已验证结果
 
+- `dotnet tool restore` 通过，可恢复本地 `dotnet-ef` 10.0.0
+- `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet dotnet-ef migrations add AddListManualOrderPreferences --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --output-dir Migrations` 通过
+- `dotnet dotnet-ef migrations script --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --idempotent` 通过
+- `dotnet dotnet-ef migrations list --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj` 可列出：
+  - `20260313092718_InitialPostgreSqlInfrastructure`
+  - `20260313093808_AddAuthInfrastructure`
+  - `20260313103139_AddListManualOrderPreferences`
+- 已确认客户端新增列表应用层目录：
+  - `Application/Lists`
+- 已确认客户端列表应用层已提供：
+  - `IListPageService`
+  - `ListPageService`
+  - `ListPageQuery`
+  - `ListPageSnapshot`
+  - `ListPageItem`
+- 已确认客户端列表应用层已覆盖：
+  - 列表标签页筛选
+  - 未完成/已完成分组输出
+  - 排序依据切换
+  - Microsoft TODO 风格的手动重排顺序持久化
+  - 基于用户时区的“我的一天”与“今天执行者”日期判断
+- 已确认客户端与服务端设置模型新增：
+  - `ListManualOrderPreferences`
+- 已确认服务端新增迁移：
+  - `20260313103139_AddListManualOrderPreferences`
 - `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - 已确认客户端新增主页应用层目录：
@@ -258,10 +286,11 @@
 - 已完成客户端认证应用层封装，覆盖登录、登出、登录态恢复与刷新
 - 已完成客户端事项 CRUD 与设置读写应用层封装，并接入本地待同步变更登记
 - 已完成客户端主页布局计算与时间选择应用层封装，可为后续主页/时间选择 UI 直接提供快照与映射结果
+- 已完成客户端列表应用层封装，支持标签筛选、排序切换、未完成/已完成分组和手动重排顺序持久化
 - 已确认 git 仓库已初始化，当前分支为 `main`，且已配置 `origin`
 - 已修正文档与仓库真实 git 状态不一致的问题
 - 已修正文档内部“阶段编号仍为 2 / 路线仍显示阶段 3 未开始 / SQLite 验收未勾选”的状态偏差
-- 下一步应进入列表筛选、排序与手动重排应用服务
+- 下一步应进入 AI 请求编排与事项摘要检索应用服务
 
 ## 风险与偏差
 
@@ -272,7 +301,6 @@
 - 当前重复展开对备忘采用“目标日期零点”为锚点，真正的编辑页输入约束和展示语义仍需后续页面与应用层配合收敛
 - 当前主页命中规则已沉到 Domain，但尚未接入页面坐标映射和单元测试工程
 - 当前主页布局应用层已输出比例和选择映射结果，但尚未接入真实页面坐标、手势和渲染层
-- 当前客户端 SQLite 方案使用 `sqlite-net-pcl`；桌面构建存在 1 条 `NETSDK1206` RID 兼容性警告，后续若影响多平台发布需在平台集成前复核
 - 本地未运行 PostgreSQL 实例，因此本轮只验证了“可生成迁移、可输出脚本”，尚未执行 `database update`
 - 当前 `send-verification-code` 仅把验证码写入数据库并记录到服务端日志，尚未接入真实 SMTP/邮件供应商发送链路
 - 当前通知调度仅提供 `INotificationScheduler` 抽象和空实现，尚未接入 Android/Windows/Web 平台本地通知
@@ -288,9 +316,9 @@
 
 ## 接手 AI 执行准则
 
-- 优先执行 `APP-430`
+- 优先执行 `APP-440`
 - 除非发现环境或工具限制，否则不要跳到 Presentation、Platform 或 QA 阶段
-- 当前 `APP-420` 已完成，后续应进入列表筛选、排序与手动重排应用服务
+- 当前 `APP-430` 已完成，后续应进入 AI 请求编排与事项摘要检索应用服务
 - 当前客户端根解决方案依赖仓库根目录 `global.json` 提供 `Uno.Sdk` 版本钉住；不要删除
 - 迁移工具通过仓库根目录 `dotnet-tools.json` 固定；后续执行 EF CLI 前先运行 `dotnet tool restore`
 - 只有在尝试补齐环境后仍无法继续时，才允许在 `PROJECT-HANDOFF.md` 标记阻塞

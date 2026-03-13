@@ -2,44 +2,41 @@
 
 ## 本轮目标
 
-- 完成 `APP-420`，实现主页布局计算与时间选择应用服务
+- 完成 `APP-430`，实现列表筛选、排序、手动重排应用服务
 
 ## 本轮完成
 
-- 在客户端新增主页应用层目录 `Application/Home`
-- 新增主页布局应用服务接口 `IHomeLayoutService`
-- 新增主页布局应用服务实现 `HomeLayoutService`
-- 新增时间选择应用服务接口 `ITimeSelectionService`
-- 新增时间选择应用服务实现 `TimeSelectionService`
-- 新增主页/时间选择输出模型：
-  - `HomeLayoutSnapshot`
-  - `HomeDateColumn`
-  - `HomeLayoutItem`
-  - `TimeSelectionSnapshot`
-  - `TimeSelectionWeekRow`
-  - `TimeSelectionDateCell`
-- 主页应用层已覆盖：
-  - 用户设置驱动的周/月时间段解析
-  - 时间块和列头快照生成
-  - 任务/日程按天拆分后的跨格比例计算
-  - 超出规划时间和跨天事项的可见区裁剪
-  - 基于 `IHomeInteractionRuleService` 的透明度映射
-- 时间选择应用层已覆盖：
-  - 月份网格构建
-  - 日期点击到日/周/月周期的映射
-  - 周格选中态计算
-  - 上一周期/下一周期导航解析
+- 在客户端新增列表应用层目录 `Application/Lists`
+- 新增列表应用服务接口 `IListPageService`
+- 新增列表应用服务实现 `ListPageService`
+- 新增列表应用层输入输出模型：
+  - `ListPageQuery`
+  - `ListPageSnapshot`
+  - `ListPageItem`
+- 列表应用层已覆盖：
+  - 列表标签页筛选
+  - 未完成/已完成分组输出
+  - 排序依据切换
+  - Microsoft TODO 风格的手动重排顺序持久化
+  - 基于用户时区的“我的一天”与“今天执行者”日期判断
+- 为修复“手动重排无持久化承载”的代码/文档缺口，在客户端与服务端同步新增：
+  - `ListManualOrderPreferences`
+  - `UserSettings.ListManualOrder`
+- 在服务端新增迁移：
+  - `20260313103139_AddListManualOrderPreferences`
 - 在客户端 `ClientServiceRegistry` 注册：
-  - `ITimeRuleService`
-  - `IHomeInteractionRuleService`
-  - `IHomeLayoutService`
-  - `ITimeSelectionService`
+  - `IListPageService`
 - 验证结果：
+  - `dotnet tool restore` 通过
+  - `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
   - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+  - `dotnet dotnet-ef migrations add AddListManualOrderPreferences --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --output-dir Migrations` 通过
+  - `dotnet dotnet-ef migrations script --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj --idempotent` 通过
+  - `dotnet dotnet-ef migrations list --project Overview.Server/Overview.Server.csproj --startup-project Overview.Server/Overview.Server.csproj` 可列出新迁移；由于本地未启动 PostgreSQL，命令会提示无法连接 `127.0.0.1:5432`，但迁移名仍可输出
 
 ## 本轮未完成
 
-- `APP-430` 及后续 Application 层用例
+- `APP-440` 及后续 Application 层用例
 - 登录页与设置页 Presentation 接入
 - 真实邮件发送提供程序接入
 - 通知平台映射
@@ -52,7 +49,15 @@
 ## 已更新文件
 
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
-- `Overview.Client/Overview.Client/Application/Home/`
+- `Overview.Client/Overview.Client/Application/Lists/`
+- `Overview.Client/Overview.Client/Application/Settings/`
+- `Overview.Client/Overview.Client/Domain/Entities/UserSettings.cs`
+- `Overview.Client/Overview.Client/Domain/ValueObjects/ListManualOrderPreferences.cs`
+- `Overview.Server/Api/Controllers/SyncController.cs`
+- `Overview.Server/Domain/Entities/UserSettings.cs`
+- `Overview.Server/Domain/ValueObjects/ListManualOrderPreferences.cs`
+- `Overview.Server/Infrastructure/Persistence/Configurations/UserSettingsConfiguration.cs`
+- `Overview.Server/Migrations/`
 - `docs/PROJECT-STATUS.md`
 - `docs/PROJECT-TODO.md`
 - `docs/PROJECT-HANDOFF.md`
@@ -61,7 +66,7 @@
 
 ## 下一步唯一推荐动作
 
-- 执行 `APP-430`：实现列表筛选、排序、手动重排应用服务
+- 执行 `APP-440`：实现 AI 请求编排与事项摘要检索用例
 
 ## 接手 AI 注意事项
 
@@ -73,6 +78,8 @@
 - `DOMAIN-200`、`DOMAIN-210`、`DOMAIN-220`、`DOMAIN-230`、`INFRA-300`、`INFRA-310` 已完成；后续基础设施实现应继续复用既有领域规则，而不是重写算法
 - `INFRA-320`、`INFRA-330`、`INFRA-340`、`APP-400`、`APP-410` 已完成；当前服务端已具备认证与同步 API 基础设施，客户端已具备认证应用层、事项/设置应用层、远程同步访问封装以及通知/小组件/日志抽象
 - `APP-420` 已完成；当前客户端已具备主页布局快照与时间选择映射应用服务，后续主页/时间选择 UI 不应在页面层重写算法
+- `APP-430` 已完成；当前客户端已具备列表筛选、排序、分组和手动重排应用服务，后续列表页 UI 不应在页面层重写筛选/排序逻辑
+- 本轮发现代码与需求存在显式差异：原模型没有可同步的手动重排承载，无法满足 `APP-430` 的“重排”要求；已通过 `UserSettings.ListManualOrder` 和服务端迁移补齐
 - 当前时间标题只做了基础格式化规则，真正的多语言资源化应放在后续 Presentation/i18n 阶段，不要在 Domain 层引入资源依赖
 - 当前提醒规则服务已提供 `NormalizeReminderConfig`、`ExpandOccurrences`、`BuildReminderSchedule` 三个入口；后续应用层和基础设施层应复用，而不是各自再写一套时间展开
 - 当前主页交互规则服务已提供 `CalculateOverlapStates`、`ResolveHit` 两个入口；后续 Presentation 主页应只负责把坐标映射成时间点和可见事项集合
@@ -85,7 +92,7 @@
 - 当前密码哈希采用 PBKDF2-SHA256，自定义格式为 `PBKDF2.{saltHex}.{hashHex}`
 - 当前刷新令牌按单条记录持久化，`refresh` 端点会吊销旧令牌并写入替换后的哈希
 - 当前已进入 Application 阶段，不应跳去做 Presentation 或 Platform 细节
-- 下一步不要回头扩写主页 UI 或平台映射，先完成 `APP-430`
+- 下一步不要回头扩写列表 UI 或平台映射，先完成 `APP-440`
 - 当前 `IUserSettingsService.GetAsync` 若本地不存在记录，会返回默认对象但不落库；只有 `SaveAsync` 才会生成同步变更
 - 运行 EF CLI 前先执行 `dotnet tool restore`
 - 本地没有可连接的 PostgreSQL 实例；如果下轮需要验证 `database update` 或真实读写，请先启动数据库或调整连接串

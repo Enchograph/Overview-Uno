@@ -322,7 +322,7 @@
 - Title: 实现列表筛选、排序、手动重排应用服务
 - Phase: 阶段 4
 - Depends On: APP-410
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持列表标签筛选、排序依据切换和手动重排
 - Implementation Notes: 包含 Microsoft TODO 风格的任务重排能力

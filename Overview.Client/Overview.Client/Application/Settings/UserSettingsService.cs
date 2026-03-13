@@ -66,6 +66,7 @@ public sealed class UserSettingsService : IUserSettingsService
             ListPageDefaultTab = request.ListPageDefaultTab,
             ListPageSortBy = request.ListPageSortBy,
             ListPageTheme = NormalizeTextOrDefault(request.ListPageTheme, "default"),
+            ListManualOrder = request.ListManualOrder,
             AiBaseUrl = NormalizeOptional(request.AiBaseUrl) ?? string.Empty,
             AiApiKey = NormalizeOptional(request.AiApiKey) ?? string.Empty,
             AiModel = NormalizeOptional(request.AiModel) ?? string.Empty,

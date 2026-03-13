@@ -29,6 +29,8 @@ public sealed record UserSettingsUpdateRequest
 
     public string ListPageTheme { get; init; } = "default";
 
+    public ListManualOrderPreferences ListManualOrder { get; init; } = new();
+
     public string AiBaseUrl { get; init; } = string.Empty;
 
     public string AiApiKey { get; init; } = string.Empty;

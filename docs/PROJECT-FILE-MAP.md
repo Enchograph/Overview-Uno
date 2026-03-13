@@ -44,6 +44,8 @@
   - 客户端认证应用层目录，包含登录、注册、登出、登录态恢复和刷新用例
 - `Overview.Client/Overview.Client/Application/Home/`
   - 客户端主页应用层目录，包含主页布局快照、跨格分段计算和时间选择映射服务
+- `Overview.Client/Overview.Client/Application/Lists/`
+  - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
 - `Overview.Client/Overview.Client/Application/Items/`
   - 客户端事项应用层目录，包含 CRUD、完成状态切换和查询输入模型
 - `Overview.Client/Overview.Client/Application/Settings/`
@@ -70,6 +72,8 @@
   - 客户端领域枚举：事项类型、主题、列表排序、AI 请求、同步变更等
 - `Overview.Client/Overview.Client/Domain/ValueObjects/`
   - 客户端领域值对象：提醒、重复、重复展开结果、主页命中/重叠结果、小组件偏好
+- `Overview.Client/Overview.Client/Domain/ValueObjects/ListManualOrderPreferences.cs`
+  - 客户端列表手动重排顺序值对象，作为用户设置的一部分参与本地持久化与同步
 - `Overview.Client/Overview.Client/Domain/Rules/`
   - 客户端领域规则：时间块生成、时间范围计算、周期标题格式化、提醒调度、重复展开、主页命中与重叠计算
 - `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
@@ -116,6 +120,8 @@
   - 服务端领域枚举：事项类型、主题、列表排序、AI 请求、同步变更等
 - `Overview.Server/Domain/ValueObjects/`
   - 服务端领域值对象：提醒、重复、重复展开结果、主页命中/重叠结果、小组件偏好
+- `Overview.Server/Domain/ValueObjects/ListManualOrderPreferences.cs`
+  - 服务端列表手动重排顺序值对象，与客户端设置快照保持同构
 - `Overview.Server/Domain/Rules/`
   - 服务端领域规则：时间块生成、时间范围计算、周期标题格式化、提醒调度、重复展开、主页命中与重叠计算
 - `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
@@ -146,6 +152,8 @@
   - 服务端邮箱验证码持久化实体
 - `Overview.Server/Migrations/`
   - 服务端 EF Core 迁移基线，当前包含认证补充迁移
+- `Overview.Server/Migrations/20260313103139_AddListManualOrderPreferences.cs`
+  - 服务端为 `user_settings` 新增列表手动重排顺序 JSONB 列的迁移
 - `Overview.Server/appsettings.Sample.json`
   - 服务端 PostgreSQL、认证、邮件、同步配置样例
 

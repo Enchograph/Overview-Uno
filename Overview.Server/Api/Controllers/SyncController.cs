@@ -387,6 +387,7 @@ public sealed class SyncController : ControllerBase
             ListPageDefaultTab = settings.ListPageDefaultTab,
             ListPageSortBy = settings.ListPageSortBy,
             ListPageTheme = settings.ListPageTheme,
+            ListManualOrder = settings.ListManualOrder,
             AiBaseUrl = settings.AiBaseUrl,
             AiApiKey = settings.AiApiKey,
             AiModel = settings.AiModel,

@@ -4,6 +4,7 @@ using System.Net.Http;
 using Overview.Client.Application.Auth;
 using Overview.Client.Application.Home;
 using Overview.Client.Application.Items;
+using Overview.Client.Application.Lists;
 using Overview.Client.Application.Settings;
 using Overview.Client.Domain.Rules;
 using Overview.Client.Infrastructure.Api.Auth;
@@ -62,6 +63,9 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IUserSettingsService>(),
             registry.Resolve<ITimeRuleService>(),
             registry.Resolve<IHomeInteractionRuleService>()));
+        registry.RegisterSingleton<IListPageService>(() => new ListPageService(
+            registry.Resolve<IItemService>(),
+            registry.Resolve<IUserSettingsService>()));
         registry.RegisterSingleton<ITimeSelectionService>(() => new TimeSelectionService(
             registry.Resolve<IUserSettingsService>(),
             registry.Resolve<ITimeRuleService>()));

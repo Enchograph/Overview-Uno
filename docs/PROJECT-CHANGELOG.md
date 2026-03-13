@@ -224,3 +224,15 @@
 - 时间选择应用层支持月份网格构建、日/周/月映射和前后周期导航解析
 - 在客户端轻量注册中心接入 `ITimeRuleService`、`IHomeInteractionRuleService`、`IHomeLayoutService`、`ITimeSelectionService`
 - 验证客户端桌面目标可无警告构建
+
+### Round 26
+
+- 完成 `APP-430`
+- 在客户端新增列表应用层目录 `Application/Lists`
+- 新增 `IListPageService`、`ListPageService`
+- 新增 `ListPageQuery`、`ListPageSnapshot`、`ListPageItem`
+- 列表应用层支持标签筛选、未完成/已完成分组、排序依据切换和手动重排顺序持久化
+- 为补齐手动重排的持久化承载，在客户端与服务端新增 `ListManualOrderPreferences`，并将其接入 `UserSettings`
+- 在服务端新增 EF Core 迁移 `20260313103139_AddListManualOrderPreferences`
+- 在客户端轻量注册中心接入 `IListPageService`
+- 验证客户端与服务端项目可无警告构建，且新迁移可生成并输出 idempotent 脚本

@@ -21,6 +21,8 @@ public sealed class UserSettingsConfiguration : IEntityTypeConfiguration<UserSet
         builder.Property(settings => settings.Language).HasMaxLength(16);
         builder.Property(settings => settings.ThemePreset).HasMaxLength(64);
         builder.Property(settings => settings.ListPageTheme).HasMaxLength(64);
+        builder.Property(settings => settings.ListManualOrder)
+            .HasJsonbConversion();
         builder.Property(settings => settings.AiBaseUrl).HasMaxLength(500);
         builder.Property(settings => settings.AiApiKey).HasMaxLength(500);
         builder.Property(settings => settings.AiModel).HasMaxLength(200);
