@@ -85,9 +85,9 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemNavigationRequest.cs`
   - 客户端添加/编辑事项导航参数模型，承载主页长按空白预填、列表页浮动添加默认值和长按事项编辑请求
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
-  - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架、设置摘要展示，以及 AI 分区的 Base URL / API Key / Model 编辑表单
+  - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架、设置摘要展示、AI 分区的 Base URL / API Key / Model 编辑表单，以及 Sync 分区的手动同步入口和状态面板
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml.cs`
-  - 客户端设置页代码后置，当前支持根据导航参数直接打开指定设置分区
+  - 客户端设置页代码后置，当前支持根据导航参数直接打开指定设置分区，并在同步状态变化时刷新页面
 - `Overview.Client/Overview.Client/Presentation/Components/ItemDetailCard.xaml`
   - 客户端统一事项详情组件，当前展示标题、类型、时间、地点、详情、提醒、重复、状态和编辑入口
 - `Overview.Client/Overview.Client/Presentation/Components/TimeSelectionPicker.xaml`
@@ -109,7 +109,7 @@
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ItemDetailViewModel.cs`
   - 客户端事项详情展示 ViewModel，负责把统一领域事项格式化为可复用的详情卡片字段
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
-  - 客户端设置页 ViewModel，负责设置主页分区、二级页状态、登录态/设置摘要加载、指定分区初始化，以及 AI 配置草稿与保存
+  - 客户端设置页 ViewModel，负责设置主页分区、二级页状态、登录态/设置摘要加载、指定分区初始化、AI 配置草稿与保存，以及 Sync 分区状态聚合和手动同步触发
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AiSettingsFormModel.cs`
   - 客户端 AI 设置表单模型，承载 Base URL、API Key、Model 的页面草稿状态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/AiPageViewModel.cs`
@@ -129,7 +129,7 @@
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ListPageThemeOptionViewModel.cs`
   - 客户端列表页主题选项展示模型，用于顶部主题下拉框
 - `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
-  - 客户端设置页 ViewModel 测试，当前覆盖按导航参数直达列表设置分页、刷新保持分区，以及 AI 配置草稿初始化与保存
+  - 客户端设置页 ViewModel 测试，当前覆盖按导航参数直达列表设置分页、刷新保持分区、AI 配置草稿初始化与保存，以及 Sync 分区状态展示与手动同步
 - `tests/Overview.Client.Tests/AddItemPageViewModelTests.cs`
   - 客户端添加页 ViewModel 测试，当前覆盖列表页默认填充导航参数到表单的落地行为
 - `tests/Overview.Client.Tests/AiChatServiceTests.cs`

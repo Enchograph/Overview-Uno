@@ -14,6 +14,7 @@ public sealed partial class SettingsPage : Page
         DataContext = App.Services.Resolve<SettingsPageViewModel>();
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        ViewModel.ViewStateChanged += OnViewModelStateChanged;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -30,6 +31,7 @@ public sealed partial class SettingsPage : Page
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
+        ViewModel.ViewStateChanged -= OnViewModelStateChanged;
         Loaded -= OnLoaded;
         Unloaded -= OnUnloaded;
     }
@@ -87,6 +89,18 @@ public sealed partial class SettingsPage : Page
         ApplyViewModelState();
     }
 
+    private async void OnRunManualSyncButtonClick(object sender, RoutedEventArgs e)
+    {
+        ApplyViewModelState();
+        await ViewModel.RunManualSyncAsync().ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
+    private void OnViewModelStateChanged(object? sender, EventArgs e)
+    {
+        _ = DispatcherQueue.TryEnqueue(ApplyViewModelState);
+    }
+
     private void ApplyViewModelState()
     {
         PageTitleTextBlock.Text = ViewModel.PageTitle;
@@ -105,7 +119,9 @@ public sealed partial class SettingsPage : Page
         BusyIndicator.IsActive = ViewModel.IsBusy;
         RefreshButton.IsEnabled = !ViewModel.IsBusy;
         AiEditorCard.Visibility = ViewModel.IsAiEditorVisible ? Visibility.Visible : Visibility.Collapsed;
+        SyncStatusCard.Visibility = ViewModel.IsSyncSectionVisible ? Visibility.Visible : Visibility.Collapsed;
         SaveAiSettingsButton.IsEnabled = ViewModel.CanSaveAiSettings;
+        RunManualSyncButton.IsEnabled = ViewModel.CanRunManualSync;
 
         if (AiBaseUrlTextBox.Text != ViewModel.AiSettingsForm.BaseUrl)
         {

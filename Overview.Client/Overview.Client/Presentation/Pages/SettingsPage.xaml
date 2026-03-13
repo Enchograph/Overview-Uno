@@ -210,6 +210,32 @@
               </StackPanel>
             </StackPanel>
           </Border>
+
+          <Border
+            x:Name="SyncStatusCard"
+            Padding="20"
+            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="24"
+            Visibility="Collapsed">
+            <StackPanel Spacing="12">
+              <TextBlock
+                FontSize="18"
+                FontWeight="SemiBold"
+                Text="Sync Controls" />
+              <TextBlock
+                Opacity="0.72"
+                Style="{ThemeResource BodyTextBlockStyle}"
+                Text="Run a foreground sync when you need immediate convergence. Background sync remains active independently."
+                TextWrapping="WrapWholeWords" />
+              <Button
+                x:Name="RunManualSyncButton"
+                Click="OnRunManualSyncButtonClick"
+                Content="Sync Now"
+                HorizontalAlignment="Left" />
+            </StackPanel>
+          </Border>
         </StackPanel>
       </Grid>
     </ScrollViewer>

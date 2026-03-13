@@ -53,6 +53,7 @@
 - `AI-820`
 - `AI-830`
 - `SYNC-900`
+- `SYNC-910`
 
 ## 正在进行任务 ID
 
@@ -60,7 +61,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `SYNC-910`
+- `SYNC-920`
 
 ## 当前阻塞
 
@@ -68,6 +69,19 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，47/47 用例通过，0 failed
+- 已确认客户端设置页已新增手动同步入口和同步状态展示：
+  - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
+  - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml.cs`
+- 已确认客户端设置页状态 ViewModel 已接入：
+  - 同步状态字段聚合
+  - 手动同步触发
+  - 同步状态变更时页面刷新
+  - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
+- 已确认客户端依赖注入与测试已更新：
+  - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
+  - `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，45/45 用例通过，0 failed
 - 已确认客户端自动同步已接入页面生命周期与后台调度：

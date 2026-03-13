@@ -1,5 +1,6 @@
 using Overview.Client.Application.Auth;
 using Overview.Client.Application.Settings;
+using Overview.Client.Application.Sync;
 using Overview.Client.Domain.Entities;
 using Overview.Client.Domain.Enums;
 using Overview.Client.Presentation.ViewModels;
@@ -57,7 +58,8 @@ public sealed class SettingsPageViewModelTests
         var settingsService = new FakeUserSettingsService();
         var viewModel = new SettingsPageViewModel(
             new FakeAuthenticationService(),
-            settingsService);
+            settingsService,
+            new FakeSyncOrchestrationService());
 
         await viewModel.InitializeAsync(SettingsPageViewModel.AiSectionKey);
 
@@ -73,11 +75,74 @@ public sealed class SettingsPageViewModelTests
         Assert.Contains(viewModel.Sections, section => section.Key == SettingsPageViewModel.AiSectionKey && section.Summary.Contains("https://proxy.example.com/v1", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public async Task InitializeAsync_WithSyncSectionKey_ShowsManualSyncStatusFields()
+    {
+        var syncService = new FakeSyncOrchestrationService
+        {
+            CurrentStatusSnapshot = new SyncStatusSnapshot
+            {
+                State = SyncLifecycleState.Succeeded,
+                LastTrigger = SyncExecutionTrigger.Automatic,
+                PendingChangeCount = 2,
+                AppliedChangeCount = 3,
+                PulledItemCount = 4,
+                SettingsApplied = true,
+                ConflictCount = 1,
+                IsAutoSyncEnabled = true,
+                LastSuccessfulAt = new DateTimeOffset(2026, 3, 13, 8, 30, 0, TimeSpan.Zero)
+            }
+        };
+        var viewModel = new SettingsPageViewModel(
+            new FakeAuthenticationService(),
+            new FakeUserSettingsService(),
+            syncService);
+
+        await viewModel.InitializeAsync(SettingsPageViewModel.SyncSectionKey);
+
+        Assert.True(viewModel.IsSyncSectionVisible);
+        Assert.True(viewModel.CanRunManualSync);
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Auto Sync" && field.Value == "Running");
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Current State" && field.Value == "Succeeded");
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Pending Local Changes" && field.Value == "2");
+    }
+
+    [Fact]
+    public async Task RunManualSyncAsync_UsesSyncServiceAndRefreshesFields()
+    {
+        var syncService = new FakeSyncOrchestrationService
+        {
+            SynchronizeNowResult = new SyncStatusSnapshot
+            {
+                State = SyncLifecycleState.Succeeded,
+                LastTrigger = SyncExecutionTrigger.Manual,
+                PendingChangeCount = 0,
+                AppliedChangeCount = 5,
+                PulledItemCount = 2,
+                SettingsApplied = true,
+                IsAutoSyncEnabled = true
+            }
+        };
+        var viewModel = new SettingsPageViewModel(
+            new FakeAuthenticationService(),
+            new FakeUserSettingsService(),
+            syncService);
+
+        await viewModel.InitializeAsync(SettingsPageViewModel.SyncSectionKey);
+        await viewModel.RunManualSyncAsync();
+
+        Assert.Equal(1, syncService.SynchronizeNowCalls);
+        Assert.Equal("Manual sync completed.", viewModel.StatusMessage);
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Last Trigger" && field.Value == "Manual");
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Applied Changes" && field.Value == "5");
+    }
+
     private static SettingsPageViewModel CreateViewModel()
     {
         return new SettingsPageViewModel(
             new FakeAuthenticationService(),
-            new FakeUserSettingsService());
+            new FakeUserSettingsService(),
+            new FakeSyncOrchestrationService());
     }
 
     private sealed class FakeAuthenticationService : IAuthenticationService
@@ -182,6 +247,47 @@ public sealed class SettingsPageViewModelTests
             };
 
             return Task.FromResult(settings);
+        }
+    }
+
+    private sealed class FakeSyncOrchestrationService : ISyncOrchestrationService
+    {
+        public SyncStatusSnapshot CurrentStatus => CurrentStatusSnapshot;
+
+        public event EventHandler<SyncStatusSnapshot>? StatusChanged;
+
+        public SyncStatusSnapshot CurrentStatusSnapshot { get; set; } = new();
+
+        public SyncStatusSnapshot SynchronizeNowResult { get; set; } = new()
+        {
+            State = SyncLifecycleState.Succeeded,
+            LastTrigger = SyncExecutionTrigger.Manual,
+            IsAutoSyncEnabled = true
+        };
+
+        public int SynchronizeNowCalls { get; private set; }
+
+        public Task<SyncStatusSnapshot> InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(CurrentStatusSnapshot);
+        }
+
+        public Task<SyncStatusSnapshot> SynchronizeNowAsync(CancellationToken cancellationToken = default)
+        {
+            SynchronizeNowCalls++;
+            CurrentStatusSnapshot = SynchronizeNowResult;
+            StatusChanged?.Invoke(this, CurrentStatusSnapshot);
+            return Task.FromResult(CurrentStatusSnapshot);
+        }
+
+        public Task<SyncStatusSnapshot> StartAutoSyncAsync(TimeSpan? interval = null, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task StopAutoSyncAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
         }
     }
 }

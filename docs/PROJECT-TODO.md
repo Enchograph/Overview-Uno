@@ -701,7 +701,7 @@
 - Title: 实现手动同步入口和同步状态展示
 - Phase: 阶段 9
 - Depends On: APP-450, UI-530
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 用户可主动触发同步并看到当前同步状态
 - Implementation Notes: 手动同步是补充，不可替代自动同步

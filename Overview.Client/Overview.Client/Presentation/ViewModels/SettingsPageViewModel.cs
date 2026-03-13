@@ -1,5 +1,6 @@
 using Overview.Client.Application.Auth;
 using Overview.Client.Application.Settings;
+using Overview.Client.Application.Sync;
 using Overview.Client.Domain.Entities;
 
 namespace Overview.Client.Presentation.ViewModels;
@@ -8,17 +9,22 @@ public sealed class SettingsPageViewModel
 {
     public const string AiSectionKey = "ai";
     public const string ListSectionKey = "list";
+    public const string SyncSectionKey = "sync";
 
     private readonly IAuthenticationService authenticationService;
     private readonly IUserSettingsService userSettingsService;
+    private readonly ISyncOrchestrationService syncOrchestrationService;
     private UserSettings? currentSettings;
+    private SyncStatusSnapshot currentSyncStatus;
 
     public SettingsPageViewModel(
         IAuthenticationService authenticationService,
-        IUserSettingsService userSettingsService)
+        IUserSettingsService userSettingsService,
+        ISyncOrchestrationService syncOrchestrationService)
     {
         this.authenticationService = authenticationService;
         this.userSettingsService = userSettingsService;
+        this.syncOrchestrationService = syncOrchestrationService;
         Sections = Array.Empty<SettingsSectionEntry>();
         ActiveFields = Array.Empty<SettingsSectionField>();
         PageTitle = "Settings";
@@ -26,7 +32,11 @@ public sealed class SettingsPageViewModel
         RootIntro = "Sign in to configure sync, AI, and planning preferences.";
         SessionSummary = "Account status unavailable.";
         AiSettingsForm = new AiSettingsFormModel();
+        currentSyncStatus = syncOrchestrationService.CurrentStatus;
+        syncOrchestrationService.StatusChanged += OnSyncStatusChanged;
     }
+
+    public event EventHandler? ViewStateChanged;
 
     public IReadOnlyList<SettingsSectionEntry> Sections { get; private set; }
 
@@ -59,7 +69,11 @@ public sealed class SettingsPageViewModel
 
     public bool IsAiEditorVisible => string.Equals(ActiveSection?.Key, AiSectionKey, StringComparison.Ordinal);
 
+    public bool IsSyncSectionVisible => string.Equals(ActiveSection?.Key, SyncSectionKey, StringComparison.Ordinal);
+
     public bool CanSaveAiSettings => IsAuthenticated && !IsBusy;
+
+    public bool CanRunManualSync => IsAuthenticated && !IsBusy;
 
     public async Task InitializeAsync(
         string? initialSectionKey = null,
@@ -98,7 +112,7 @@ public sealed class SettingsPageViewModel
         PageTitle = section.Title;
         PageSubtitle = section.Description;
         DetailLead = section.Subtitle;
-        ActiveFields = BuildActiveFields(section.Key, currentSettings, authenticationService.CurrentSession);
+        ActiveFields = BuildActiveFields(section.Key, currentSettings, authenticationService.CurrentSession, currentSyncStatus);
         DetailFootnote = BuildDetailFootnote(section.Key);
         ResetSectionDraft(section.Key);
         StatusMessage = $"{section.Title} section ready.";
@@ -145,12 +159,37 @@ public sealed class SettingsPageViewModel
                     cancellationToken).ConfigureAwait(false);
 
                 Sections = BuildSections(currentSettings, session);
-                ActiveFields = BuildActiveFields(AiSectionKey, currentSettings, session);
+                ActiveFields = BuildActiveFields(AiSectionKey, currentSettings, session, currentSyncStatus);
                 ResetSectionDraft(AiSectionKey);
                 DetailFootnote = BuildDetailFootnote(AiSectionKey);
                 SessionSummary =
                     $"Signed in as {session.Email}. Sync endpoint: {DisplayOrFallback(currentSettings.SyncServerBaseUrl, "not configured")}.";
                 StatusMessage = "AI settings saved.";
+                return true;
+            }).ConfigureAwait(false);
+    }
+
+    public async Task RunManualSyncAsync(CancellationToken cancellationToken = default)
+    {
+        if (authenticationService.CurrentSession is null)
+        {
+            StatusMessage = "Sign in before running sync.";
+            NotifyStateChanged();
+            return;
+        }
+
+        await ExecuteBusyActionAsync(
+            async () =>
+            {
+                var snapshot = await syncOrchestrationService.SynchronizeNowAsync(cancellationToken).ConfigureAwait(false);
+                ApplySyncStatus(snapshot);
+                StatusMessage = snapshot.State switch
+                {
+                    SyncLifecycleState.Succeeded => "Manual sync completed.",
+                    SyncLifecycleState.Failed => $"Manual sync failed: {snapshot.LastError ?? "Unknown error."}",
+                    SyncLifecycleState.RequiresAuthentication => "Sign in before running sync.",
+                    _ => "Manual sync requested."
+                };
                 return true;
             }).ConfigureAwait(false);
     }
@@ -242,7 +281,7 @@ public sealed class SettingsPageViewModel
                 Title = "Sync",
                 Subtitle = "Server endpoint, sync model, and background status entry.",
                 Summary =
-                    $"Server {DisplayOrFallback(settings?.SyncServerBaseUrl, "not configured")} · Conflict policy last-write-wins",
+                    $"Server {DisplayOrFallback(settings?.SyncServerBaseUrl, "not configured")} · Manual sync and live status",
                 Description = "Expose sync configuration and reserve the secondary page for status and manual controls."
             },
             new SettingsSectionEntry
@@ -259,7 +298,8 @@ public sealed class SettingsPageViewModel
     private static IReadOnlyList<SettingsSectionField> BuildActiveFields(
         string sectionKey,
         UserSettings? settings,
-        AuthSession? session)
+        AuthSession? session,
+        SyncStatusSnapshot? syncStatus)
     {
         return sectionKey switch
         {
@@ -312,8 +352,17 @@ public sealed class SettingsPageViewModel
             [
                 CreateField("Sync Server", DisplayOrFallback(settings?.SyncServerBaseUrl, "not configured")),
                 CreateField("Conflict Strategy", "LastModifiedAt last-write-wins"),
-                CreateField("Notification Toggle", settings?.NotificationEnabled == false ? "Disabled" : "Enabled"),
-                CreateField("Background Sync UI", "Reserved for later task")
+                CreateField("Auto Sync", syncStatus?.IsAutoSyncEnabled == true ? "Running" : "Stopped"),
+                CreateField("Current State", FormatSyncState(syncStatus)),
+                CreateField("Last Trigger", FormatTrigger(syncStatus?.LastTrigger)),
+                CreateField("Pending Local Changes", (syncStatus?.PendingChangeCount ?? 0).ToString()),
+                CreateField("Applied Changes", (syncStatus?.AppliedChangeCount ?? 0).ToString()),
+                CreateField("Pulled Items", (syncStatus?.PulledItemCount ?? 0).ToString()),
+                CreateField("Settings Applied", syncStatus?.SettingsApplied == true ? "Yes" : "No"),
+                CreateField("Conflicts", (syncStatus?.ConflictCount ?? 0).ToString()),
+                CreateField("Last Attempt", FormatTimestamp(syncStatus?.LastAttemptedAt)),
+                CreateField("Last Success", FormatTimestamp(syncStatus?.LastSuccessfulAt)),
+                CreateField("Last Error", DisplayOrFallback(syncStatus?.LastError, "None"))
             ],
             "about" =>
             [
@@ -331,7 +380,7 @@ public sealed class SettingsPageViewModel
         return sectionKey switch
         {
             "ai" => "AI settings now persist to synchronized user settings. Chat delivery will land in the next AI tasks.",
-            "sync" => "Manual sync actions and status widgets will be added in the real-time sync presentation phase.",
+            "sync" => "Manual sync is a fallback control. Background sync remains the primary path for cross-device convergence.",
             "about" => "This page is a stable shell for later version, license, and support details.",
             _ => "This secondary page skeleton is complete. Editable controls will be layered in later focused tasks."
         };
@@ -423,5 +472,58 @@ public sealed class SettingsPageViewModel
         return string.IsNullOrWhiteSpace(sectionKey)
             ? null
             : sectionKey.Trim().ToLowerInvariant();
+    }
+
+    private void OnSyncStatusChanged(object? sender, SyncStatusSnapshot snapshot)
+    {
+        ApplySyncStatus(snapshot);
+        NotifyStateChanged();
+    }
+
+    private void ApplySyncStatus(SyncStatusSnapshot snapshot)
+    {
+        currentSyncStatus = snapshot;
+        if (ActiveSection is not null)
+        {
+            ActiveFields = BuildActiveFields(ActiveSection.Key, currentSettings, authenticationService.CurrentSession, currentSyncStatus);
+        }
+    }
+
+    private void NotifyStateChanged()
+    {
+        ViewStateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private static string FormatSyncState(SyncStatusSnapshot? snapshot)
+    {
+        if (snapshot is null)
+        {
+            return "Unknown";
+        }
+
+        return snapshot.State switch
+        {
+            SyncLifecycleState.Idle => "Idle",
+            SyncLifecycleState.Running => "Running",
+            SyncLifecycleState.Succeeded => "Succeeded",
+            SyncLifecycleState.Failed => $"Failed ({snapshot.ConsecutiveFailureCount} consecutive)",
+            SyncLifecycleState.RequiresAuthentication => "Sign-in required",
+            _ => snapshot.State.ToString()
+        };
+    }
+
+    private static string FormatTrigger(SyncExecutionTrigger? trigger)
+    {
+        return trigger switch
+        {
+            SyncExecutionTrigger.Automatic => "Automatic",
+            SyncExecutionTrigger.Manual => "Manual",
+            _ => "Not yet triggered"
+        };
+    }
+
+    private static string FormatTimestamp(DateTimeOffset? timestamp)
+    {
+        return timestamp?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "Never";
     }
 }

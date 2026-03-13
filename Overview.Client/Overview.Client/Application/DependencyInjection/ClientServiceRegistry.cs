@@ -53,7 +53,8 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<IUserSettingsService>()));
         registry.RegisterSingleton(() => new SettingsPageViewModel(
             registry.Resolve<IAuthenticationService>(),
-            registry.Resolve<IUserSettingsService>()));
+            registry.Resolve<IUserSettingsService>(),
+            registry.Resolve<ISyncOrchestrationService>()));
         registry.RegisterSingleton(() => new HttpClient());
         registry.RegisterSingleton<IOverviewLoggerFactory>(() => NullOverviewLoggerFactory.Instance);
         registry.RegisterSingleton<INotificationScheduler>(() => new NoOpNotificationScheduler());
