@@ -15,6 +15,7 @@
 ## 已完成任务 ID
 
 - `DOC-000`
+- `BOOT-100`
 
 ## 正在进行任务 ID
 
@@ -22,7 +23,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `BOOT-100`
+- `SHELL-110`
 
 ## 当前阻塞
 
@@ -30,33 +31,34 @@
 
 ## 最近已验证结果
 
-- 已存在并确认以下文档：
-  - `“一览”用户要求.md`
-  - `一览-开发设计文档.md`
-  - `一览-开发任务拆解.md`
-  - 接力开发文档体系
+- `dotnet restore Overview.Uno.slnx` 通过
+- `dotnet build Overview.Server/Overview.Server.csproj` 通过
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过
+- 已确认客户端入口文件存在：`Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
+- 已确认服务端入口文件存在：`Overview.Server/Program.cs`
 
 ## 当前真实状态摘要
 
-- 项目目前仍处于纯文档阶段
-- 尚未创建客户端项目骨架
-- 尚未创建服务端项目骨架
+- 已创建根解决方案 `Overview.Uno.slnx`
+- 已创建 Uno Platform 客户端最小项目骨架 `Overview.Client/`
+- 已创建 ASP.NET Core 服务端最小项目骨架 `Overview.Server/`
 - 尚未创建五页应用壳层和默认主页启动
 - 尚未开始任何业务代码实现
-- 尚未初始化 git 仓库，也尚未配置远端上传目标
-- 当前最合理的下一步是先建立客户端和服务端最小项目骨架，再建立五页应用壳层
+- 已确认 git 仓库已初始化，当前分支为 `main`，且已配置 `origin`
+- 已修正文档与仓库真实 git 状态不一致的问题
+- 当前最合理的下一步是建立客户端 MVVM 分层目录，然后继续服务端分层目录和五页应用壳层
 
 ## 风险与偏差
 
-- 当前没有代码，后续 AI 若不先建立工程骨架，会导致 TODO 无法正常推进
+- 已解决此前“无代码骨架”风险
 - 如果跳过应用壳层，后续即使页面分别实现，也不能保证应用直接可用
 - 如果不按 MVVM 顺序推进，页面逻辑会提前侵入数据和同步细节
 - 如果后续实现未同步更新状态文件，接力链路会很快失效
 
 ## 接手 AI 执行准则
 
-- 优先执行 `BOOT-100`
+- 优先执行 `SHELL-110`
 - 除非发现环境或工具限制，否则不要跳到 Domain、同步、主页等后续任务
-- `BOOT-100` 完成后，应继续执行 `SHELL-110`、`SHELL-120`、`SHELL-130`
-- 若执行 `BOOT-100` 时发现缺少必要工具链，应先尝试自行安装或补齐环境，再继续推进
+- `SHELL-110` 完成后，应继续执行 `SHELL-120`、`SHELL-130`
+- 当前客户端根解决方案依赖仓库根目录 `global.json` 提供 `Uno.Sdk` 版本钉住；不要删除
 - 只有在尝试补齐环境后仍无法继续时，才允许在 `PROJECT-HANDOFF.md` 标记阻塞

@@ -1,1 +1,9 @@
 /.codex/
+**/bin/
+**/obj/
+*.user
+**/.run/
+**/.vscode/
+**/.vsconfig
+**/.editorconfig
+**/.gitignore

@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Overview.Client/">
+    <Project Path="Overview.Client/Overview.Client/Overview.Client.csproj" />
+  </Folder>
+  <Project Path="Overview.Server/Overview.Server.csproj" />
+</Solution>

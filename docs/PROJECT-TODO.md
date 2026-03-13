@@ -39,15 +39,18 @@
 - Title: 创建客户端与服务端项目根骨架
 - Phase: 阶段 1
 - Depends On: DOC-000
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 创建 Uno Platform 客户端和 ASP.NET Core 服务端的最小项目结构
-- Implementation Notes: 先建立目录、解决方案/项目文件、最小可启动程序
+- Implementation Notes: 已建立根解决方案、Uno 客户端项目、ASP.NET Core 服务端项目，并补充根级 `global.json` 以保证从仓库根目录可恢复 Uno SDK
 - Done When:
   - 存在客户端项目骨架
   - 存在服务端项目骨架
   - 存在统一的基础目录结构
 - Verification:
+  - `dotnet restore Overview.Uno.slnx`
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
   - 能定位客户端入口文件
   - 能定位服务端入口文件
 - Files Expected:

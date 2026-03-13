@@ -57,3 +57,13 @@
 ### Round 9
 
 - 新增开始前规则：每轮工作开始前必须先检查 git 仓库状态
+
+### Round 10
+
+- 完成 `BOOT-100`
+- 创建根解决方案 `Overview.Uno.slnx`
+- 创建 Uno Platform 客户端项目骨架 `Overview.Client/`
+- 创建 ASP.NET Core 服务端项目骨架 `Overview.Server/`
+- 新增根级 `global.json`，固定 `Uno.Sdk` 版本并支持从仓库根目录恢复
+- 验证客户端桌面目标和服务端项目可成功构建
+- 修正文档中关于 git 初始化状态的过期描述

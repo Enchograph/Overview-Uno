@@ -4,6 +4,10 @@
 
 ## 当前实际文件
 
+- `global.json`
+  - 仓库根目录 SDK 固定文件，提供 .NET SDK 版本和 `Uno.Sdk` 版本
+- `Overview.Uno.slnx`
+  - 仓库主解决方案入口，统一挂接客户端与服务端项目
 - `docs/“一览”用户要求.md`
   - 用户原始需求，最高业务优先级来源
 - `docs/一览-开发设计文档.md`
@@ -30,13 +34,37 @@
   - 当前文件地图
 - `docs/PROJECT-CHANGELOG.md`
   - 接力变更记录
+- `Overview.Client/Overview.Client/Overview.Client.csproj`
+  - Uno Platform 客户端主项目
+- `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
+  - 客户端桌面入口
+- `Overview.Client/Overview.Client/Platforms/WebAssembly/Program.cs`
+  - 客户端 WebAssembly 入口
+- `Overview.Client/Overview.Client/MainPage.xaml`
+  - 当前客户端默认占位页面
+- `Overview.Server/Overview.Server.csproj`
+  - ASP.NET Core 服务端主项目
+- `Overview.Server/Program.cs`
+  - 服务端入口文件
 
 ## 当前不存在但未来应出现的关键路径
 
-- `Overview.Client/`
-  - Uno Platform 客户端根目录
-- `Overview.Server/`
-  - ASP.NET Core 服务端根目录
+- `Overview.Client/Presentation/`
+  - 客户端 Presentation 分层目录
+- `Overview.Client/Application/`
+  - 客户端 Application 分层目录
+- `Overview.Client/Domain/`
+  - 客户端 Domain 分层目录
+- `Overview.Client/Infrastructure/`
+  - 客户端 Infrastructure 分层目录
+- `Overview.Server/Api/`
+  - 服务端 API 分层目录
+- `Overview.Server/Application/`
+  - 服务端 Application 分层目录
+- `Overview.Server/Domain/`
+  - 服务端 Domain 分层目录
+- `Overview.Server/Infrastructure/`
+  - 服务端 Infrastructure 分层目录
 - `tests/` 或等价测试项目目录
   - 自动化测试
 
