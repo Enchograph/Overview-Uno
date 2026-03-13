@@ -54,6 +54,18 @@
   - ASP.NET Core 服务端主项目
 - `Overview.Server/Program.cs`
   - 服务端入口文件
+- `Overview.Server/Api/Controllers/HealthController.cs`
+  - 服务端最小健康检查控制器
+- `Overview.Server/Api/Contracts/HealthResponse.cs`
+  - 服务端最小 API 返回契约
+- `Overview.Server/Application/DependencyInjection/ApplicationServiceCollectionExtensions.cs`
+  - 服务端应用层注册入口
+- `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
+  - 服务端基础设施层注册入口
+- `Overview.Server/Infrastructure/Configuration/PersistenceOptions.cs`
+  - 服务端持久化配置样例对象
+- `Overview.Server/appsettings.Sample.json`
+  - 服务端 PostgreSQL、认证、邮件、同步配置样例
 
 ## 当前不存在但未来应出现的关键路径
 

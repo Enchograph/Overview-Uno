@@ -2,21 +2,23 @@
 
 ## 本轮目标
 
-- 完成 `SHELL-110`，建立客户端 MVVM 分层目录和基础注册点
+- 完成 `SHELL-120`，建立服务端分层目录和基础配置样例
 
 ## 本轮完成
 
-- 在客户端项目中创建 `Presentation`、`Application`、`Domain`、`Infrastructure` 目录
-- 将默认 `MainPage` 迁移至 `Presentation/Pages/MainPage.xaml`
-- 新增 `Presentation/ViewModels/MainViewModel.cs`
-- 新增基础注册点 `Application/DependencyInjection/ClientServiceRegistry.cs`
-- 新增 `DomainAssemblyMarker.cs` 与 `InfrastructureAssemblyMarker.cs` 作为分层落点
-- 更新 `App.xaml.cs`，使应用启动时初始化轻量注册中心并解析页面 ViewModel
-- 验证 `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 在服务端项目中创建 `Api`、`Application`、`Domain`、`Infrastructure` 目录
+- 删除模板自带的天气示例控制器和模型
+- 新增 `Api/Controllers/HealthController.cs` 作为最小 API 落点
+- 新增 `Api/Contracts/HealthResponse.cs`
+- 新增 `Application/DependencyInjection/ApplicationServiceCollectionExtensions.cs`
+- 新增 `Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
+- 新增 `Infrastructure/Configuration/PersistenceOptions.cs`
+- 新增 `appsettings.Sample.json` 作为 PostgreSQL、认证、邮件、同步的配置样例
+- 更新 `Program.cs`，将应用层和基础设施层注册接入启动入口
+- 验证 `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
 
 ## 本轮未完成
 
-- 服务端分层目录和基础配置样例
 - 五页应用壳层、底部导航、默认主页启动
 - 任何业务代码实现
 
@@ -26,13 +28,14 @@
 
 ## 已更新文件
 
-- `Overview.Client/Overview.Client/App.xaml.cs`
-- `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
-- `Overview.Client/Overview.Client/Presentation/Pages/MainPage.xaml`
-- `Overview.Client/Overview.Client/Presentation/Pages/MainPage.xaml.cs`
-- `Overview.Client/Overview.Client/Presentation/ViewModels/MainViewModel.cs`
-- `Overview.Client/Overview.Client/Domain/DomainAssemblyMarker.cs`
-- `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
+- `Overview.Server/Program.cs`
+- `Overview.Server/Api/Contracts/HealthResponse.cs`
+- `Overview.Server/Api/Controllers/HealthController.cs`
+- `Overview.Server/Application/DependencyInjection/ApplicationServiceCollectionExtensions.cs`
+- `Overview.Server/Domain/AssemblyMarker.cs`
+- `Overview.Server/Infrastructure/Configuration/PersistenceOptions.cs`
+- `Overview.Server/Infrastructure/DependencyInjection/InfrastructureServiceCollectionExtensions.cs`
+- `Overview.Server/appsettings.Sample.json`
 - `docs/PROJECT-STATUS.md`
 - `docs/PROJECT-TODO.md`
 - `docs/PROJECT-HANDOFF.md`
@@ -41,7 +44,7 @@
 
 ## 下一步唯一推荐动作
 
-- 执行 `SHELL-120`：在服务端建立 `Api`、`Application`、`Domain`、`Infrastructure` 目录和基础配置样例；不要提前实现完整业务逻辑
+- 执行 `SHELL-130`：实现 5 页应用壳层、底部导航和默认主页启动，保持页面为占位壳层，不提前进入业务逻辑
 
 ## 接手 AI 注意事项
 
@@ -51,6 +54,7 @@
 - 若从仓库根目录执行 `dotnet restore/build`，必须保留根级 `global.json`，否则 `Uno.Sdk` 无法解析
 - Uno 模板还生成了 `Overview.Client/Overview.Client.sln`，当前以仓库根解决方案为主
 - 当前客户端已经有轻量注册中心，但这只是骨架，不应在 `SHELL-120` 前开始实现业务服务
+- 服务端当前只有健康检查与配置落点，不应在 `SHELL-130` 前跳去实现持久化或认证
 - 不要跳过 Shell/Domain/Application 直接做页面细节
 - 如果发现本地环境缺少构建所需工具链，先尝试自行安装或补齐环境，再继续任务
 - 只有在尝试安装后仍无法继续时，才记录阻塞

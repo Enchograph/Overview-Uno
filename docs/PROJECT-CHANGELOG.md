@@ -76,3 +76,12 @@
 - 新增 `Presentation/ViewModels/MainViewModel.cs`
 - 新增轻量注册点 `Application/DependencyInjection/ClientServiceRegistry.cs`
 - 验证客户端桌面目标在分层调整后仍可无警告构建
+
+### Round 12
+
+- 完成 `SHELL-120`
+- 在服务端项目中建立 `Api`、`Application`、`Domain`、`Infrastructure` 分层目录
+- 删除模板天气示例，改为最小健康检查控制器
+- 新增服务端基础配置样例 `appsettings.Sample.json`
+- 将应用层和基础设施层注册扩展接入服务端启动入口
+- 验证服务端项目可无警告构建

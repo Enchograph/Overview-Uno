@@ -80,13 +80,18 @@
 - Title: 建立服务端分层目录和基础配置样例
 - Phase: 阶段 1
 - Depends On: BOOT-100
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 建立 API、Application、Domain、Infrastructure 目录与基础配置样例
-- Implementation Notes: 暂不实现完整业务逻辑
+- Implementation Notes: 已移除模板天气示例，新增 `Api`、`Application`、`Domain`、`Infrastructure` 目录落点、健康检查控制器以及 `appsettings.Sample.json`；暂不实现完整业务逻辑
 - Done When: 服务端分层目录存在
-- Verification: 可定位服务端分层目录
-- Files Expected: 服务端分层目录
+- Verification:
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - 可定位服务端分层目录
+  - 可定位基础配置样例
+- Files Expected:
+  - 服务端分层目录
+  - 基础配置样例
 
 ### Task ID: SHELL-130
 
