@@ -765,7 +765,7 @@
 - Title: 完成平板横竖屏适配
 - Phase: 阶段 10
 - Depends On: HOME-630, LIST-750, AI-830
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 完成平板主流程适配
 - Implementation Notes: 保持逻辑不变，只调整布局和交互尺寸

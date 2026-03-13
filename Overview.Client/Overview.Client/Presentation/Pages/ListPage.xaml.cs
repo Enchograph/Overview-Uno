@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Overview.Client.Presentation.Layout;
 using Overview.Client.Presentation.ViewModels;
 using Overview.Client.Domain.Enums;
 using Windows.UI;
@@ -18,10 +19,12 @@ public sealed partial class ListPage : Page
         DataContext = App.Services.Resolve<ListPageViewModel>();
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        SizeChanged += OnSizeChanged;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        ApplyAdaptiveLayout(ActualWidth);
         await ViewModel.InitializeAsync().ConfigureAwait(true);
         ApplyViewModelState();
     }
@@ -30,6 +33,12 @@ public sealed partial class ListPage : Page
     {
         Loaded -= OnLoaded;
         Unloaded -= OnUnloaded;
+        SizeChanged -= OnSizeChanged;
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        ApplyAdaptiveLayout(e.NewSize.Width);
     }
 
     private async void OnTabButtonClick(object sender, RoutedEventArgs e)
@@ -261,6 +270,23 @@ public sealed partial class ListPage : Page
         {
             brush.Color = color;
         }
+    }
+
+    private void ApplyAdaptiveLayout(double width)
+    {
+        var useDualPane = AdaptiveLayout.UseDualPane(width);
+        var isTablet = AdaptiveLayout.IsTablet(width);
+
+        PrimaryActionPanel.Orientation = isTablet ? Orientation.Vertical : Orientation.Horizontal;
+        SummaryPanel.Orientation = isTablet ? Orientation.Vertical : Orientation.Horizontal;
+        LayoutRoot.Padding = new Thickness(isTablet ? 32 : 24);
+        PrimaryActionPanel.MaxWidth = isTablet ? 420 : double.PositiveInfinity;
+
+        ContentPanel.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+        ContentPanel.ColumnDefinitions[1].Width = useDualPane ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+
+        Grid.SetRow(CompletedSectionBorder, useDualPane ? 0 : 1);
+        Grid.SetColumn(CompletedSectionBorder, useDualPane ? 1 : 0);
     }
 
     private static ListPageThemePalette ResolveThemePalette(string themeKey)

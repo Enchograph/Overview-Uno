@@ -17,7 +17,7 @@
     <SolidColorBrush x:Key="ListPageCompletedBadgeBrush" Color="#FFE2CFAE" />
     <SolidColorBrush x:Key="ListPageStatusBrush" Color="#FF8A5A2B" />
   </Page.Resources>
-  <Grid Padding="24" RowDefinitions="Auto,Auto,*">
+  <Grid x:Name="LayoutRoot" Padding="24" RowDefinitions="Auto,Auto,*">
     <StackPanel Spacing="6">
       <TextBlock x:Name="PageTitleTextBlock" FontSize="30" FontWeight="SemiBold" Text="List" />
       <TextBlock
@@ -56,60 +56,58 @@
           </ItemsControl>
         </ScrollViewer>
 
-        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
-          <TextBlock
-            VerticalAlignment="Center"
-            Text="Sort by"
-            Style="{ThemeResource BodyStrongTextBlockStyle}" />
-          <ComboBox
-            x:Name="SortByComboBox"
-            Grid.Column="1"
-            MinWidth="180"
-            SelectionChanged="OnSortBySelectionChanged">
-            <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="viewModels:ListPageSortOptionViewModel">
-                <TextBlock Text="{Binding Label}" />
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-          <Button
-            x:Name="ReorderModeButton"
-            Grid.Column="2"
-            Click="OnReorderModeButtonClick"
-            Content="Reorder Tasks" />
-          <ComboBox
-            x:Name="ThemeComboBox"
-            Grid.Column="3"
-            MinWidth="150"
-            PlaceholderText="Theme"
-            SelectionChanged="OnThemeSelectionChanged">
-            <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="viewModels:ListPageThemeOptionViewModel">
-                <TextBlock Text="{Binding Label}" />
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-          <Button
-            x:Name="MoreSettingsButton"
-            Grid.Column="4"
-            Click="OnMoreSettingsButtonClick"
-            Content="More Settings" />
-          <TextBlock
-            x:Name="ActiveSummaryTextBlock"
-            Grid.Column="5"
-            Style="{ThemeResource BodyStrongTextBlockStyle}" />
-          <TextBlock
-            x:Name="CompletedSummaryTextBlock"
-            Grid.Column="6"
-            Style="{ThemeResource BodyStrongTextBlockStyle}" />
-          <ProgressRing
-            x:Name="BusyIndicator"
-            Grid.Column="7"
-            Width="24"
-            Height="24"
-            IsActive="False"
-            VerticalAlignment="Center" />
-        </Grid>
+        <StackPanel x:Name="ToolbarControlsPanel" Spacing="12">
+          <StackPanel x:Name="PrimaryActionPanel" Orientation="Horizontal" Spacing="12">
+            <TextBlock
+              VerticalAlignment="Center"
+              Text="Sort by"
+              Style="{ThemeResource BodyStrongTextBlockStyle}" />
+            <ComboBox
+              x:Name="SortByComboBox"
+              MinWidth="180"
+              SelectionChanged="OnSortBySelectionChanged">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:ListPageSortOptionViewModel">
+                  <TextBlock Text="{Binding Label}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button
+              x:Name="ReorderModeButton"
+              Click="OnReorderModeButtonClick"
+              Content="Reorder Tasks" />
+            <ComboBox
+              x:Name="ThemeComboBox"
+              MinWidth="150"
+              PlaceholderText="Theme"
+              SelectionChanged="OnThemeSelectionChanged">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:ListPageThemeOptionViewModel">
+                  <TextBlock Text="{Binding Label}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button
+              x:Name="MoreSettingsButton"
+              Click="OnMoreSettingsButtonClick"
+              Content="More Settings" />
+          </StackPanel>
+
+          <StackPanel x:Name="SummaryPanel" Orientation="Horizontal" Spacing="12">
+            <TextBlock
+              x:Name="ActiveSummaryTextBlock"
+              Style="{ThemeResource BodyStrongTextBlockStyle}" />
+            <TextBlock
+              x:Name="CompletedSummaryTextBlock"
+              Style="{ThemeResource BodyStrongTextBlockStyle}" />
+            <ProgressRing
+              x:Name="BusyIndicator"
+              Width="24"
+              Height="24"
+              IsActive="False"
+              VerticalAlignment="Center" />
+          </StackPanel>
+        </StackPanel>
 
         <TextBlock
           x:Name="StatusTextBlock"
@@ -121,9 +119,19 @@
     <Grid Grid.Row="2">
       <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
-        <StackPanel x:Name="ContentPanel" Spacing="16">
+        <Grid x:Name="ContentPanel" RowSpacing="16" ColumnSpacing="16">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="0" />
+          </Grid.ColumnDefinitions>
           <Border
             x:Name="ActiveSectionBorder"
+            Grid.Row="0"
+            Grid.Column="0"
             Padding="20"
             Background="{StaticResource ListPageSectionBackgroundBrush}"
             BorderBrush="{StaticResource ListPageSectionBorderBrush}"
@@ -222,6 +230,8 @@
 
           <Border
             x:Name="CompletedSectionBorder"
+            Grid.Row="1"
+            Grid.Column="0"
             Padding="20"
             Background="{StaticResource ListPageSectionBackgroundBrush}"
             BorderBrush="{StaticResource ListPageSectionBorderBrush}"
@@ -318,7 +328,7 @@
               </ListView>
             </StackPanel>
           </Border>
-        </StackPanel>
+        </Grid>
 
         <Border
           x:Name="EmptyStateBorder"

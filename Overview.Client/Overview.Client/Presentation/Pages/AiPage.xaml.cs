@@ -1,4 +1,5 @@
 using Overview.Client.Domain.Enums;
+using Overview.Client.Presentation.Layout;
 using Overview.Client.Presentation.Components;
 using Overview.Client.Presentation.ViewModels;
 
@@ -14,10 +15,12 @@ public sealed partial class AiPage : Page
         DataContext = App.Services.Resolve<AiPageViewModel>();
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        SizeChanged += OnSizeChanged;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        ApplyAdaptiveLayout(ActualWidth);
         await ViewModel.InitializeAsync().ConfigureAwait(true);
         ApplyViewModelState();
     }
@@ -26,6 +29,12 @@ public sealed partial class AiPage : Page
     {
         Loaded -= OnLoaded;
         Unloaded -= OnUnloaded;
+        SizeChanged -= OnSizeChanged;
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        ApplyAdaptiveLayout(e.NewSize.Width);
     }
 
     private void OnComposerTextChanged(object sender, TextChangedEventArgs e)
@@ -111,5 +120,29 @@ public sealed partial class AiPage : Page
         {
             MessagesListView.ScrollIntoView(ViewModel.Messages[^1]);
         }
+    }
+
+    private void ApplyAdaptiveLayout(double width)
+    {
+        var useDualPane = AdaptiveLayout.UseDualPane(width);
+        var isTablet = AdaptiveLayout.IsTablet(width);
+
+        LayoutRoot.Padding = new Thickness(isTablet ? 32 : 24);
+        LayoutRoot.ColumnDefinitions[0].Width = useDualPane ? new GridLength(340) : new GridLength(1, GridUnitType.Star);
+        LayoutRoot.ColumnDefinitions[1].Width = useDualPane ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+        LayoutRoot.RowDefinitions[0].Height = GridLength.Auto;
+        LayoutRoot.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
+        LayoutRoot.RowDefinitions[2].Height = useDualPane ? new GridLength(1, GridUnitType.Star) : GridLength.Auto;
+
+        Grid.SetRow(SidebarPanel, 0);
+        Grid.SetColumn(SidebarPanel, 0);
+        Grid.SetRowSpan(SidebarPanel, useDualPane ? 3 : 1);
+
+        Grid.SetRow(ConversationPanel, useDualPane ? 0 : 1);
+        Grid.SetColumn(ConversationPanel, useDualPane ? 1 : 0);
+        Grid.SetRowSpan(ConversationPanel, useDualPane ? 2 : 1);
+
+        Grid.SetRow(ComposerPanel, useDualPane ? 2 : 2);
+        Grid.SetColumn(ComposerPanel, useDualPane ? 1 : 0);
     }
 }

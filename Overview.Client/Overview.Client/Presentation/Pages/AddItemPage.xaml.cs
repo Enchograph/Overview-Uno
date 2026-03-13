@@ -1,6 +1,7 @@
 using System;
 using Overview.Client.Presentation.ViewModels;
 using Overview.Client.Domain.Enums;
+using Overview.Client.Presentation.Layout;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace Overview.Client.Presentation.Pages;
@@ -17,10 +18,12 @@ public sealed partial class AddItemPage : Page
         DataContext = App.Services.Resolve<AddItemPageViewModel>();
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        SizeChanged += OnSizeChanged;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        ApplyAdaptiveLayout(ActualWidth);
         await ViewModel.InitializeAsync(navigationRequest).ConfigureAwait(true);
         ApplyViewModelState();
     }
@@ -35,6 +38,12 @@ public sealed partial class AddItemPage : Page
     {
         Loaded -= OnLoaded;
         Unloaded -= OnUnloaded;
+        SizeChanged -= OnSizeChanged;
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        ApplyAdaptiveLayout(e.NewSize.Width);
     }
 
     private async void OnSubmitButtonClick(object sender, RoutedEventArgs e)
@@ -223,5 +232,24 @@ public sealed partial class AddItemPage : Page
 
         itemId = Guid.Empty;
         return false;
+    }
+
+    private void ApplyAdaptiveLayout(double width)
+    {
+        var useDualPane = AdaptiveLayout.UseDualPane(width);
+
+        LayoutRoot.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+        LayoutRoot.ColumnDefinitions[1].Width = useDualPane ? new GridLength(420) : new GridLength(0);
+
+        Grid.SetColumn(FormHeaderPanel, 0);
+        Grid.SetColumn(FormCard, 0);
+        Grid.SetColumn(ExistingItemsCard, useDualPane ? 1 : 0);
+        Grid.SetColumn(DetailPanel, useDualPane ? 1 : 0);
+
+        Grid.SetRow(FormHeaderPanel, 0);
+        Grid.SetRow(FormCard, 1);
+        Grid.SetRow(ExistingItemsCard, useDualPane ? 0 : 2);
+        Grid.SetRow(DetailPanel, useDualPane ? 1 : 3);
+        Grid.SetRowSpan(ExistingItemsCard, useDualPane ? 1 : 1);
     }
 }

@@ -2,6 +2,15 @@
 
 ## 2026-03-13
 
+### Round 50
+
+- 完成 `PLATFORM-1020`
+- 新增 `Presentation/Layout/AdaptiveLayout.cs`，统一平板断点和双栏布局切换规则
+- 将 `ShellPage` 宽屏导航切换为左侧导航栏，保留窄屏底部导航
+- 将 `HomePage`、`ListPage`、`AiPage`、`AddItemPage` 升级为平板双栏或重排布局
+- 调整 `SettingsPage` 平板间距，保持设置主流程可读性
+- 验证客户端桌面构建通过、客户端测试 58/58 通过
+
 ### Round 49
 
 - 完成 `PLATFORM-1010`

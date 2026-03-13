@@ -3,7 +3,17 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:components="using:Overview.Client.Presentation.Components"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <Grid Padding="24" RowDefinitions="Auto,Auto,*">
+  <Grid x:Name="LayoutRoot" Padding="24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="0" />
+    </Grid.ColumnDefinitions>
+
+    <StackPanel x:Name="ControlPanel" Grid.Row="0" Grid.Column="0" Spacing="18">
     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
       <Button
         x:Name="PreviousPeriodButton"
@@ -40,7 +50,6 @@
         HorizontalAlignment="Right" />
     </Grid>
 
-    <StackPanel Grid.Row="1" Margin="0,18,0,18" Spacing="16">
       <Border
         Padding="18"
         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -114,7 +123,7 @@
       </Border>
     </StackPanel>
 
-    <Grid Grid.Row="2">
+    <Grid x:Name="TimelineHost" Grid.Row="1" Grid.Column="0">
       <Border
         x:Name="LoggedOutStateBorder"
         Padding="24"

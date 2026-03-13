@@ -6,7 +6,7 @@
       xmlns:viewModels="using:Overview.Client.Presentation.ViewModels"
       mc:Ignorable="d"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <Grid Padding="24" RowDefinitions="Auto,Auto,*">
+  <Grid x:Name="LayoutRoot" Padding="24" RowDefinitions="Auto,Auto,*">
     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
       <Button
         x:Name="BackButton"

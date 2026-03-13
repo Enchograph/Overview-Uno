@@ -57,6 +57,7 @@
 - `SYNC-920`
 - `PLATFORM-1000`
 - `PLATFORM-1010`
+- `PLATFORM-1020`
 
 ## 正在进行任务 ID
 
@@ -64,7 +65,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `PLATFORM-1020`
+- `PLATFORM-1030`
 
 ## 当前阻塞
 
@@ -72,6 +73,23 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，58/58 用例通过，0 failed
+- 已确认客户端已新增统一平板断点与横竖屏自适应布局：
+  - `Overview.Client/Overview.Client/Presentation/Layout/AdaptiveLayout.cs`
+- 已确认客户端以下主流程页面已完成平板适配：
+  - 壳层底部导航在宽屏切换为左侧导航栏
+  - 主页在宽屏切换为控制面板 + 时间轴双栏
+  - 列表页在宽屏切换为分组双栏，在平板宽度下重排工具栏
+  - AI 页在宽屏切换为侧边控制区 + 会话区双栏
+  - 添加页在宽屏切换为表单区 + 已有事项/详情区双栏
+  - 设置页按平板断点放大边距，保持主流程可用
+  - `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml`
+  - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
+  - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
+  - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
+  - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
+  - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop -v q` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，58/58 用例通过，0 failed
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-android -v q` 在 120 秒超时前未出现编译错误，已生成 `bin/Debug/net10.0-android/Overview.Client.dll`；当前环境下 Android 构建收尾仍未正常回收，但小组件 Provider / Resources / MainActivity 跳转链路已通过编译阶段，仅剩既有平台警告

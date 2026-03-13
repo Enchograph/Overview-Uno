@@ -1,4 +1,5 @@
 using Overview.Client.Presentation.ViewModels;
+using Overview.Client.Presentation.Layout;
 
 namespace Overview.Client.Presentation.Pages;
 
@@ -14,11 +15,13 @@ public sealed partial class SettingsPage : Page
         DataContext = App.Services.Resolve<SettingsPageViewModel>();
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        SizeChanged += OnSizeChanged;
         ViewModel.ViewStateChanged += OnViewModelStateChanged;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        ApplyAdaptiveLayout(ActualWidth);
         await ViewModel.InitializeAsync(initialSectionKey).ConfigureAwait(true);
         ApplyViewModelState();
     }
@@ -34,6 +37,12 @@ public sealed partial class SettingsPage : Page
         ViewModel.ViewStateChanged -= OnViewModelStateChanged;
         Loaded -= OnLoaded;
         Unloaded -= OnUnloaded;
+        SizeChanged -= OnSizeChanged;
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        ApplyAdaptiveLayout(e.NewSize.Width);
     }
 
     private async void OnRefreshButtonClick(object sender, RoutedEventArgs e)
@@ -137,5 +146,10 @@ public sealed partial class SettingsPage : Page
         {
             AiModelTextBox.Text = ViewModel.AiSettingsForm.Model;
         }
+    }
+
+    private void ApplyAdaptiveLayout(double width)
+    {
+        LayoutRoot.Padding = new Thickness(AdaptiveLayout.IsTablet(width) ? 32 : 24);
     }
 }

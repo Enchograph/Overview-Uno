@@ -5,21 +5,33 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <Grid RowDefinitions="*,Auto">
-    <Frame x:Name="ContentFrame" />
+  <Grid x:Name="RootGrid">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="0" />
+    </Grid.ColumnDefinitions>
+
+    <Frame x:Name="ContentFrame" Grid.Row="0" Grid.Column="0" />
 
     <Border
+      x:Name="NavigationBorder"
       Grid.Row="1"
+      Grid.Column="0"
+      Grid.ColumnSpan="2"
       Padding="12"
       BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
       BorderThickness="0,1,0,0">
-      <Grid ColumnDefinitions="*,*,*,*,*">
-        <Button Grid.Column="0" Click="OnNavigationButtonClick" Content="Home" Tag="Home" />
-        <Button Grid.Column="1" Click="OnNavigationButtonClick" Content="List" Tag="List" />
-        <Button Grid.Column="2" Click="OnNavigationButtonClick" Content="AI" Tag="Ai" />
-        <Button Grid.Column="3" Click="OnNavigationButtonClick" Content="Add" Tag="Add" />
-        <Button Grid.Column="4" Click="OnNavigationButtonClick" Content="Settings" Tag="Settings" />
-      </Grid>
+      <StackPanel x:Name="NavigationPanel" Orientation="Horizontal" Spacing="12">
+        <Button x:Name="HomeNavigationButton" Click="OnNavigationButtonClick" Content="Home" Tag="Home" />
+        <Button x:Name="ListNavigationButton" Click="OnNavigationButtonClick" Content="List" Tag="List" />
+        <Button x:Name="AiNavigationButton" Click="OnNavigationButtonClick" Content="AI" Tag="Ai" />
+        <Button x:Name="AddNavigationButton" Click="OnNavigationButtonClick" Content="Add" Tag="Add" />
+        <Button x:Name="SettingsNavigationButton" Click="OnNavigationButtonClick" Content="Settings" Tag="Settings" />
+      </StackPanel>
     </Border>
   </Grid>
 </Page>

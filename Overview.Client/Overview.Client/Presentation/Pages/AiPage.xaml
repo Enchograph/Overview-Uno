@@ -4,16 +4,19 @@
       xmlns:components="using:Overview.Client.Presentation.Components"
       xmlns:viewModels="using:Overview.Client.Presentation.ViewModels"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <Grid Padding="24" RowSpacing="16">
+  <Grid x:Name="LayoutRoot" Padding="24" RowSpacing="16">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
-      <RowDefinition Height="Auto" />
+      <RowDefinition Height="0" />
     </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="0" />
+    </Grid.ColumnDefinitions>
 
-    <StackPanel Spacing="6">
+    <StackPanel x:Name="SidebarPanel" Grid.Row="0" Grid.Column="0" Spacing="16">
+      <StackPanel Spacing="6">
       <TextBlock x:Name="PageTitleTextBlock" FontSize="28" FontWeight="SemiBold" />
       <TextBlock x:Name="PageDescriptionTextBlock"
                  Opacity="0.72"
@@ -33,9 +36,9 @@
                      TextWrapping="WrapWholeWords" />
         </StackPanel>
       </Button>
-    </StackPanel>
+      </StackPanel>
 
-    <Border Grid.Row="1"
+    <Border
             Padding="12"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             CornerRadius="14">
@@ -46,7 +49,7 @@
       </StackPanel>
     </Border>
 
-    <StackPanel Grid.Row="2" Spacing="12">
+    <StackPanel Spacing="12">
       <StackPanel Orientation="Horizontal" Spacing="8">
         <Button x:Name="DayModeButton"
                 Click="OnDayModeButtonClick"
@@ -70,8 +73,9 @@
                                         SelectionConfirmed="OnTimeSelectionConfirmed" />
       </Border>
     </StackPanel>
+    </StackPanel>
 
-    <Grid Grid.Row="3">
+    <Grid x:Name="ConversationPanel" Grid.Row="1" Grid.Column="0">
       <ListView x:Name="MessagesListView"
                 SelectionMode="None"
                 IsItemClickEnabled="False">
@@ -107,7 +111,7 @@
       </Border>
     </Grid>
 
-    <Grid Grid.Row="4" ColumnSpacing="12">
+    <Grid x:Name="ComposerPanel" Grid.Row="2" Grid.Column="0" ColumnSpacing="12">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="Auto" />

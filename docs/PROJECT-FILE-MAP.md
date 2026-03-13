@@ -79,21 +79,23 @@
 - `Overview.Client/Overview.Client/Application/Settings/`
   - 客户端设置应用层目录，包含默认设置读取、设置保存和更新输入模型
 - `Overview.Client/Overview.Client/Presentation/Pages/ShellPage.xaml`
-  - 客户端应用壳层和底部导航入口
+  - 客户端应用壳层和底部导航入口，当前在平板宽屏下切换为左侧导航栏
+- `Overview.Client/Overview.Client/Presentation/Layout/AdaptiveLayout.cs`
+  - 客户端统一平板断点与双栏布局规则，供壳层和各主页面复用
 - `Overview.Client/Overview.Client/Presentation/Pages/LoginPage.xaml`
   - 客户端登录/注册入口页，负责启动时会话恢复和进入壳层前的认证流程
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
-  - 客户端主页真实骨架，当前支持顶栏周期切换、窄屏周视图、宽屏月视图、时间块网格、标题展开时间选择组件和事项详情弹层
+  - 客户端主页真实骨架，当前支持顶栏周期切换、窄屏周视图、宽屏月视图、时间块网格、标题展开时间选择组件、事项详情弹层，以及平板双栏布局
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
-  - 客户端列表页真实骨架，当前支持六个标签筛选、五种排序、完成/重要切换、手动重排、四种主题切换、“更多设置”跳转、左右滑动编辑删除、浮动添加按钮、未完成/已完成分组和空态展示
+  - 客户端列表页真实骨架，当前支持六个标签筛选、五种排序、完成/重要切换、手动重排、四种主题切换、“更多设置”跳转、左右滑动编辑删除、浮动添加按钮、未完成/已完成分组、空态展示和平板双栏布局
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
-  - 客户端 AI 聊天页，当前支持按日/周/月切换查看聊天记录、展开时间选择器、输入消息、发送请求和空态展示
+  - 客户端 AI 聊天页，当前支持按日/周/月切换查看聊天记录、展开时间选择器、输入消息、发送请求、空态展示和平板双栏布局
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
-  - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口、详情卡片接入，以及来自主页长按的预填导航参数支持
+  - 客户端添加/编辑事项页，当前包含三类事项基础表单、已有事项查看/编辑入口、详情卡片接入、来自主页长按的预填导航参数支持，以及平板表单/详情双栏布局
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemNavigationRequest.cs`
   - 客户端添加/编辑事项导航参数模型，承载主页长按空白预填、列表页浮动添加默认值和长按事项编辑请求
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
-  - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架、设置摘要展示、AI 分区的 Base URL / API Key / Model 编辑表单，以及 Sync 分区的手动同步入口和状态面板
+  - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架、设置摘要展示、AI 分区的 Base URL / API Key / Model 编辑表单，以及 Sync 分区的手动同步入口和状态面板；当前已补平板间距适配
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml.cs`
   - 客户端设置页代码后置，当前支持根据导航参数直接打开指定设置分区，并在同步状态变化时刷新页面
 - `Overview.Client/Overview.Client/Presentation/Components/ItemDetailCard.xaml`

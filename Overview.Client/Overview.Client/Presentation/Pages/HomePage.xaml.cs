@@ -1,6 +1,7 @@
 using Overview.Client.Presentation.ViewModels;
 using Overview.Client.Domain.Enums;
 using Overview.Client.Presentation.Components;
+using Overview.Client.Presentation.Layout;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace Overview.Client.Presentation.Pages;
@@ -20,6 +21,7 @@ public sealed partial class HomePage : Page
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        ApplyAdaptiveLayout(ActualWidth);
         await ViewModel.InitializeAsync(ActualWidth).ConfigureAwait(true);
         ApplyViewModelState();
     }
@@ -33,6 +35,7 @@ public sealed partial class HomePage : Page
 
     private async void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
+        ApplyAdaptiveLayout(e.NewSize.Width);
         await ViewModel.UpdateViewportAsync(e.NewSize.Width).ConfigureAwait(true);
         ApplyViewModelState();
     }
@@ -188,5 +191,25 @@ public sealed partial class HomePage : Page
             TimelineGrid.Render(null);
             LoggedOutStateBorder.Visibility = Visibility.Visible;
         }
+    }
+
+    private void ApplyAdaptiveLayout(double width)
+    {
+        var useDualPane = AdaptiveLayout.UseDualPane(width);
+
+        LayoutRoot.ColumnDefinitions[0].Width = useDualPane ? new GridLength(360) : new GridLength(1, GridUnitType.Star);
+        LayoutRoot.ColumnDefinitions[1].Width = useDualPane ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+        LayoutRoot.RowDefinitions[0].Height = useDualPane ? new GridLength(1, GridUnitType.Star) : GridLength.Auto;
+        LayoutRoot.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
+
+        ControlPanel.MaxWidth = useDualPane ? 360 : double.PositiveInfinity;
+
+        Grid.SetRow(ControlPanel, 0);
+        Grid.SetColumn(ControlPanel, 0);
+        Grid.SetRowSpan(ControlPanel, useDualPane ? 2 : 1);
+
+        Grid.SetRow(TimelineHost, useDualPane ? 0 : 1);
+        Grid.SetColumn(TimelineHost, useDualPane ? 1 : 0);
+        Grid.SetRowSpan(TimelineHost, useDualPane ? 2 : 1);
     }
 }

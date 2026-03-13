@@ -5,8 +5,19 @@
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
   <Grid Padding="24">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-      <StackPanel MaxWidth="720" HorizontalAlignment="Center" Spacing="16">
-        <StackPanel Spacing="8">
+      <Grid x:Name="LayoutRoot" HorizontalAlignment="Center" MaxWidth="1240" ColumnSpacing="24" RowSpacing="16">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="0" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel x:Name="FormHeaderPanel" Grid.Row="0" Grid.Column="0" Spacing="8">
           <TextBlock x:Name="PageTitleTextBlock" FontSize="32" FontWeight="SemiBold" />
           <TextBlock
             Opacity="0.72"
@@ -16,6 +27,9 @@
         </StackPanel>
 
         <Border
+          x:Name="FormCard"
+          Grid.Row="1"
+          Grid.Column="0"
           Padding="20"
           Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
           BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -128,6 +142,9 @@
         </Border>
 
         <Border
+          x:Name="ExistingItemsCard"
+          Grid.Row="2"
+          Grid.Column="0"
           Padding="20"
           Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
           BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -173,7 +190,7 @@
           </StackPanel>
         </Border>
 
-        <StackPanel Spacing="12">
+        <StackPanel x:Name="DetailPanel" Grid.Row="3" Grid.Column="0" Spacing="12">
           <TextBlock FontSize="22" FontWeight="SemiBold" Text="Item Details" />
           <TextBlock
             Opacity="0.72"
@@ -182,7 +199,7 @@
             TextWrapping="WrapWholeWords" />
           <components:ItemDetailCard x:Name="ItemDetailCard" EditRequested="OnDetailEditRequested" />
         </StackPanel>
-      </StackPanel>
+      </Grid>
     </ScrollViewer>
   </Grid>
 </Page>
