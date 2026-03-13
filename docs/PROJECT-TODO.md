@@ -242,12 +242,17 @@
 - Title: 实现同步 API 契约与远程访问层
 - Phase: 阶段 3
 - Depends On: INFRA-310, DOMAIN-200
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 实现 pull/push 契约和客户端远程访问封装
 - Implementation Notes: 只做基础设施，不做同步编排
 - Done When: 同步契约和访问层完成
-- Verification: 可定位同步接口和远程客户端
+- Verification:
+  - `dotnet build Overview.Server/Overview.Server.csproj`
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - 可定位 `Overview.Server/Api/Controllers/SyncController.cs`
+  - 可定位 `Overview.Client/Overview.Client/Infrastructure/Api/Sync/ISyncRemoteClient.cs`
+  - 可定位 `Overview.Client/Overview.Client/Infrastructure/Api/Sync/SyncRemoteClient.cs`
 - Files Expected: 同步接口和远程客户端
 
 ### Task ID: INFRA-340

@@ -20,6 +20,8 @@ public static class InfrastructureServiceCollectionExtensions
             configuration.GetSection(PersistenceOptions.SectionName));
         services.Configure<AuthenticationOptions>(
             configuration.GetSection(AuthenticationOptions.SectionName));
+        services.Configure<SyncOptions>(
+            configuration.GetSection(SyncOptions.SectionName));
 
         var persistenceOptions = configuration
             .GetSection(PersistenceOptions.SectionName)

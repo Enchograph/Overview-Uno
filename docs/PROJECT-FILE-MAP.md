@@ -66,6 +66,8 @@
   - 客户端领域规则：时间块生成、时间范围计算、周期标题格式化、提醒调度、重复展开、主页命中与重叠计算
 - `Overview.Client/Overview.Client/Infrastructure/InfrastructureAssemblyMarker.cs`
   - 客户端 Infrastructure 层目录落点
+- `Overview.Client/Overview.Client/Infrastructure/Api/Sync/`
+  - 客户端远程同步访问层，包含 `pull/push` 契约、接口与 HTTP 客户端实现
 - `Overview.Client/Overview.Client/Infrastructure/Persistence/`
   - 客户端 SQLite 数据层，包含数据库选项、表记录、仓储接口与实现、连接工厂
 - `Overview.Client/Overview.Client/Platforms/Desktop/Program.cs`
@@ -80,10 +82,14 @@
   - 服务端最小健康检查控制器
 - `Overview.Server/Api/Controllers/AuthController.cs`
   - 服务端认证控制器，提供验证码、注册、登录、刷新令牌端点
+- `Overview.Server/Api/Controllers/SyncController.cs`
+  - 服务端同步控制器，提供 `pull/push` 同步端点和基础冲突检测
 - `Overview.Server/Api/Contracts/HealthResponse.cs`
   - 服务端最小 API 返回契约
 - `Overview.Server/Api/Contracts/Auth/`
   - 服务端认证请求/响应契约
+- `Overview.Server/Api/Contracts/Sync/`
+  - 服务端同步请求/响应契约
 - `Overview.Server/Application/DependencyInjection/ApplicationServiceCollectionExtensions.cs`
   - 服务端应用层注册入口
 - `Overview.Server/Domain/Entities/`
@@ -100,6 +106,8 @@
   - 服务端认证配置样例对象
 - `Overview.Server/Infrastructure/Configuration/PersistenceOptions.cs`
   - 服务端持久化配置样例对象
+- `Overview.Server/Infrastructure/Configuration/SyncOptions.cs`
+  - 服务端同步配置样例对象
 - `Overview.Server/Infrastructure/Identity/`
   - 服务端认证基础设施，包含密码哈希、JWT 令牌和验证码服务
 - `Overview.Server/Infrastructure/Persistence/OverviewDbContext.cs`

@@ -160,3 +160,15 @@
 - 生成认证补充迁移 `20260313093808_AddAuthInfrastructure`
 - 更新 `appsettings.Sample.json` 认证配置样例
 - 验证服务端项目可无警告构建，认证迁移可生成且可输出 idempotent 脚本
+
+### Round 21
+
+- 完成 `INFRA-330`
+- 新增服务端同步契约 DTO：`pull` / `push` / `conflict`
+- 新增 `SyncController`，落地 `GET /api/sync/pull` 与 `POST /api/sync/push`
+- 为服务端新增 `SyncOptions` 并接入基础设施配置绑定
+- 在同步接口中补入 JWT 用户隔离、批次限制、幂等去重和 `LastModifiedAt` 冲突返回
+- 新增客户端远程同步访问目录 `Infrastructure/Api/Sync`
+- 新增 `ISyncRemoteClient` 与 `SyncRemoteClient`
+- 在客户端轻量注册中心注册 `HttpClient` 与同步远程访问服务
+- 验证服务端与客户端项目均可无警告构建
