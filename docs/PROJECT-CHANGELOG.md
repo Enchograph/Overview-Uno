@@ -2,6 +2,14 @@
 
 ## 2026-03-13
 
+### Round 44
+
+- 完成 `AI-830`
+- 为 `AiStructuredResponse` 与 `AiOrchestrationService` 补齐 `itemIds`、`color`、`expectedDurationMinutes`、`targetDate` 等结构化字段解析与校验
+- 将 `AiChatService` 升级为“解析 -> 校验 -> 意图分发 -> 安全执行 -> 追问保护”闭环，当前支持 `create_item`、`delete_item`、`query_items`、`answer_question`、`clarify`
+- 写操作仅在高置信度且关键字段完整时执行；删除必须依赖 AI 返回的明确 `itemIds`
+- 扩展 AI 服务与解析测试，并验证客户端桌面构建通过、客户端测试 41/41 通过
+
 ### Round 43
 
 - 完成 `AI-820`

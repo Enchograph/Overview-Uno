@@ -6,6 +6,8 @@ public sealed record AiStructuredResponse
 {
     public AiRequestType Intent { get; init; } = AiRequestType.AnswerQuestion;
 
+    public IReadOnlyList<Guid> ItemIds { get; init; } = Array.Empty<Guid>();
+
     public ItemType? ItemType { get; init; }
 
     public string? Title { get; init; }
@@ -20,7 +22,13 @@ public sealed record AiStructuredResponse
 
     public string? Location { get; init; }
 
+    public string? Color { get; init; }
+
     public bool? IsImportant { get; init; }
+
+    public int? ExpectedDurationMinutes { get; init; }
+
+    public DateOnly? TargetDate { get; init; }
 
     public AiReminderInstruction? Reminder { get; init; }
 

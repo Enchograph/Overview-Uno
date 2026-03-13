@@ -1,4 +1,5 @@
 using Overview.Client.Application.Settings;
+using Overview.Client.Application.Items;
 using Overview.Client.Domain.Entities;
 using Overview.Client.Domain.Enums;
 using Overview.Client.Domain.ValueObjects;
@@ -11,6 +12,7 @@ public sealed class AiChatService : IAiChatService
 {
     private readonly IAiChatMessageRepository aiChatMessageRepository;
     private readonly IAiOrchestrationService aiOrchestrationService;
+    private readonly IItemService itemService;
     private readonly IUserSettingsService userSettingsService;
     private readonly IAiRemoteClient aiRemoteClient;
     private readonly TimeProvider timeProvider;
@@ -18,12 +20,14 @@ public sealed class AiChatService : IAiChatService
     public AiChatService(
         IAiChatMessageRepository aiChatMessageRepository,
         IAiOrchestrationService aiOrchestrationService,
+        IItemService itemService,
         IUserSettingsService userSettingsService,
         IAiRemoteClient aiRemoteClient,
         TimeProvider timeProvider)
     {
         this.aiChatMessageRepository = aiChatMessageRepository;
         this.aiOrchestrationService = aiOrchestrationService;
+        this.itemService = itemService;
         this.userSettingsService = userSettingsService;
         this.aiRemoteClient = aiRemoteClient;
         this.timeProvider = timeProvider;
@@ -87,9 +91,12 @@ public sealed class AiChatService : IAiChatService
             requestPackage.ApiKey,
             requestPackage.RequestBody,
             cancellationToken).ConfigureAwait(false);
-        var normalizedReply = string.IsNullOrWhiteSpace(assistantReply)
-            ? "AI returned an empty response."
-            : assistantReply.Trim();
+        var executionResult = await ExecuteAssistantReplyAsync(
+            userId,
+            requestPackage,
+            assistantReply,
+            settings.TimeZoneId,
+            cancellationToken).ConfigureAwait(false);
 
         await aiChatMessageRepository.UpsertAsync(new AiChatMessage
         {
@@ -107,10 +114,10 @@ public sealed class AiChatService : IAiChatService
             UserId = userId,
             OccurredOn = occurredOn,
             Role = Domain.Enums.AiChatRole.Assistant,
-            Message = normalizedReply,
+            Message = executionResult.Message,
             CreatedAt = timeProvider.GetUtcNow(),
             RequestType = requestPackage.RequestType,
-            LinkedItemIds = linkedItemIds
+            LinkedItemIds = executionResult.LinkedItemIds
         }, cancellationToken).ConfigureAwait(false);
 
         var snapshot = await BuildSnapshotAsync(
@@ -124,6 +131,184 @@ public sealed class AiChatService : IAiChatService
             TimeZoneId = snapshot.TimeZoneId,
             Messages = snapshot.Messages
         };
+    }
+
+    private async Task<AiAssistantExecutionResult> ExecuteAssistantReplyAsync(
+        Guid userId,
+        AiRequestPackage requestPackage,
+        string assistantReply,
+        string timeZoneId,
+        CancellationToken cancellationToken)
+    {
+        var normalizedReply = string.IsNullOrWhiteSpace(assistantReply)
+            ? "AI returned an empty response."
+            : assistantReply.Trim();
+        var parseResult = aiOrchestrationService.ParseResponse(normalizedReply);
+        if (parseResult.Response is null)
+        {
+            return AiAssistantExecutionResult.Clarify(BuildValidationMessage(parseResult.ValidationErrors), requestPackage.RelevantItems.Select(item => item.Id));
+        }
+
+        var response = parseResult.Response;
+        if (parseResult.ValidationErrors.Count > 0)
+        {
+            return response.Intent is AiRequestType.Clarify or AiRequestType.AnswerQuestion or AiRequestType.QueryItems
+                ? new AiAssistantExecutionResult(response.Answer ?? BuildValidationMessage(parseResult.ValidationErrors), ResolveLinkedItemIds(response, requestPackage.RelevantItems))
+                : AiAssistantExecutionResult.Clarify(BuildValidationMessage(parseResult.ValidationErrors), ResolveLinkedItemIds(response, requestPackage.RelevantItems));
+        }
+
+        return response.Intent switch
+        {
+            AiRequestType.CreateItem => parseResult.CanApplyWriteOperation
+                ? await ExecuteCreateAsync(userId, response, timeZoneId, cancellationToken).ConfigureAwait(false)
+                : AiAssistantExecutionResult.Clarify(BuildLowConfidenceMessage("create or update an item"), Array.Empty<Guid>()),
+            AiRequestType.DeleteItem => parseResult.CanApplyWriteOperation
+                ? await ExecuteDeleteAsync(userId, response, cancellationToken).ConfigureAwait(false)
+                : AiAssistantExecutionResult.Clarify(BuildLowConfidenceMessage("delete an item"), ResolveLinkedItemIds(response, requestPackage.RelevantItems)),
+            AiRequestType.QueryItems => new AiAssistantExecutionResult(
+                response.Answer ?? "I could not summarize the matching items yet.",
+                ResolveLinkedItemIds(response, requestPackage.RelevantItems)),
+            AiRequestType.Clarify => new AiAssistantExecutionResult(
+                response.Answer ?? "I need more detail before I can help with that.",
+                ResolveLinkedItemIds(response, requestPackage.RelevantItems)),
+            _ => new AiAssistantExecutionResult(
+                response.Answer ?? normalizedReply,
+                ResolveLinkedItemIds(response, requestPackage.RelevantItems))
+        };
+    }
+
+    private async Task<AiAssistantExecutionResult> ExecuteCreateAsync(
+        Guid userId,
+        AiStructuredResponse response,
+        string timeZoneId,
+        CancellationToken cancellationToken)
+    {
+        var createdItem = await itemService.CreateAsync(
+            userId,
+            BuildCreateRequest(response, timeZoneId),
+            cancellationToken).ConfigureAwait(false);
+
+        var message = string.IsNullOrWhiteSpace(response.Answer)
+            ? $"Created {createdItem.Type.ToString().ToLowerInvariant()} \"{createdItem.Title}\"."
+            : response.Answer!;
+        return new AiAssistantExecutionResult(message, [createdItem.Id]);
+    }
+
+    private async Task<AiAssistantExecutionResult> ExecuteDeleteAsync(
+        Guid userId,
+        AiStructuredResponse response,
+        CancellationToken cancellationToken)
+    {
+        var deletedItems = new List<Item>();
+        foreach (var itemId in response.ItemIds)
+        {
+            var item = await itemService.GetAsync(userId, itemId, includeDeleted: false, cancellationToken).ConfigureAwait(false);
+            if (item is null)
+            {
+                return AiAssistantExecutionResult.Clarify(
+                    "I could not safely match the item to delete. Please restate it with a clearer title or time.",
+                    response.ItemIds);
+            }
+
+            deletedItems.Add(item);
+        }
+
+        foreach (var item in deletedItems)
+        {
+            await itemService.DeleteAsync(userId, item.Id, cancellationToken).ConfigureAwait(false);
+        }
+
+        var message = string.IsNullOrWhiteSpace(response.Answer)
+            ? deletedItems.Count == 1
+                ? $"Deleted \"{deletedItems[0].Title}\"."
+                : $"Deleted {deletedItems.Count} items: {string.Join(", ", deletedItems.Select(item => $"\"{item.Title}\""))}."
+            : response.Answer!;
+        return new AiAssistantExecutionResult(message, deletedItems.Select(item => item.Id).ToArray());
+    }
+
+    private static ItemUpsertRequest BuildCreateRequest(AiStructuredResponse response, string timeZoneId)
+    {
+        var reminderConfig = response.Reminder is null
+            ? new ReminderConfig()
+            : new ReminderConfig
+            {
+                IsEnabled = response.Reminder.IsEnabled,
+                Triggers = response.Reminder.MinutesBeforeStart
+                    .Distinct()
+                    .OrderBy(value => value)
+                    .Select(value => new ReminderTrigger
+                    {
+                        MinutesBeforeStart = value
+                    })
+                    .ToArray()
+            };
+
+        var repeatRule = response.RepeatRule is null
+            ? new RepeatRule()
+            : new RepeatRule
+            {
+                Frequency = response.RepeatRule.Frequency,
+                Interval = response.RepeatRule.Interval,
+                DaysOfWeek = response.RepeatRule.DaysOfWeek,
+                DayOfMonth = response.RepeatRule.DayOfMonth,
+                MonthOfYear = response.RepeatRule.MonthOfYear,
+                UntilAt = response.RepeatRule.UntilAt,
+                Count = response.RepeatRule.Count
+            };
+
+        return new ItemUpsertRequest
+        {
+            Type = response.ItemType ?? ItemType.Task,
+            Title = response.Title ?? string.Empty,
+            Description = response.Description,
+            Location = response.Location,
+            Color = response.Color,
+            IsImportant = response.IsImportant ?? false,
+            ReminderConfig = reminderConfig,
+            RepeatRule = repeatRule,
+            TimeZoneId = string.IsNullOrWhiteSpace(timeZoneId) ? "UTC" : timeZoneId,
+            StartAt = response.ItemType == ItemType.Schedule ? response.StartAt : null,
+            EndAt = response.ItemType == ItemType.Schedule ? response.EndAt : null,
+            PlannedStartAt = response.ItemType == ItemType.Task ? response.StartAt : null,
+            PlannedEndAt = response.ItemType == ItemType.Task ? response.EndAt : null,
+            DeadlineAt = response.ItemType == ItemType.Task ? response.DeadlineAt : null,
+            ExpectedDurationMinutes = response.ItemType == ItemType.Note ? response.ExpectedDurationMinutes : null,
+            TargetDate = response.ItemType == ItemType.Note ? response.TargetDate : null
+        };
+    }
+
+    private static IReadOnlyList<Guid> ResolveLinkedItemIds(
+        AiStructuredResponse response,
+        IReadOnlyList<AiItemSummary> relevantItems)
+    {
+        if (response.ItemIds.Count > 0)
+        {
+            return response.ItemIds;
+        }
+
+        return response.Intent == AiRequestType.QueryItems
+            ? relevantItems.Select(item => item.Id).ToArray()
+            : Array.Empty<Guid>();
+    }
+
+    private static string BuildValidationMessage(IReadOnlyList<string> validationErrors)
+    {
+        return validationErrors.Count == 0
+            ? "I need more detail before I can safely change your data."
+            : $"I need more detail before I can safely change your data. {validationErrors[0]}";
+    }
+
+    private static string BuildLowConfidenceMessage(string action)
+    {
+        return $"I need more detail before I can safely {action}. Please confirm the exact item or provide the missing time details.";
+    }
+
+    private sealed record AiAssistantExecutionResult(string Message, IReadOnlyList<Guid> LinkedItemIds)
+    {
+        public static AiAssistantExecutionResult Clarify(string message, IEnumerable<Guid> linkedItemIds)
+        {
+            return new AiAssistantExecutionResult(message, linkedItemIds.Distinct().ToArray());
+        }
     }
 
     private async Task<AiChatPeriodSnapshot> BuildSnapshotAsync(

@@ -144,6 +144,7 @@ public sealed class AiOrchestrationService : IAiOrchestrationService
             var response = new AiStructuredResponse
             {
                 Intent = intent,
+                ItemIds = ReadItemIds(root),
                 ItemType = itemType,
                 Title = ReadOptionalString(root, "title"),
                 Description = ReadOptionalString(root, "description"),
@@ -151,7 +152,10 @@ public sealed class AiOrchestrationService : IAiOrchestrationService
                 EndAt = ReadOptionalDateTimeOffset(root, "endAt"),
                 DeadlineAt = ReadOptionalDateTimeOffset(root, "deadlineAt"),
                 Location = ReadOptionalString(root, "location"),
+                Color = ReadOptionalString(root, "color"),
                 IsImportant = ReadOptionalBoolean(root, "importance"),
+                ExpectedDurationMinutes = ReadOptionalInt32(root, "expectedDurationMinutes"),
+                TargetDate = ReadOptionalDateOnly(root, "targetDate"),
                 Reminder = ReadReminder(root),
                 RepeatRule = ReadRepeatRule(root),
                 Confidence = ReadConfidence(root, errors),
@@ -184,10 +188,11 @@ public sealed class AiOrchestrationService : IAiOrchestrationService
         builder.AppendLine("Supported intents: create_item, delete_item, query_items, answer_question, clarify.");
         builder.AppendLine("Supported item types: schedule, task, note.");
         builder.AppendLine("When the user asks about existing items, rely only on the provided relevant item summaries.");
+        builder.AppendLine("When referencing existing items for delete_item or query_items, include 'itemIds' from the provided summaries.");
         builder.AppendLine("Do not rely on prior chat history. Treat this request independently.");
         builder.AppendLine($"Current request type hint: {ToIntentString(requestType)}.");
         builder.AppendLine($"Use timezone '{timeZoneId}'.");
-        builder.AppendLine("Expected JSON fields: intent, itemType, title, description, startAt, endAt, deadlineAt, location, importance, reminder, repeatRule, confidence, answer.");
+        builder.AppendLine("Expected JSON fields: intent, itemIds, itemType, title, description, startAt, endAt, deadlineAt, location, color, importance, expectedDurationMinutes, targetDate, reminder, repeatRule, confidence, answer.");
         return builder.ToString().Trim();
     }
 
@@ -438,6 +443,21 @@ public sealed class AiOrchestrationService : IAiOrchestrationService
                 : null;
     }
 
+    private static int? ReadOptionalInt32(JsonElement root, string propertyName)
+    {
+        if (!root.TryGetProperty(propertyName, out var property) || property.ValueKind == JsonValueKind.Null)
+        {
+            return null;
+        }
+
+        return property.ValueKind switch
+        {
+            JsonValueKind.Number when property.TryGetInt32(out var number) => number,
+            JsonValueKind.String when int.TryParse(property.GetString(), out var parsed) => parsed,
+            _ => null
+        };
+    }
+
     private static DateTimeOffset? ReadOptionalDateTimeOffset(JsonElement root, string propertyName)
     {
         if (!root.TryGetProperty(propertyName, out var property) || property.ValueKind == JsonValueKind.Null)
@@ -446,6 +466,46 @@ public sealed class AiOrchestrationService : IAiOrchestrationService
         }
 
         return DateTimeOffset.TryParse(property.GetString(), out var value) ? value : null;
+    }
+
+    private static DateOnly? ReadOptionalDateOnly(JsonElement root, string propertyName)
+    {
+        if (!root.TryGetProperty(propertyName, out var property) || property.ValueKind == JsonValueKind.Null)
+        {
+            return null;
+        }
+
+        return DateOnly.TryParse(property.GetString(), out var value) ? value : null;
+    }
+
+    private static IReadOnlyList<Guid> ReadItemIds(JsonElement root)
+    {
+        var itemIds = new List<Guid>();
+
+        if (root.TryGetProperty("itemId", out var singleItemId))
+        {
+            TryAppendGuid(singleItemId, itemIds);
+        }
+
+        if (root.TryGetProperty("itemIds", out var multipleItemIds) &&
+            multipleItemIds.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var itemId in multipleItemIds.EnumerateArray())
+            {
+                TryAppendGuid(itemId, itemIds);
+            }
+        }
+
+        return itemIds.Distinct().ToArray();
+    }
+
+    private static void TryAppendGuid(JsonElement property, ICollection<Guid> itemIds)
+    {
+        if (property.ValueKind == JsonValueKind.String &&
+            Guid.TryParse(property.GetString(), out var itemId))
+        {
+            itemIds.Add(itemId);
+        }
     }
 
     private static double ReadConfidence(JsonElement root, List<string> errors)
@@ -600,15 +660,28 @@ public sealed class AiOrchestrationService : IAiOrchestrationService
 
                         break;
                     case Domain.Enums.ItemType.Note:
+                        if (response.ExpectedDurationMinutes is null || response.ExpectedDurationMinutes <= 0)
+                        {
+                            errors.Add("Field 'expectedDurationMinutes' is required for note creation.");
+                        }
+
                         break;
                 }
 
                 break;
+            case AiRequestType.DeleteItem:
+                if (response.ItemIds.Count == 0)
+                {
+                    errors.Add("Field 'itemIds' is required for delete_item.");
+                }
+
+                break;
+            case AiRequestType.QueryItems:
             case AiRequestType.AnswerQuestion:
             case AiRequestType.Clarify:
                 if (string.IsNullOrWhiteSpace(response.Answer))
                 {
-                    errors.Add("Field 'answer' is required for answer_question and clarify.");
+                    errors.Add("Field 'answer' is required for query_items, answer_question and clarify.");
                 }
 
                 break;

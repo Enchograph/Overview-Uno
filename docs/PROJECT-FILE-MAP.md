@@ -53,9 +53,9 @@
 - `Overview.Client/Overview.Client/Application/Lists/`
   - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
 - `Overview.Client/Overview.Client/Application/Ai/`
-  - 客户端 AI 应用层目录，当前包含事项摘要检索、OpenAI 兼容请求体组装、结构化响应解析，以及 AI 聊天加载/发送/按日周月范围读取服务
+  - 客户端 AI 应用层目录，当前包含事项摘要检索、OpenAI 兼容请求体组装、结构化响应解析、自然语言意图执行，以及 AI 聊天加载/发送/按日周月范围读取服务
 - `Overview.Client/Overview.Client/Application/Ai/AiChatService.cs`
-  - 客户端 AI 聊天应用服务，负责范围消息读取、直连 AI 接口并将用户/助手消息按日写入 SQLite
+  - 客户端 AI 聊天应用服务，负责范围消息读取、直连 AI 接口、将结构化意图执行成事项增删查结果，并把用户/助手消息按日写入 SQLite
 - `Overview.Client/Overview.Client/Application/Ai/AiChatDaySnapshot.cs`
   - 客户端 AI 聊天日快照模型，承载当前日期与消息列表
 - `Overview.Client/Overview.Client/Application/Ai/AiChatPeriodSnapshot.cs`
@@ -129,7 +129,9 @@
 - `tests/Overview.Client.Tests/AddItemPageViewModelTests.cs`
   - 客户端添加页 ViewModel 测试，当前覆盖列表页默认填充导航参数到表单的落地行为
 - `tests/Overview.Client.Tests/AiChatServiceTests.cs`
-  - 客户端 AI 聊天应用服务测试，当前覆盖按用户时区解析当天日期、按日过滤和发送后本地落库
+  - 客户端 AI 聊天应用服务测试，当前覆盖按用户时区解析当天日期、按日过滤、创建事项、删除事项、低置信度保护和发送后本地落库
+- `tests/Overview.Client.Tests/AiOrchestrationServiceTests.cs`
+  - 客户端 AI 编排解析测试，当前覆盖结构化 JSON 扩展字段解析、删除意图关键字段校验和 query itemIds 解析
 - `tests/Overview.Client.Tests/AiPageViewModelTests.cs`
   - 客户端 AI 页 ViewModel 测试，当前覆盖初始化加载、日/周/月范围切换、发送后刷新当前范围和未登录提示
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`

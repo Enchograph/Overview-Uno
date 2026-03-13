@@ -100,6 +100,7 @@ internal sealed class ClientServiceRegistry
         registry.RegisterSingleton<IAiChatService>(() => new AiChatService(
             registry.Resolve<IAiChatMessageRepository>(),
             registry.Resolve<IAiOrchestrationService>(),
+            registry.Resolve<IItemService>(),
             registry.Resolve<IUserSettingsService>(),
             registry.Resolve<IAiRemoteClient>(),
             registry.Resolve<TimeProvider>()));

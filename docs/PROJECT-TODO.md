@@ -659,12 +659,18 @@
 - Title: 实现 AI JSON 响应解析和自然语言增删查事项
 - Phase: 阶段 8
 - Depends On: AI-810, APP-440, UI-510
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持 create_item、delete_item、query_items、answer_question、clarify
-- Implementation Notes: 低置信度和缺关键字段时必须转为追问
+- Implementation Notes: 已在 `AiOrchestrationService` 补齐 JSON 结构化解析字段与校验，并在 `AiChatService` 接入意图分发；当前对 create/delete 仅在高置信度且关键字段完整时执行，删除必须依赖 AI 返回的明确 `itemIds`
 - Done When: AI 首版意图闭环完成
-- Verification: 存在解析器、意图分发和验证逻辑
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位 `Overview.Client/Overview.Client/Application/Ai/AiOrchestrationService.cs`
+  - 可定位 `Overview.Client/Overview.Client/Application/Ai/AiChatService.cs`
+  - 可定位 `tests/Overview.Client.Tests/AiOrchestrationServiceTests.cs`
+  - 可定位 `tests/Overview.Client.Tests/AiChatServiceTests.cs`
 - Files Expected: AI 服务、解析器、用例
 
 ---

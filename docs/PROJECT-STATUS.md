@@ -2,8 +2,8 @@
 
 ## 当前阶段
 
-- 阶段编号：8
-- 阶段名称：Presentation AI 页
+- 阶段编号：9
+- 阶段名称：实时同步与状态一致性
 - 阶段状态：`active`
 
 ## 当前里程碑
@@ -51,6 +51,7 @@
 - `AI-800`
 - `AI-810`
 - `AI-820`
+- `AI-830`
 
 ## 正在进行任务 ID
 
@@ -58,7 +59,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `AI-830`
+- `SYNC-900`
 
 ## 当前阻塞
 
@@ -66,6 +67,20 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，41/41 用例通过，0 failed
+- 已确认客户端 AI 聊天应用层已完成 AI-830 意图闭环：
+  - `Application/Ai/AiChatService.cs`
+  - `Application/Ai/AiOrchestrationService.cs`
+  - `Application/Ai/AiStructuredResponse.cs`
+- 已确认客户端 AI 当前已支持：
+  - create_item 创建事项并写入本地库
+  - delete_item 按 AI 返回的明确 itemIds 删除事项
+  - query_items / answer_question / clarify 以自然语言答案写入聊天线程
+  - 低置信度或缺关键字段时不改数据，转为追问回复
+- 已确认客户端新增 AI JSON 解析与执行测试：
+  - `tests/Overview.Client.Tests/AiOrchestrationServiceTests.cs`
+  - `tests/Overview.Client.Tests/AiChatServiceTests.cs`
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，35/35 用例通过，0 failed
 - 已确认客户端 AI 页已新增日 / 周 / 月聊天范围切换与时间选择联动：
