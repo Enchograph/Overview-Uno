@@ -4,6 +4,8 @@ namespace Overview.Client.Presentation.Pages;
 
 public sealed partial class SettingsPage : Page
 {
+    private string? initialSectionKey;
+
     private SettingsPageViewModel ViewModel => (SettingsPageViewModel)DataContext;
 
     public SettingsPage()
@@ -16,8 +18,14 @@ public sealed partial class SettingsPage : Page
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        await ViewModel.InitializeAsync().ConfigureAwait(true);
+        await ViewModel.InitializeAsync(initialSectionKey).ConfigureAwait(true);
         ApplyViewModelState();
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        initialSectionKey = e.Parameter as string;
     }
 
     private void OnUnloaded(object sender, RoutedEventArgs e)

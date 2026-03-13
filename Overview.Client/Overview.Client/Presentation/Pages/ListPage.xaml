@@ -56,7 +56,7 @@
           </ItemsControl>
         </ScrollViewer>
 
-        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
+        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
           <TextBlock
             VerticalAlignment="Center"
             Text="Sort by"
@@ -89,17 +89,22 @@
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </ComboBox>
+          <Button
+            x:Name="MoreSettingsButton"
+            Grid.Column="4"
+            Click="OnMoreSettingsButtonClick"
+            Content="More Settings" />
           <TextBlock
             x:Name="ActiveSummaryTextBlock"
-            Grid.Column="4"
+            Grid.Column="5"
             Style="{ThemeResource BodyStrongTextBlockStyle}" />
           <TextBlock
             x:Name="CompletedSummaryTextBlock"
-            Grid.Column="5"
+            Grid.Column="6"
             Style="{ThemeResource BodyStrongTextBlockStyle}" />
           <ProgressRing
             x:Name="BusyIndicator"
-            Grid.Column="6"
+            Grid.Column="7"
             Width="24"
             Height="24"
             IsActive="False"

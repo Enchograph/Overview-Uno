@@ -6,6 +6,8 @@ namespace Overview.Client.Presentation.ViewModels;
 
 public sealed class SettingsPageViewModel
 {
+    public const string ListSectionKey = "list";
+
     private readonly IAuthenticationService authenticationService;
     private readonly IUserSettingsService userSettingsService;
     private UserSettings? currentSettings;
@@ -51,30 +53,26 @@ public sealed class SettingsPageViewModel
 
     public bool IsRootView => ActiveSection is null;
 
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    public async Task InitializeAsync(
+        string? initialSectionKey = null,
+        CancellationToken cancellationToken = default)
     {
-        await RefreshAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    public async Task RefreshAsync(CancellationToken cancellationToken = default)
-    {
-        var currentSectionKey = ActiveSection?.Key;
         await ExecuteBusyActionAsync(
             async () =>
             {
                 await LoadSnapshotAsync(cancellationToken).ConfigureAwait(false);
-                if (currentSectionKey is not null)
-                {
-                    OpenSection(currentSectionKey);
-                }
-                else
-                {
-                    NavigateBack();
-                }
+                ApplySectionState(initialSectionKey);
+                return true;
+            }).ConfigureAwait(false);
+    }
 
-                StatusMessage = IsAuthenticated
-                    ? "Settings summary loaded."
-                    : "Sign in to load synchronized settings.";
+    public async Task RefreshAsync(CancellationToken cancellationToken = default)
+    {
+        await ExecuteBusyActionAsync(
+            async () =>
+            {
+                await LoadSnapshotAsync(cancellationToken).ConfigureAwait(false);
+                ApplySectionState(ActiveSection?.Key);
                 return true;
             }).ConfigureAwait(false);
     }
@@ -106,6 +104,21 @@ public sealed class SettingsPageViewModel
         DetailLead = string.Empty;
         DetailFootnote =
             "This section currently provides the navigation shell and summary. Editable controls will be added in later tasks.";
+    }
+
+    private void ApplySectionState(string? sectionKey)
+    {
+        var normalizedSectionKey = NormalizeSectionKey(sectionKey);
+        if (normalizedSectionKey is not null)
+        {
+            OpenSection(normalizedSectionKey);
+            return;
+        }
+
+        NavigateBack();
+        StatusMessage = IsAuthenticated
+            ? "Settings summary loaded."
+            : "Sign in to load synchronized settings.";
     }
 
     private async Task LoadSnapshotAsync(CancellationToken cancellationToken)
@@ -310,5 +323,12 @@ public sealed class SettingsPageViewModel
     private static string DisplayOrFallback(string? value, string fallback)
     {
         return string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+    }
+
+    private static string? NormalizeSectionKey(string? sectionKey)
+    {
+        return string.IsNullOrWhiteSpace(sectionKey)
+            ? null
+            : sectionKey.Trim().ToLowerInvariant();
     }
 }

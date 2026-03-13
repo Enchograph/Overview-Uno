@@ -570,12 +570,15 @@
 - Title: 实现列表页更多设置入口与列表页设置分页联动
 - Phase: 阶段 7
 - Depends On: UI-530
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 支持更多设置跳转到设置页列表页设置分页
 - Implementation Notes: 必须与设置页联通
 - Done When: 更多设置跳转完成
-- Verification: 可定位跳转入口
+- Verification:
+  - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop`
+  - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj`
+  - 可定位列表页更多设置入口与设置页列表分页联动
 - Files Expected: 跳转与设置页联动代码
 
 ### Task ID: LIST-750

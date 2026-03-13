@@ -74,6 +74,11 @@ public sealed partial class ListPage : Page
         ApplyViewModelState();
     }
 
+    private void OnMoreSettingsButtonClick(object sender, RoutedEventArgs e)
+    {
+        Frame?.Navigate(typeof(SettingsPage), SettingsPageViewModel.ListSectionKey);
+    }
+
     private async void OnCompletionButtonClick(object sender, RoutedEventArgs e)
     {
         if (!TryGetItemId(sender, out var itemId))

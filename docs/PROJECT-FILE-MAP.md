@@ -39,7 +39,7 @@
 - `Overview.Client/Overview.Client/Overview.Client.csproj`
   - Uno Platform 客户端主项目
 - `tests/Overview.Client.Tests/`
-  - 客户端主页交互测试项目，当前覆盖主页命中规则、被包裹事项优先和空白单元格起始时间映射
+  - 客户端测试项目，当前覆盖主页命中规则、列表页状态以及设置页分页联动
 - `Overview.Client/Overview.Client/Application/DependencyInjection/ClientServiceRegistry.cs`
   - 客户端轻量注册中心，作为后续服务注册的基础落点
 - `Overview.Client/Overview.Client/Application/Auth/`
@@ -67,7 +67,7 @@
 - `Overview.Client/Overview.Client/Presentation/Pages/HomePage.xaml`
   - 客户端主页真实骨架，当前支持顶栏周期切换、窄屏周视图、宽屏月视图、时间块网格、标题展开时间选择组件和事项详情弹层
 - `Overview.Client/Overview.Client/Presentation/Pages/ListPage.xaml`
-  - 客户端列表页真实骨架，当前支持六个标签筛选、五种排序、完成/重要切换、手动重排、四种主题切换、未完成/已完成分组和空态展示
+  - 客户端列表页真实骨架，当前支持六个标签筛选、五种排序、完成/重要切换、手动重排、四种主题切换、“更多设置”跳转、未完成/已完成分组和空态展示
 - `Overview.Client/Overview.Client/Presentation/Pages/AiPage.xaml`
   - 当前 AI 页壳层占位页
 - `Overview.Client/Overview.Client/Presentation/Pages/AddItemPage.xaml`
@@ -76,6 +76,8 @@
   - 客户端添加/编辑事项导航参数模型，承载主页长按空白预填和长按事项编辑请求
 - `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml`
   - 客户端设置页，当前包含设置主页分区入口、二级页返回骨架和设置摘要展示
+- `Overview.Client/Overview.Client/Presentation/Pages/SettingsPage.xaml.cs`
+  - 客户端设置页代码后置，当前支持根据导航参数直接打开指定设置分区
 - `Overview.Client/Overview.Client/Presentation/Components/ItemDetailCard.xaml`
   - 客户端统一事项详情组件，当前展示标题、类型、时间、地点、详情、提醒、重复、状态和编辑入口
 - `Overview.Client/Overview.Client/Presentation/Components/TimeSelectionPicker.xaml`
@@ -97,7 +99,7 @@
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ItemDetailViewModel.cs`
   - 客户端事项详情展示 ViewModel，负责把统一领域事项格式化为可复用的详情卡片字段
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsPageViewModel.cs`
-  - 客户端设置页 ViewModel，负责设置主页分区、二级页状态和登录态/设置摘要加载
+  - 客户端设置页 ViewModel，负责设置主页分区、二级页状态、登录态/设置摘要加载以及指定分区初始化
 - `Overview.Client/Overview.Client/Presentation/ViewModels/TimeSelectionViewModel.cs`
   - 客户端时间选择组件 ViewModel，负责月份快照加载、日/周/月映射、前后月份切换和确认前状态
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ListPageViewModel.cs`
@@ -110,6 +112,8 @@
   - 客户端列表页排序选项展示模型，用于顶部排序依据下拉框
 - `Overview.Client/Overview.Client/Presentation/ViewModels/ListPageThemeOptionViewModel.cs`
   - 客户端列表页主题选项展示模型，用于顶部主题下拉框
+- `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
+  - 客户端设置页 ViewModel 测试，当前覆盖按导航参数直达列表设置分页与刷新保持分区
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionEntry.cs`
   - 客户端设置页分区入口模型，用于设置主页卡片列表
 - `Overview.Client/Overview.Client/Presentation/ViewModels/SettingsSectionField.cs`

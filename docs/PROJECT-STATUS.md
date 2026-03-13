@@ -46,6 +46,7 @@
 - `LIST-710`
 - `LIST-720`
 - `LIST-730`
+- `LIST-740`
 
 ## 正在进行任务 ID
 
@@ -53,13 +54,24 @@
 
 ## 下一个唯一优先任务 ID
 
-- `LIST-740`
+- `LIST-750`
 
 ## 当前阻塞
 
 - 无
 
 ## 最近已验证结果
+
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，21/21 用例通过，0 failed
+- 已确认客户端列表页已新增“更多设置”入口，并联通到设置页列表分页：
+  - `Presentation/Pages/ListPage.xaml`
+  - `Presentation/Pages/ListPage.xaml.cs`
+  - `Presentation/Pages/SettingsPage.xaml.cs`
+- 已确认客户端设置页状态 ViewModel 已支持按导航参数直接打开指定分区：
+  - `Presentation/ViewModels/SettingsPageViewModel.cs`
+- 已确认客户端新增设置页分页联动测试：
+  - `tests/Overview.Client.Tests/SettingsPageViewModelTests.cs`
 
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
 - `dotnet test tests/Overview.Client.Tests/Overview.Client.Tests.csproj` 通过，19/19 用例通过，0 failed
