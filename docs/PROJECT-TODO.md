@@ -335,7 +335,7 @@
 - Title: 实现 AI 请求编排与事项摘要检索用例
 - Phase: 阶段 4
 - Depends On: APP-410, INFRA-300
-- Status: `todo`
+- Status: `done`
 - Owner: `next-ai`
 - Goal: 生成 AI 所需的事项摘要、请求体和响应解析入口
 - Implementation Notes: 不传历史聊天上下文

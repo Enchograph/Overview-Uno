@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Overview.Client.Application.Ai;
 using Overview.Client.Application.Auth;
 using Overview.Client.Application.Home;
 using Overview.Client.Application.Items;
@@ -64,6 +65,9 @@ internal sealed class ClientServiceRegistry
             registry.Resolve<ITimeRuleService>(),
             registry.Resolve<IHomeInteractionRuleService>()));
         registry.RegisterSingleton<IListPageService>(() => new ListPageService(
+            registry.Resolve<IItemService>(),
+            registry.Resolve<IUserSettingsService>()));
+        registry.RegisterSingleton<IAiOrchestrationService>(() => new AiOrchestrationService(
             registry.Resolve<IItemService>(),
             registry.Resolve<IUserSettingsService>()));
         registry.RegisterSingleton<ITimeSelectionService>(() => new TimeSelectionService(

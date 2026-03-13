@@ -236,3 +236,15 @@
 - 在服务端新增 EF Core 迁移 `20260313103139_AddListManualOrderPreferences`
 - 在客户端轻量注册中心接入 `IListPageService`
 - 验证客户端与服务端项目可无警告构建，且新迁移可生成并输出 idempotent 脚本
+
+### Round 27
+
+- 完成 `APP-440`
+- 在客户端新增 AI 应用层目录 `Application/Ai`
+- 新增 `IAiOrchestrationService`、`AiOrchestrationService`
+- 新增 `AiRequestPackage`、`AiChatCompletionRequest`、`AiChatCompletionMessage`
+- 新增 `AiItemSummary`、`AiParseResult`、`AiStructuredResponse`
+- 新增 `AiReminderInstruction`、`AiRepeatRuleInstruction`
+- AI 应用层支持请求类型识别、相关事项摘要检索、OpenAI 兼容请求体组装和结构化响应解析入口
+- 在客户端轻量注册中心接入 `IAiOrchestrationService`
+- 验证客户端桌面目标可无警告构建

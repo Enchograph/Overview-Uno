@@ -32,6 +32,7 @@
 - `APP-410`
 - `APP-420`
 - `APP-430`
+- `APP-440`
 
 ## 正在进行任务 ID
 
@@ -39,7 +40,7 @@
 
 ## 下一个唯一优先任务 ID
 
-- `APP-440`
+- `APP-450`
 
 ## 当前阻塞
 
@@ -47,6 +48,21 @@
 
 ## 最近已验证结果
 
+- `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
+- 已确认客户端新增 AI 应用层目录：
+  - `Application/Ai`
+- 已确认客户端 AI 应用层已提供：
+  - `IAiOrchestrationService`
+  - `AiOrchestrationService`
+  - `AiRequestPackage`
+  - `AiParseResult`
+  - `AiStructuredResponse`
+- 已确认客户端 AI 应用层已覆盖：
+  - AI 请求类型启发式识别
+  - 基于本地事项数据的相关摘要检索
+  - OpenAI 兼容聊天请求体组装
+  - 不带历史上下文的系统提示词构建
+  - AI JSON 结构化响应解析与基础校验入口
 - `dotnet tool restore` 通过，可恢复本地 `dotnet-ef` 10.0.0
 - `dotnet build Overview.Server/Overview.Server.csproj` 通过，0 warning / 0 error
 - `dotnet build Overview.Client/Overview.Client/Overview.Client.csproj -f net10.0-desktop` 通过，0 warning / 0 error
@@ -287,10 +303,11 @@
 - 已完成客户端事项 CRUD 与设置读写应用层封装，并接入本地待同步变更登记
 - 已完成客户端主页布局计算与时间选择应用层封装，可为后续主页/时间选择 UI 直接提供快照与映射结果
 - 已完成客户端列表应用层封装，支持标签筛选、排序切换、未完成/已完成分组和手动重排顺序持久化
+- 已完成客户端 AI 应用层封装，支持事项摘要检索、请求体组装和结构化响应解析入口
 - 已确认 git 仓库已初始化，当前分支为 `main`，且已配置 `origin`
 - 已修正文档与仓库真实 git 状态不一致的问题
 - 已修正文档内部“阶段编号仍为 2 / 路线仍显示阶段 3 未开始 / SQLite 验收未勾选”的状态偏差
-- 下一步应进入 AI 请求编排与事项摘要检索应用服务
+- 下一步应进入自动同步编排、同步状态机与冲突收敛应用服务
 
 ## 风险与偏差
 
@@ -316,9 +333,9 @@
 
 ## 接手 AI 执行准则
 
-- 优先执行 `APP-440`
+- 优先执行 `APP-450`
 - 除非发现环境或工具限制，否则不要跳到 Presentation、Platform 或 QA 阶段
-- 当前 `APP-430` 已完成，后续应进入 AI 请求编排与事项摘要检索应用服务
+- 当前 `APP-440` 已完成，后续应进入自动同步编排、同步状态机与冲突收敛应用服务
 - 当前客户端根解决方案依赖仓库根目录 `global.json` 提供 `Uno.Sdk` 版本钉住；不要删除
 - 迁移工具通过仓库根目录 `dotnet-tools.json` 固定；后续执行 EF CLI 前先运行 `dotnet tool restore`
 - 只有在尝试补齐环境后仍无法继续时，才允许在 `PROJECT-HANDOFF.md` 标记阻塞

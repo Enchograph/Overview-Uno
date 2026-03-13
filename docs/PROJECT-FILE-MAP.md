@@ -46,6 +46,8 @@
   - 客户端主页应用层目录，包含主页布局快照、跨格分段计算和时间选择映射服务
 - `Overview.Client/Overview.Client/Application/Lists/`
   - 客户端列表应用层目录，包含列表筛选、排序、分组和手动重排应用服务
+- `Overview.Client/Overview.Client/Application/Ai/`
+  - 客户端 AI 应用层目录，包含事项摘要检索、OpenAI 兼容请求体组装和结构化响应解析入口
 - `Overview.Client/Overview.Client/Application/Items/`
   - 客户端事项应用层目录，包含 CRUD、完成状态切换和查询输入模型
 - `Overview.Client/Overview.Client/Application/Settings/`
