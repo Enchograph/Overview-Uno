@@ -22,13 +22,20 @@ public sealed class SqliteAiChatMessageRepository : IAiChatMessageRepository
         cancellationToken.ThrowIfCancellationRequested();
 
         var connection = await connectionFactory.GetConnectionAsync().ConfigureAwait(false);
+        var userIdValue = userId.ToString();
+        var startDateValue = startDate.ToString("O");
+        var endDateValue = endDate.ToString("O");
         var records = await connection.Table<AiChatMessageRecord>()
-            .Where(row => row.UserId == userId.ToString() && string.CompareOrdinal(row.OccurredOn, startDate.ToString("O")) >= 0 && string.CompareOrdinal(row.OccurredOn, endDate.ToString("O")) <= 0)
+            .Where(row => row.UserId == userIdValue)
             .OrderBy(row => row.CreatedAtTicks)
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return records.Select(record => ClientJsonSerializer.Deserialize<AiChatMessage>(record.PayloadJson)).ToArray();
+        return records
+            .Where(record => string.CompareOrdinal(record.OccurredOn, startDateValue) >= 0)
+            .Where(record => string.CompareOrdinal(record.OccurredOn, endDateValue) <= 0)
+            .Select(record => ClientJsonSerializer.Deserialize<AiChatMessage>(record.PayloadJson))
+            .ToArray();
     }
 
     public async Task UpsertAsync(AiChatMessage message, CancellationToken cancellationToken = default)

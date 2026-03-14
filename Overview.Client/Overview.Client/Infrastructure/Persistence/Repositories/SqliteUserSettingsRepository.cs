@@ -17,8 +17,9 @@ public sealed class SqliteUserSettingsRepository : IUserSettingsRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
         var connection = await connectionFactory.GetConnectionAsync().ConfigureAwait(false);
+        var userIdValue = userId.ToString();
         var record = await connection.Table<UserSettingsRecord>()
-            .Where(row => row.UserId == userId.ToString())
+            .Where(row => row.UserId == userIdValue)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 

@@ -17,8 +17,10 @@ public sealed class SqliteItemRepository : IItemRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
         var connection = await connectionFactory.GetConnectionAsync().ConfigureAwait(false);
+        var userIdValue = userId.ToString();
+        var itemIdValue = itemId.ToString();
         var record = await connection.Table<ItemRecord>()
-            .Where(row => row.UserId == userId.ToString() && row.Id == itemId.ToString())
+            .Where(row => row.UserId == userIdValue && row.Id == itemIdValue)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 
@@ -29,8 +31,9 @@ public sealed class SqliteItemRepository : IItemRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
         var connection = await connectionFactory.GetConnectionAsync().ConfigureAwait(false);
+        var userIdValue = userId.ToString();
         var records = await connection.Table<ItemRecord>()
-            .Where(row => row.UserId == userId.ToString())
+            .Where(row => row.UserId == userIdValue)
             .OrderByDescending(row => row.LastModifiedAtTicks)
             .ToListAsync()
             .ConfigureAwait(false);
@@ -60,8 +63,10 @@ public sealed class SqliteItemRepository : IItemRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
         var connection = await connectionFactory.GetConnectionAsync().ConfigureAwait(false);
+        var userIdValue = userId.ToString();
+        var itemIdValue = itemId.ToString();
         await connection.Table<ItemRecord>()
-            .DeleteAsync(row => row.UserId == userId.ToString() && row.Id == itemId.ToString())
+            .DeleteAsync(row => row.UserId == userIdValue && row.Id == itemIdValue)
             .ConfigureAwait(false);
     }
 }

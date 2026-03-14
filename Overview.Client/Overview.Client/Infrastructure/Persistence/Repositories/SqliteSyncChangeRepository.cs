@@ -17,8 +17,9 @@ public sealed class SqliteSyncChangeRepository : ISyncChangeRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
         var connection = await connectionFactory.GetConnectionAsync().ConfigureAwait(false);
+        var userIdValue = userId.ToString();
         var records = await connection.Table<SyncChangeRecord>()
-            .Where(row => row.UserId == userId.ToString() && row.SyncedAtTicks == null)
+            .Where(row => row.UserId == userIdValue && row.SyncedAtTicks == null)
             .OrderBy(row => row.LastModifiedAtTicks)
             .ToListAsync()
             .ConfigureAwait(false);
@@ -55,7 +56,8 @@ public sealed class SqliteSyncChangeRepository : ISyncChangeRepository
         foreach (var changeId in changeIds.Distinct())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var record = await connection.FindAsync<SyncChangeRecord>(changeId.ToString()).ConfigureAwait(false);
+            var changeIdValue = changeId.ToString();
+            var record = await connection.FindAsync<SyncChangeRecord>(changeIdValue).ConfigureAwait(false);
             if (record is null)
             {
                 continue;
