@@ -7,6 +7,8 @@ namespace Overview.Client.Application.Auth;
 
 public sealed class AuthenticationService : IAuthenticationService
 {
+    private static readonly Guid OfflineUserId = Guid.Parse("f12ce825-6fcd-4d3e-98cf-47c3d7ec6f31");
+    private const string OfflineEmail = "offline@overview.local";
     private readonly IAuthRemoteClient authRemoteClient;
     private readonly IAuthSessionStore authSessionStore;
     private readonly IOverviewLogger logger;
@@ -74,6 +76,20 @@ public sealed class AuthenticationService : IAuthenticationService
         return session;
     }
 
+    public async Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default)
+    {
+        var session = new AuthSession
+        {
+            Mode = AuthenticationMode.OfflineLocal,
+            UserId = OfflineUserId,
+            Email = OfflineEmail,
+            RestoredAt = DateTimeOffset.UtcNow
+        };
+
+        await PersistSessionAsync(session, cancellationToken).ConfigureAwait(false);
+        return session;
+    }
+
     public async Task<AuthSession?> RestoreSessionAsync(CancellationToken cancellationToken = default)
     {
         await sessionLock.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -91,18 +107,17 @@ public sealed class AuthenticationService : IAuthenticationService
                 return null;
             }
 
+            if (!storedSession.SupportsRemoteSync)
+            {
+                currentSession = CloneSession(storedSession, restoredAt: DateTimeOffset.UtcNow);
+                logger.LogInformation("Offline authentication session restored for user {UserId}.", storedSession.UserId);
+                await widgetRefreshService.RefreshAsync(currentSession.UserId, cancellationToken).ConfigureAwait(false);
+                return currentSession;
+            }
+
             if (storedSession.AccessTokenExpiresAt > DateTimeOffset.UtcNow)
             {
-                currentSession = new AuthSession
-                {
-                    UserId = storedSession.UserId,
-                    Email = storedSession.Email,
-                    BaseUrl = storedSession.BaseUrl,
-                    AccessToken = storedSession.AccessToken,
-                    RefreshToken = storedSession.RefreshToken,
-                    AccessTokenExpiresAt = storedSession.AccessTokenExpiresAt,
-                    RestoredAt = DateTimeOffset.UtcNow
-                };
+                currentSession = CloneSession(storedSession, restoredAt: DateTimeOffset.UtcNow);
                 logger.LogInformation("Authentication session restored for user {UserId}.", storedSession.UserId);
                 await widgetRefreshService.RefreshAsync(currentSession.UserId, cancellationToken).ConfigureAwait(false);
                 return currentSession;
@@ -141,6 +156,12 @@ public sealed class AuthenticationService : IAuthenticationService
             if (session is null)
             {
                 throw new InvalidOperationException("No authentication session is available.");
+            }
+
+            if (!session.SupportsRemoteSync)
+            {
+                currentSession = CloneSession(session, restoredAt: DateTimeOffset.UtcNow);
+                return currentSession;
             }
 
             var refreshed = await RefreshSessionCoreAsync(session, cancellationToken).ConfigureAwait(false);
@@ -201,6 +222,7 @@ public sealed class AuthenticationService : IAuthenticationService
 
         return new AuthSession
         {
+            Mode = AuthenticationMode.Remote,
             UserId = response.UserId,
             Email = session.Email,
             BaseUrl = session.BaseUrl,
@@ -215,6 +237,7 @@ public sealed class AuthenticationService : IAuthenticationService
     {
         return new AuthSession
         {
+            Mode = AuthenticationMode.Remote,
             UserId = response.UserId,
             Email = NormalizeEmail(email),
             BaseUrl = NormalizeBaseUrl(baseUrl),
@@ -242,5 +265,20 @@ public sealed class AuthenticationService : IAuthenticationService
         }
 
         return baseUrl.Trim().TrimEnd('/');
+    }
+
+    private static AuthSession CloneSession(AuthSession session, DateTimeOffset? restoredAt = null)
+    {
+        return new AuthSession
+        {
+            Mode = session.Mode,
+            UserId = session.UserId,
+            Email = session.Email,
+            BaseUrl = session.BaseUrl,
+            AccessToken = session.AccessToken,
+            RefreshToken = session.RefreshToken,
+            AccessTokenExpiresAt = session.AccessTokenExpiresAt,
+            RestoredAt = restoredAt ?? session.RestoredAt
+        };
     }
 }

@@ -24,6 +24,8 @@ public interface IAuthenticationService
         string password,
         CancellationToken cancellationToken = default);
 
+    Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default);
+
     Task<AuthSession?> RestoreSessionAsync(CancellationToken cancellationToken = default);
 
     Task<AuthSession> RefreshSessionAsync(CancellationToken cancellationToken = default);

@@ -174,6 +174,60 @@ public sealed class SyncOrchestrationServiceTests
         Assert.Equal(SyncLifecycleState.Succeeded, status.State);
     }
 
+    [Fact]
+    public async Task SynchronizeNowAsync_WithOfflineSession_DoesNotHitRemoteSync()
+    {
+        var itemRepository = new InMemoryItemRepository();
+        var settingsRepository = new InMemoryUserSettingsRepository();
+        var changeRepository = new InMemorySyncChangeRepository();
+        var localItem = new Item
+        {
+            Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+            UserId = UserId,
+            Type = ItemType.Task,
+            Title = "Local draft",
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow,
+            LastModifiedAt = DateTimeOffset.UtcNow,
+            SourceDeviceId = "device-a"
+        };
+
+        await changeRepository.UpsertAsync(new SyncChange
+        {
+            UserId = UserId,
+            DeviceId = "device-a",
+            EntityType = SyncEntityType.Item,
+            ChangeType = SyncChangeType.Upsert,
+            EntityId = localItem.Id,
+            ItemSnapshot = localItem,
+            CreatedAt = localItem.CreatedAt,
+            LastModifiedAt = localItem.LastModifiedAt
+        });
+
+        var remoteClient = new ThrowingSyncRemoteClient();
+        var service = new SyncOrchestrationService(
+            new FakeAuthenticationService(new AuthSession
+            {
+                Mode = AuthenticationMode.OfflineLocal,
+                UserId = UserId,
+                Email = "offline@overview.local"
+            }),
+            itemRepository,
+            settingsRepository,
+            changeRepository,
+            remoteClient,
+            new InMemorySyncStateStore(),
+            new FixedDeviceIdStore("device-a"),
+            NullOverviewLoggerFactory.Instance,
+            TimeProvider.System);
+
+        var status = await service.SynchronizeNowAsync();
+
+        Assert.Equal(SyncLifecycleState.Offline, status.State);
+        Assert.Equal(1, status.PendingChangeCount);
+        Assert.False(remoteClient.WasCalled);
+    }
+
     private static TestHarness CreateHarness(
         string deviceId,
         SharedSyncBackend backend,
@@ -181,6 +235,7 @@ public sealed class SyncOrchestrationServiceTests
     {
         var session = new AuthSession
         {
+            Mode = AuthenticationMode.Remote,
             UserId = UserId,
             Email = "sync@example.com",
             BaseUrl = "https://sync.example.com",
@@ -222,6 +277,7 @@ public sealed class SyncOrchestrationServiceTests
     {
         var session = new AuthSession
         {
+            Mode = AuthenticationMode.Remote,
             UserId = UserId,
             Email = "sync@example.com",
             BaseUrl = "https://sync.example.com",
@@ -276,6 +332,11 @@ public sealed class SyncOrchestrationServiceTests
             throw new NotSupportedException();
         }
 
+        public Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(CurrentSession!);
+        }
+
         public Task<AuthSession?> RestoreSessionAsync(CancellationToken cancellationToken = default)
         {
             return Task.FromResult(CurrentSession);
@@ -290,6 +351,23 @@ public sealed class SyncOrchestrationServiceTests
         {
             CurrentSession = null;
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class ThrowingSyncRemoteClient : ISyncRemoteClient
+    {
+        public bool WasCalled { get; private set; }
+
+        public Task<SyncPullResponse> PullAsync(string baseUrl, string accessToken, DateTimeOffset? since = null, CancellationToken cancellationToken = default)
+        {
+            WasCalled = true;
+            throw new NotSupportedException();
+        }
+
+        public Task<SyncPushResponse> PushAsync(string baseUrl, string accessToken, SyncPushRequest request, CancellationToken cancellationToken = default)
+        {
+            WasCalled = true;
+            throw new NotSupportedException();
         }
     }
 

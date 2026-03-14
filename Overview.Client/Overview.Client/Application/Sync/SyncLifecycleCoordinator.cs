@@ -12,7 +12,7 @@ public sealed class SyncLifecycleCoordinator : ISyncLifecycleCoordinator
     public async Task HandleShellLoadedAsync(CancellationToken cancellationToken = default)
     {
         var status = await syncOrchestrationService.InitializeAsync(cancellationToken).ConfigureAwait(false);
-        if (!status.IsAuthenticated)
+        if (!status.IsAuthenticated || status.State == SyncLifecycleState.Offline)
         {
             return;
         }
@@ -23,7 +23,7 @@ public sealed class SyncLifecycleCoordinator : ISyncLifecycleCoordinator
     public async Task HandleWindowActivatedAsync(CancellationToken cancellationToken = default)
     {
         var status = await syncOrchestrationService.InitializeAsync(cancellationToken).ConfigureAwait(false);
-        if (!status.IsAuthenticated)
+        if (!status.IsAuthenticated || status.State == SyncLifecycleState.Offline)
         {
             return;
         }

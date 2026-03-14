@@ -72,6 +72,13 @@
               Style="{StaticResource AccentButtonStyle}" />
 
             <Button
+              x:Name="OfflineButton"
+              Click="OnOfflineButtonClick"
+              Content="Continue Offline"
+              HorizontalAlignment="Stretch"
+              Style="{StaticResource DefaultButtonStyle}" />
+
+            <Button
               x:Name="ToggleModeButton"
               Click="OnToggleModeButtonClick"
               Content="Need an account? Register"

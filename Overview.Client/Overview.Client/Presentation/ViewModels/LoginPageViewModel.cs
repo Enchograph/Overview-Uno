@@ -98,6 +98,22 @@ public sealed class LoginPageViewModel
             }).ConfigureAwait(false);
     }
 
+    public async Task<bool> SubmitOfflineAsync(CancellationToken cancellationToken = default)
+    {
+        return await ExecuteBusyActionAsync(
+            async () =>
+            {
+                var session = await authenticationService.LoginOfflineAsync(cancellationToken).ConfigureAwait(false);
+                BaseUrl = string.Empty;
+                Email = session.Email;
+                Password = string.Empty;
+                VerificationCode = string.Empty;
+                StatusMessage = "Offline mode enabled. Your data stays on this device.";
+                AuthenticationSucceeded?.Invoke(this, session);
+                return true;
+            }).ConfigureAwait(false);
+    }
+
     private async Task<bool> ExecuteBusyActionAsync(Func<Task<bool>> action)
     {
         if (IsBusy)

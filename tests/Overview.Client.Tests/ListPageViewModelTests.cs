@@ -334,12 +334,10 @@ public sealed class ListPageViewModelTests
     {
         public AuthSession? CurrentSession { get; } = new()
         {
+            Mode = AuthenticationMode.OfflineLocal,
             UserId = UserId,
             Email = "test@example.com",
-            BaseUrl = "https://example.com",
-            AccessToken = "token",
-            RefreshToken = "refresh",
-            AccessTokenExpiresAt = DateTimeOffset.UtcNow.AddHours(1)
+            RestoredAt = DateTimeOffset.UtcNow
         };
 
         public bool IsAuthenticated => true;
@@ -355,6 +353,11 @@ public sealed class ListPageViewModelTests
         }
 
         public Task<AuthSession> LoginAsync(string baseUrl, string email, string password, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }

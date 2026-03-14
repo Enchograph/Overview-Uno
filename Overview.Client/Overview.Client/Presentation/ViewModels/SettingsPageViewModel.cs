@@ -77,7 +77,7 @@ public sealed class SettingsPageViewModel
 
     public bool CanSaveAiSettings => IsAuthenticated && !IsBusy;
 
-    public bool CanRunManualSync => IsAuthenticated && !IsBusy;
+    public bool CanRunManualSync => IsAuthenticated && authenticationService.CurrentSession?.SupportsRemoteSync == true && !IsBusy;
 
     public async Task InitializeAsync(
         string? initialSectionKey = null,
@@ -176,8 +176,7 @@ public sealed class SettingsPageViewModel
                     platformCapabilities);
                 ResetSectionDraft(AiSectionKey);
                 DetailFootnote = BuildDetailFootnote(AiSectionKey);
-                SessionSummary =
-                    $"Signed in as {session.Email}. Sync endpoint: {DisplayOrFallback(currentSettings.SyncServerBaseUrl, "not configured")}.";
+                SessionSummary = BuildSessionSummary(session, currentSettings);
                 StatusMessage = "AI settings saved.";
                 return true;
             }).ConfigureAwait(false);
@@ -201,6 +200,7 @@ public sealed class SettingsPageViewModel
                 {
                     SyncLifecycleState.Succeeded => "Manual sync completed.",
                     SyncLifecycleState.Failed => $"Manual sync failed: {snapshot.LastError ?? "Unknown error."}",
+                    SyncLifecycleState.Offline => "Offline mode is active. Sync is unavailable.",
                     SyncLifecycleState.RequiresAuthentication => "Sign in before running sync.",
                     _ => "Manual sync requested."
                 };
@@ -233,10 +233,10 @@ public sealed class SettingsPageViewModel
         Sections = BuildSections(currentSettings, session);
         RootIntro = session is null
             ? "Sign in to configure sync, AI, and planning preferences."
-            : "Select a settings section. Secondary pages already follow the final back-navigation structure.";
-        SessionSummary = session is null
-            ? "Not signed in. Account and sync settings will unlock after login."
-            : $"Signed in as {session.Email}. Sync endpoint: {DisplayOrFallback(currentSettings?.SyncServerBaseUrl, "not configured")}.";
+            : session.SupportsRemoteSync
+                ? "Select a settings section. Secondary pages already follow the final back-navigation structure."
+                : "Offline mode is active. Your data, reminders, and settings stay on this device.";
+        SessionSummary = BuildSessionSummary(session, currentSettings);
     }
 
     private static IReadOnlyList<SettingsSectionEntry> BuildSections(
@@ -286,7 +286,7 @@ public sealed class SettingsPageViewModel
                 Key = "account",
                 Title = "Account",
                 Subtitle = "Current sign-in identity and future account actions.",
-                Summary = session is null ? "Not signed in" : $"{session.Email} · Session active",
+                Summary = session is null ? "Not signed in" : session.SupportsRemoteSync ? $"{session.Email} · Cloud sync active" : $"{session.Email} · Offline local mode",
                 Description = "Review the current account identity before later account-management tasks land."
             },
             new SettingsSectionEntry
@@ -294,9 +294,12 @@ public sealed class SettingsPageViewModel
                 Key = "sync",
                 Title = "Sync",
                 Subtitle = "Server endpoint, sync model, and background status entry.",
-                Summary =
-                    $"Server {DisplayOrFallback(settings?.SyncServerBaseUrl, "not configured")} · Manual sync and live status",
-                Description = "Expose sync configuration and reserve the secondary page for status and manual controls."
+                Summary = session?.SupportsRemoteSync == true
+                    ? $"Server {DisplayOrFallback(settings?.SyncServerBaseUrl, session.BaseUrl)} · Manual sync and live status"
+                    : "Offline mode · Local-only data and sync controls disabled",
+                Description = session?.SupportsRemoteSync == true
+                    ? "Expose sync configuration and reserve the secondary page for status and manual controls."
+                    : "Show that this session stores data locally and does not contact the sync server."
             },
             new SettingsSectionEntry
             {
@@ -358,16 +361,16 @@ public sealed class SettingsPageViewModel
             ],
             "account" =>
             [
-                CreateField("Authentication", session is null ? "Not signed in" : "Signed in"),
+                CreateField("Authentication", session is null ? "Not signed in" : session.SupportsRemoteSync ? "Signed in to sync server" : "Offline local session"),
                 CreateField("Email", session?.Email ?? "Unavailable"),
                 CreateField("User ID", session?.UserId.ToString() ?? "Unavailable"),
-                CreateField("Token Expires At", session?.AccessTokenExpiresAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss zzz") ?? "Unavailable")
+                CreateField("Token Expires At", session?.SupportsRemoteSync == true ? session.AccessTokenExpiresAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss zzz") : "Unavailable in offline mode")
             ],
             "sync" =>
             [
-                CreateField("Sync Server", DisplayOrFallback(settings?.SyncServerBaseUrl, "not configured")),
-                CreateField("Conflict Strategy", "LastModifiedAt last-write-wins"),
-                CreateField("Auto Sync", syncStatus?.IsAutoSyncEnabled == true ? "Running" : "Stopped"),
+                CreateField("Sync Server", session?.SupportsRemoteSync == true ? DisplayOrFallback(settings?.SyncServerBaseUrl, session.BaseUrl) : "Offline mode"),
+                CreateField("Conflict Strategy", session?.SupportsRemoteSync == true ? "LastModifiedAt last-write-wins" : "Not applicable while offline"),
+                CreateField("Auto Sync", session?.SupportsRemoteSync == true ? (syncStatus?.IsAutoSyncEnabled == true ? "Running" : "Stopped") : "Disabled in offline mode"),
                 CreateField("Current State", FormatSyncState(syncStatus)),
                 CreateField("Last Trigger", FormatTrigger(syncStatus?.LastTrigger)),
                 CreateField("Pending Local Changes", (syncStatus?.PendingChangeCount ?? 0).ToString()),
@@ -403,7 +406,7 @@ public sealed class SettingsPageViewModel
         return sectionKey switch
         {
             "ai" => "AI settings now persist to synchronized user settings. Chat delivery will land in the next AI tasks.",
-            "sync" => "Manual sync is a fallback control. Background sync remains the primary path for cross-device convergence.",
+            "sync" => "Manual sync is available only for remote sessions. Offline mode keeps all data on this device.",
             "about" => "This page now records the active platform profile, supported capabilities, and explicit downgrade policy.",
             _ => "This secondary page skeleton is complete. Editable controls will be layered in later focused tasks."
         };
@@ -536,8 +539,21 @@ public sealed class SettingsPageViewModel
             SyncLifecycleState.Succeeded => "Succeeded",
             SyncLifecycleState.Failed => $"Failed ({snapshot.ConsecutiveFailureCount} consecutive)",
             SyncLifecycleState.RequiresAuthentication => "Sign-in required",
+            SyncLifecycleState.Offline => "Offline mode",
             _ => snapshot.State.ToString()
         };
+    }
+
+    private static string BuildSessionSummary(AuthSession? session, UserSettings? settings)
+    {
+        if (session is null)
+        {
+            return "Not signed in. Account and sync settings will unlock after login.";
+        }
+
+        return session.SupportsRemoteSync
+            ? $"Signed in as {session.Email}. Sync endpoint: {DisplayOrFallback(settings?.SyncServerBaseUrl, session.BaseUrl)}."
+            : $"Offline mode active as {session.Email}. Data is stored on this device only.";
     }
 
     private static string FormatTrigger(SyncExecutionTrigger? trigger)

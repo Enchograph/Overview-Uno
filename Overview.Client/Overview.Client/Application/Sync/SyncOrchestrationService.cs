@@ -80,10 +80,16 @@ public sealed class SyncOrchestrationService : ISyncOrchestrationService
             pendingChangeCount = (await syncChangeRepository.ListPendingAsync(session.UserId, cancellationToken).ConfigureAwait(false)).Count;
         }
 
+        var state = session is null
+            ? SyncLifecycleState.RequiresAuthentication
+            : session.SupportsRemoteSync
+                ? SyncLifecycleState.Idle
+                : SyncLifecycleState.Offline;
+
         currentCheckpoint = checkpoint;
         UpdateStatus(new SyncStatusSnapshot
         {
-            State = session is null ? SyncLifecycleState.RequiresAuthentication : SyncLifecycleState.Idle,
+            State = state,
             LastTrigger = checkpoint?.LastTrigger,
             LastAttemptedAt = checkpoint?.LastAttemptedAt,
             LastSuccessfulAt = checkpoint?.LastSuccessfulAt,
@@ -118,6 +124,15 @@ public sealed class SyncOrchestrationService : ISyncOrchestrationService
         }
 
         await InitializeAsync(cancellationToken).ConfigureAwait(false);
+
+        if (authenticationService.CurrentSession is { SupportsRemoteSync: false })
+        {
+            UpdateStatus(CloneCurrentStatus(
+                state: SyncLifecycleState.Offline,
+                isAutoSyncEnabled: false,
+                lastError: "Offline mode does not connect to a sync server."));
+            return CurrentStatus;
+        }
 
         lock (autoSyncGate)
         {
@@ -201,6 +216,20 @@ public sealed class SyncOrchestrationService : ISyncOrchestrationService
                     isAuthenticated: false,
                     lastError: "Authentication session is unavailable."));
 
+                return CurrentStatus;
+            }
+
+            if (!session.SupportsRemoteSync)
+            {
+                var offlinePendingChanges = await syncChangeRepository.ListPendingAsync(session.UserId, cancellationToken).ConfigureAwait(false);
+                UpdateStatus(CloneCurrentStatus(
+                    state: SyncLifecycleState.Offline,
+                    lastTrigger: trigger,
+                    lastAttemptedAt: timeProvider.GetUtcNow(),
+                    pendingChangeCount: offlinePendingChanges.Count,
+                    isAuthenticated: true,
+                    isAutoSyncEnabled: false,
+                    lastError: "Offline mode does not connect to a sync server."));
                 return CurrentStatus;
             }
 

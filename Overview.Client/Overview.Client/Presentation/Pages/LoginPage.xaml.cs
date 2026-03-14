@@ -55,6 +55,14 @@ public sealed partial class LoginPage : Page
         ApplyViewModelState();
     }
 
+    private async void OnOfflineButtonClick(object sender, RoutedEventArgs e)
+    {
+        SyncViewModelFromInputs();
+        ApplyViewModelState();
+        await ViewModel.SubmitOfflineAsync().ConfigureAwait(true);
+        ApplyViewModelState();
+    }
+
     private void OnToggleModeButtonClick(object sender, RoutedEventArgs e)
     {
         SyncViewModelFromInputs();
@@ -94,7 +102,8 @@ public sealed partial class LoginPage : Page
             : "Need an account? Register";
         SubtitleTextBlock.Text = ViewModel.IsRegisterMode
             ? "Create an account, request a code, and complete registration."
-            : "Sign in to sync your plans across devices.";
+            : "Sign in to sync across devices, or continue offline to keep everything local.";
+        OfflineButton.Visibility = ViewModel.IsRegisterMode ? Visibility.Collapsed : Visibility.Visible;
         StatusTextBlock.Text = ViewModel.StatusMessage;
         BusyIndicator.IsActive = ViewModel.IsBusy;
         FormPanel.IsHitTestVisible = !ViewModel.IsBusy;

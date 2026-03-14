@@ -63,6 +63,24 @@ public sealed class AiPageViewModelTests
     }
 
     [Fact]
+    public async Task SendAsync_WithOfflineSession_StillUsesAiService()
+    {
+        var chatService = new FakeAiChatService();
+        var viewModel = new AiPageViewModel(
+            new OfflineAuthenticationService(),
+            chatService,
+            new FakeTimeSelectionService());
+
+        await viewModel.InitializeAsync();
+        viewModel.UpdateDraft("Review my local plan");
+
+        await viewModel.SendAsync();
+
+        Assert.Equal("Review my local plan", chatService.LastSentMessage);
+        Assert.Equal(string.Empty, viewModel.DraftMessage);
+    }
+
+    [Fact]
     public async Task SetSelectionModeAsync_LoadsWeekMessages()
     {
         var chatService = new FakeAiChatService();
@@ -257,6 +275,7 @@ public sealed class AiPageViewModelTests
     {
         public AuthSession? CurrentSession { get; } = new()
         {
+            Mode = AuthenticationMode.Remote,
             UserId = UserId,
             Email = "ai@example.com",
             BaseUrl = "https://sync.example.com",
@@ -278,6 +297,11 @@ public sealed class AiPageViewModelTests
         }
 
         public Task<AuthSession> LoginAsync(string baseUrl, string email, string password, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
         }
@@ -319,6 +343,11 @@ public sealed class AiPageViewModelTests
             throw new NotSupportedException();
         }
 
+        public Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
         public Task<AuthSession?> RestoreSessionAsync(CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
@@ -333,5 +362,26 @@ public sealed class AiPageViewModelTests
         {
             throw new NotSupportedException();
         }
+    }
+
+    private sealed class OfflineAuthenticationService : IAuthenticationService
+    {
+        public AuthSession? CurrentSession { get; } = new()
+        {
+            Mode = AuthenticationMode.OfflineLocal,
+            UserId = UserId,
+            Email = "offline@overview.local",
+            RestoredAt = new DateTimeOffset(2026, 3, 13, 8, 0, 0, TimeSpan.Zero)
+        };
+
+        public bool IsAuthenticated => true;
+
+        public Task<VerificationCodeDispatchResult> SendVerificationCodeAsync(string baseUrl, string email, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<AuthSession> RegisterAsync(string baseUrl, string email, string password, string verificationCode, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<AuthSession> LoginAsync(string baseUrl, string email, string password, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default) => Task.FromResult(CurrentSession!);
+        public Task<AuthSession?> RestoreSessionAsync(CancellationToken cancellationToken = default) => Task.FromResult(CurrentSession);
+        public Task<AuthSession> RefreshSessionAsync(CancellationToken cancellationToken = default) => Task.FromResult(CurrentSession!);
+        public Task LogoutAsync(CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 }

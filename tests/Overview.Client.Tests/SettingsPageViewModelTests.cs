@@ -141,6 +141,29 @@ public sealed class SettingsPageViewModelTests
         Assert.Contains(viewModel.ActiveFields, field => field.Label == "Applied Changes" && field.Value == "5");
     }
 
+    [Fact]
+    public async Task InitializeAsync_WithOfflineSession_DisablesManualSync()
+    {
+        var viewModel = new SettingsPageViewModel(
+            new OfflineAuthenticationService(),
+            new FakeUserSettingsService(),
+            new FakeSyncOrchestrationService
+            {
+                CurrentStatusSnapshot = new SyncStatusSnapshot
+                {
+                    State = SyncLifecycleState.Offline,
+                    PendingChangeCount = 3
+                }
+            },
+            new FakePlatformCapabilities());
+
+        await viewModel.InitializeAsync(SettingsPageViewModel.SyncSectionKey);
+
+        Assert.False(viewModel.CanRunManualSync);
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Sync Server" && field.Value == "Offline mode");
+        Assert.Contains(viewModel.ActiveFields, field => field.Label == "Auto Sync" && field.Value == "Disabled in offline mode");
+    }
+
     private static SettingsPageViewModel CreateViewModel()
     {
         return new SettingsPageViewModel(
@@ -178,6 +201,7 @@ public sealed class SettingsPageViewModelTests
     {
         public AuthSession? CurrentSession { get; } = new()
         {
+            Mode = AuthenticationMode.Remote,
             UserId = UserId,
             Email = "list@example.com",
             BaseUrl = "https://sync.example.com",
@@ -203,6 +227,11 @@ public sealed class SettingsPageViewModelTests
             throw new NotSupportedException();
         }
 
+        public Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
         public Task<AuthSession?> RestoreSessionAsync(CancellationToken cancellationToken = default)
         {
             throw new NotSupportedException();
@@ -217,6 +246,27 @@ public sealed class SettingsPageViewModelTests
         {
             throw new NotSupportedException();
         }
+    }
+
+    private sealed class OfflineAuthenticationService : IAuthenticationService
+    {
+        public AuthSession? CurrentSession { get; } = new()
+        {
+            Mode = AuthenticationMode.OfflineLocal,
+            UserId = UserId,
+            Email = "offline@overview.local",
+            RestoredAt = new DateTimeOffset(2026, 3, 13, 8, 0, 0, TimeSpan.Zero)
+        };
+
+        public bool IsAuthenticated => true;
+
+        public Task<VerificationCodeDispatchResult> SendVerificationCodeAsync(string baseUrl, string email, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<AuthSession> RegisterAsync(string baseUrl, string email, string password, string verificationCode, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<AuthSession> LoginAsync(string baseUrl, string email, string password, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public Task<AuthSession> LoginOfflineAsync(CancellationToken cancellationToken = default) => Task.FromResult(CurrentSession!);
+        public Task<AuthSession?> RestoreSessionAsync(CancellationToken cancellationToken = default) => Task.FromResult(CurrentSession);
+        public Task<AuthSession> RefreshSessionAsync(CancellationToken cancellationToken = default) => Task.FromResult(CurrentSession!);
+        public Task LogoutAsync(CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 
     private sealed class FakeUserSettingsService : IUserSettingsService

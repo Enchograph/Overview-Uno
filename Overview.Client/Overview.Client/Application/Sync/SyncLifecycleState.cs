@@ -6,5 +6,6 @@ public enum SyncLifecycleState
     Running = 1,
     Succeeded = 2,
     Failed = 3,
-    RequiresAuthentication = 4
+    RequiresAuthentication = 4,
+    Offline = 5
 }
